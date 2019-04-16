@@ -9,8 +9,8 @@ import pandas
 
 
 class WebCrawling:
-    logging.basicConfig(format='%(asctime)s %(message)s',
-                        datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
+    logging.basicConfig(filename='WebCrawling.log', format='%(asctime)s %(levelname)s %(message)s',
+                        datefmt='%Y-%m-%d %H:%M:%S ', level=logging.INFO)
 
     def __init__(self):
         self.browser = webdriver.Safari()
@@ -26,7 +26,7 @@ class WebCrawling:
 
     def reFormatText(self, text):
         # Trim space, remove line break, remove double space
-        return re.sub(' +', ' ', text.replace('\n', ' ').replace('\r', '').replace(',', '').strip())
+        return re.sub(' +', ' ', text.replace('\n', ' ').replace('\r', '').replace(',', '').replace('HK$ ','').strip())
 
     def getHistory(self, day, racecource, raceno):
         url_base = 'https://racing.hkjc.com/racing/information/English/Racing/LocalResults.aspx?'
@@ -35,7 +35,7 @@ class WebCrawling:
         url_raceNo = '&RaceNo=' + raceno
         url = url_base + url_raceDate + url_raceCourse + url_raceNo
 
-        logging.info('Access Url: %s', url)
+        logging.debug('Access Url: %s', url)
 
         html_source = self.request(url)
 
@@ -92,31 +92,42 @@ matchCSV = pandas.DataFrame(matchCSV)
 
 try:
     # initial webCrawling
+    logging.info('Initital Web Crawling - Launch Selenium Browser')
     webCrawling = WebCrawling()
 
     for index, row in matchCSV.iterrows():
 
         for matchIndex in range(row['RaceNo']):
             # Logic for debug use,
-            if matchIndex > 2:
-                break
+            # if matchIndex > 2:
+            #     break
             
             day = '{:0>4d}'.format(row['RaceDate1']) + '/' + '{:0>2d}'.format(
                 row['RaceDate2']) + '/' + '{:0>2d}'.format(row['RaceDate3'])
             racecource = row['Racecourse']
             raceno = str(matchIndex + 1)
-            # logging.info('day = %s, racecource=%s, raceno = %s ',
-            #  day, racecource, raceno)
+
+            logging.info('Access web with parameters, day = %s, racecource=%s, raceno = %s ',
+             day, racecource, raceno)
+
             temp_history = webCrawling.getHistory(day, racecource, raceno)
-            logging.info(temp_history)
+            logging.info('Get history record with shpe: %s', numpy.shape(temp_history))
+
             history = numpy.concatenate((history, temp_history), axis=0)
+            logging.info('Added to history list')
         else:
             continue
         break
 
 
 except Exception as ex:
-    logging.error(ex)
+
+    logging.error('Exception found %s', ex)
 finally:
+
+    logging.info('Close Selenium Browser')
     webCrawling.close()
+
+    logging.info('Ready to write csv with histroy shape: %s',numpy.shape(history))
     numpy.savetxt('history.csv', history, delimiter=',', fmt='%s')
+    logging.info('Finished write csv')
