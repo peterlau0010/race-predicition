@@ -1,4 +1,8 @@
 from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
 # from selenium.webdriver.chrome.options import Options
 import bs4
 import logging
@@ -20,13 +24,22 @@ class WebCrawling:
 
     def request(self, url):
         self.browser.get(url)
-        time.sleep(5)
-        html_source = bs4.BeautifulSoup(self.browser.page_source, 'lxml')
-        return html_source
+        try:
+            page_source = WebDriverWait(self.browser, 10).until(
+                EC.presence_of_element_located((By.XPATH, "/html/body/div/div[5]/table")))
+            html_source = bs4.BeautifulSoup(self.browser.page_source, 'lxml')
+            return html_source
+        except TimeoutException as ex:
+            logging.error('Loading took too much time!')
+            logging.error('Exception found %s', ex)
+            logging.error('URL with %s', url)
+            return
+
+        # time.sleep(10)
 
     def reFormatText(self, text):
         # Trim space, remove line break, remove double space
-        return re.sub(' +', ' ', text.replace('\n', ' ').replace('\r', '').replace(',', '').replace('HK$ ','').strip())
+        return re.sub(' +', ' ', text.replace('\n', ' ').replace('\r', '').replace(',', '').replace('HK$ ', '').strip())
 
     def getHistory(self, day, racecource, raceno):
         url_base = 'https://racing.hkjc.com/racing/information/English/Racing/LocalResults.aspx?'
@@ -39,14 +52,17 @@ class WebCrawling:
 
         html_source = self.request(url)
 
+        # Initital history list
+        history = []
+        history_header = []
+        if html_source is None:
+            history = numpy.zeros(shape=(0, 21))
+            return history
+
         table = html_source.find(
             name='table', class_='f_tac table_bd draggable')
 
         matchDetail = html_source.find(name='tbody', class_='f_fs13')
-
-        # Initital history list
-        history = []
-        history_header = []
 
         # Add Index value to history
         history_header.append(day)
@@ -74,8 +90,12 @@ class WebCrawling:
 
         logging.debug('Before reFormat, Shape of Histroy: %s',
                       numpy.shape(history))
-
-        history = numpy.reshape(history, (-1, 21))
+        try:
+            history = numpy.reshape(history, (-1, 21))
+        except Exception as ex:
+            logging.error('Exception found %s', ex)
+            history = numpy.zeros(shape=(0, 21))
+            return history
 
         logging.debug('After reFormat, Shape of Histroy: %s',
                       numpy.shape(history))
@@ -101,17 +121,18 @@ try:
             # Logic for debug use,
             # if matchIndex > 2:
             #     break
-            
+
             day = '{:0>4d}'.format(row['RaceDate1']) + '/' + '{:0>2d}'.format(
                 row['RaceDate2']) + '/' + '{:0>2d}'.format(row['RaceDate3'])
             racecource = row['Racecourse']
             raceno = str(matchIndex + 1)
 
             logging.info('Access web with parameters, day = %s, racecource=%s, raceno = %s ',
-             day, racecource, raceno)
+                         day, racecource, raceno)
 
             temp_history = webCrawling.getHistory(day, racecource, raceno)
-            logging.info('Get history record with shpe: %s', numpy.shape(temp_history))
+            logging.info('Get history record with shpe: %s',
+                         numpy.shape(temp_history))
 
             history = numpy.concatenate((history, temp_history), axis=0)
             logging.info('Added to history list')
@@ -128,6 +149,7 @@ finally:
     logging.info('Close Selenium Browser')
     webCrawling.close()
 
-    logging.info('Ready to write csv with histroy shape: %s',numpy.shape(history))
+    logging.info('Ready to write csv with histroy shape: %s',
+                 numpy.shape(history))
     numpy.savetxt('history.csv', history, delimiter=',', fmt='%s')
     logging.info('Finished write csv')
