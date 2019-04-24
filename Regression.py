@@ -16,28 +16,48 @@ import matplotlib.pyplot as plt
 import time
 
 dist = '1200M'
+going = 'GOOD'
 
 # Read CSV file
 data = pd.read_csv('history_bak.csv', header=0)
 data = data.iloc[::-1]
 print(np.shape(data))
 
+# Group category
+data.loc[data['class'].str.contains('Class 2'), 'class'] = 'Class 2'
+data.loc[data['class'].str.contains('Class 3'), 'class'] = 'Class 3'
+data.loc[data['class'].str.contains('Class 4'), 'class'] = 'Class 4'
+data.loc[data['road'].str.contains('"A+'), 'road'] = 'TURF - "A" Course'
+data.loc[data['road'].str.contains('"B+'), 'road'] = 'TURF - "B" Course'
+data.loc[data['road'].str.contains('"C+'), 'road'] = 'TURF - "C" Course'
+
 # Remove '---' value
 data = data[data.finishTime != '---']
 data = data[data.awt != '---']
 data = data[data.dhw != '---']
+data = data[(data['class'] == 'Class 2') | (
+    data['class'] == 'Class 3') | (data['class'] == 'Class 4') | (data['class'] == 'Class 5') | (data['class'] == 'Class 1')]
 
-# Group category
-data.loc[ data['class'].str.contains('Class 2'), 'class'] = 'Class 2'
-data.loc[ data['class'].str.contains('Class 3'), 'class'] = 'Class 3'
-data.loc[ data['class'].str.contains('Class 4'), 'class'] = 'Class 4'
-data.loc[ data['road'].str.contains('"A+'), 'road'] = 'TURF - "A" Course'
-data.loc[ data['road'].str.contains('"B+'), 'road'] = 'TURF - "B" Course'
-data.loc[ data['road'].str.contains('"C+'), 'road'] = 'TURF - "C" Course'
-print(np.shape(data))
+data = data[(data['trainer'] != 'J M Moore') & (
+    data['trainer'] != 'M C Tam') & (data['trainer'] != 'P Leyshan') & (data['trainer'] != 'S H Cheong') & (data['trainer'] != 'W H Tse') & (data['trainer'] != 'Y C Fung') & (data['trainer'] != 'K C Chong')]
+
+jockeylist = data['jockey'].value_counts()
+jockeylist = jockeylist[jockeylist > 300]
+data = data[data['jockey'].isin(jockeylist.index.values.tolist())]
+
+trainerlist = data['trainer'].value_counts()
+trainerlist = trainerlist[trainerlist > 30]
+data = data[data['trainer'].isin(trainerlist.index.values.tolist())]
+
+# print(data.head())
+# data.groupby('trainer')['horseName'].nunique().plot(kind='bar')
+# plt.show()
+# exit()
+
 
 # Match information
-data = data[ data.dist == dist]
+# data = data[data.dist == dist]
+# data = data[data.going == going]
 
 
 # Prepare reformat data
@@ -60,21 +80,23 @@ reformat_data = pd.get_dummies(
 reformat_data = pd.get_dummies(
     reformat_data, columns=['trainer'], prefix=['trainer'])
 reformat_data = pd.get_dummies(reformat_data, columns=[
-                               'draw'], prefix=['draw'])
+    'draw'], prefix=['draw'])
 reformat_data = pd.get_dummies(
     reformat_data, columns=['class'], prefix=['class'])
 # reformat_data = pd.get_dummies(reformat_data, columns=[
 #     'money'], prefix=['money'])
 reformat_data = pd.get_dummies(reformat_data, columns=[
-                               'road'], prefix=['road'])
-# reformat_data = pd.get_dummies(reformat_data, columns=[
-#                                'dist'], prefix=['dist'])
+    'road'], prefix=['road'])
+reformat_data = pd.get_dummies(reformat_data, columns=[
+                               'dist'], prefix=['dist'])
 # reformat_data = pd.get_dummies(reformat_data, columns=[
 #                                'awt'], prefix=['awt'])
+# reformat_data = pd.get_dummies(reformat_data, columns=[
+#                                'horseName'], prefix=['horseName'])
 
 # Split train and test
 X = reformat_data.drop(['finishTime', 'date', 'raceNo', 'raceName',
-                        'plc', 'horseNo', 'lbw', 'runPos', 'odds','horseName','money','dist'], axis=1)
+                        'plc', 'horseNo', 'lbw', 'runPos', 'odds', 'horseName', 'money', ], axis=1)
 y = reformat_data['finishTime']
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.05, shuffle=False)
@@ -113,4 +135,3 @@ headers = 'date,raceCource,raceNo,going,raceName,road,money,class,dist,plc,horse
 
 np.savetxt('regression_report.csv', X_test_original.round(0),
            delimiter=',', fmt='%s', header=headers)
-
