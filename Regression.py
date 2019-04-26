@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn import datasets, linear_model
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 
 from sklearn import datasets, linear_model
@@ -19,7 +20,7 @@ dist = '1200M'
 going = 'GOOD'
 
 # Read CSV file
-data = pd.read_csv('history_bak.csv', header=0)
+data = pd.read_csv('history_adv.csv', header=0)
 data = data.iloc[::-1]
 print(np.shape(data))
 
@@ -49,6 +50,15 @@ trainerlist = data['trainer'].value_counts()
 trainerlist = trainerlist[trainerlist > 30]
 data = data[data['trainer'].isin(trainerlist.index.values.tolist())]
 
+Damlist = data['Dam'].value_counts()
+Damlist = Damlist[Damlist > 5]
+data = data[data['Dam'].isin(Damlist.index.values.tolist())]
+
+Sirelist = data['Sire'].value_counts()
+Sirelist = Sirelist[Sirelist > 5]
+data = data[data['Sire'].isin(Sirelist.index.values.tolist())]
+
+
 # print(data.head())
 # data.groupby('trainer')['horseName'].nunique().plot(kind='bar')
 # plt.show()
@@ -68,7 +78,7 @@ reformat_data['finishTime'] = (pd.to_datetime(
     reformat_data['finishTime'], format="%M:%S.%f") - datetime(1900, 1, 1))/timedelta(milliseconds=1)
 
 X_train_original, X_test_original, y_train_original, y_test_original = train_test_split(
-    reformat_data, reformat_data, test_size=0.05, shuffle=False)
+    reformat_data, reformat_data, test_size=0.10)
 
 # Process Category data
 reformat_data = pd.get_dummies(
@@ -89,22 +99,32 @@ reformat_data = pd.get_dummies(reformat_data, columns=[
     'road'], prefix=['road'])
 reformat_data = pd.get_dummies(reformat_data, columns=[
                                'dist'], prefix=['dist'])
-# reformat_data = pd.get_dummies(reformat_data, columns=[
-#                                'awt'], prefix=['awt'])
-# reformat_data = pd.get_dummies(reformat_data, columns=[
-#                                'horseName'], prefix=['horseName'])
+reformat_data = pd.get_dummies(reformat_data, columns=[
+                               'Country Of Origin'], prefix=['Country Of Origin'])
+reformat_data = pd.get_dummies(reformat_data, columns=[
+                               'Dam'], prefix=['Dam'])
+reformat_data = pd.get_dummies(reformat_data, columns=[
+                               'Sire'], prefix=['Sire'])
+reformat_data = pd.get_dummies(reformat_data, columns=[
+                               'Import Type'], prefix=['Import Type'])
 
+reformat_data = pd.get_dummies(reformat_data, columns=[
+                               '# Age'], prefix=['# Age'])
 # Split train and test
 X = reformat_data.drop(['finishTime', 'date', 'raceNo', 'raceName',
-                        'plc', 'horseNo', 'lbw', 'runPos', 'odds', 'horseName', 'money', ], axis=1)
+                        'plc', 'horseNo', 'lbw', 'runPos', 'odds', 'horseName', 'money','Chinese Name','English Name','Code','Foaling Date','Former Name','_id','code' ], axis=1)
 y = reformat_data['finishTime']
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.05, shuffle=False)
+    X, y, test_size=0.10)
 
 print(X_train.columns.values)
 
 # Create linear regression object
 regr = linear_model.LinearRegression()
+
+# Create RandomForestRegressor
+regr = RandomForestRegressor(max_depth=2, random_state=0,
+                             n_estimators=100)
 
 # Train the model using the training sets
 regr.fit(X_train, y_train)
@@ -130,8 +150,7 @@ plt.show()
 X_test_original['p_finishTime'] = y_pred
 
 # print(X_test_original.head())
-
-headers = 'date,raceCource,raceNo,going,raceName,road,money,class,dist,plc,horseNo,horseName,jockey,trainer,awt,dhw,draw,lbw,runPos,finishTime,odds,p_finishTime'
+headers = ','.join(map(str, X_test_original.columns.values))
 
 np.savetxt('regression_report.csv', X_test_original.round(0),
            delimiter=',', fmt='%s', header=headers)
