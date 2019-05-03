@@ -4,7 +4,7 @@ from sklearn import datasets, linear_model
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.preprocessing import StandardScaler
-
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 
 from sklearn.linear_model import LinearRegression
 from datetime import datetime, timedelta
@@ -17,7 +17,8 @@ from sklearn import preprocessing
 import matplotlib.pyplot as plt
 import time
 import logging
-from sklearn.preprocessing import MinMaxScaler 
+from sklearn.preprocessing import MinMaxScaler
+
 
 class Regression:
 
@@ -26,24 +27,68 @@ class Regression:
 
     def __init__(self, data):
         self.data = data
+        self.originaldata = data
 
     def removeEmpty(self):
         # Group category
-        self.data.loc[self.data['class'].str.contains('Class 2'), 'class'] = 'Class 2'
-        self.data.loc[self.data['class'].str.contains('Class 3'), 'class'] = 'Class 3'
-        self.data.loc[self.data['class'].str.contains('Class 4'), 'class'] = 'Class 4'
-        self.data.loc[self.data['road'].str.contains('"A+'), 'road'] = 'TURF - "A" Course'
-        self.data.loc[self.data['road'].str.contains('"B+'), 'road'] = 'TURF - "B" Course'
-        self.data.loc[self.data['road'].str.contains('"C+'), 'road'] = 'TURF - "C" Course'
+        self.data.loc[self.data['class'].str.contains(
+            'Class 2'), 'class'] = 'Class 2'
+        self.data.loc[self.data['class'].str.contains(
+            'Class 3'), 'class'] = 'Class 3'
+        self.data.loc[self.data['class'].str.contains(
+            'Class 4'), 'class'] = 'Class 4'
+        self.data.loc[self.data['road'].str.contains(
+            '"A+'), 'road'] = 'TURF - "A" Course'
+        self.data.loc[self.data['road'].str.contains(
+            '"B+'), 'road'] = 'TURF - "B" Course'
+        self.data.loc[self.data['road'].str.contains(
+            '"C+'), 'road'] = 'TURF - "C" Course'
 
         # Remove '---' value
         self.data = self.data[self.data.finishTime != '---']
-        print(self.data.info())
+        # print(self.data.info())
+
+        # Covert finishTime from string to float
+        self.data['finishTime'] = (pd.to_datetime(
+            self.data['finishTime'], format="%M:%S.%f") - datetime(1900, 1, 1))/timedelta(milliseconds=1)
+
+        # Remove used col
+        self.data = self.data.drop(['date', 'raceNo', 'raceName',
+                                    'plc', 'horseNo', 'lbw', 'runPos', 'odds', 'horseName', 'money', 'code'], axis=1)
+
+        # Process Category data
+        self.data = pd.get_dummies(
+            self.data, columns=['raceCource'], prefix=['raceCource'])
+        self.data = pd.get_dummies(
+            self.data, columns=['going'], prefix=['going'])
+        self.data = pd.get_dummies(self.data, columns=[
+            'draw'], prefix=['draw'])
+        self.data = pd.get_dummies(
+            self.data, columns=['jockey'], prefix=['jockey'])
+        self.data = pd.get_dummies(
+            self.data, columns=['trainer'], prefix=['trainer'])
+        self.data = pd.get_dummies(self.data, columns=[
+            'road'], prefix=['road'])
+        self.data = pd.get_dummies(self.data, columns=[
+            'dist'], prefix=['dist'])
+        self.data = pd.get_dummies(self.data, columns=[
+            'class'], prefix=['class'])
+
+        # self.data.info()
+
+        headers = ','.join(map(str, self.data.columns.values))
+        np.savetxt('processedData.csv', self.data,
+                   delimiter=',', fmt='%s', header=headers)
+
         return self.data
 
     def standardizeData(self):
-        
+        headers = ','.join(map(str, self.data.columns.values))
+
         self.data = preprocessing.scale(self.data)
+
+        np.savetxt('processedData.csv', self.data,
+                   delimiter=',', fmt='%s', header=headers)
         return self.data
 
 
@@ -55,8 +100,22 @@ r = Regression(data)
 r.removeEmpty()
 logging.debug(np.shape(r.data))
 
-# r.standardizeData()
-# print(r.data.head())
+X = r.data.drop(['finishTime'], axis=1)
+y = r.data['finishTime']
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.01, random_state=0)
+
+sc_X = StandardScaler()
+print(X_train)
+X_train = sc_X.fit_transform(X_train)
+X_test = sc_X.transform(X_test)
+print(X_train)
+sc_y = StandardScaler()
+y_train = y_train.values.reshape((len(y_train), 1))
+y_train = sc_y.fit_transform(y_train)
+y_train = y_train.ravel()
+
 # # Group category
 # data.loc[data['class'].str.contains('Class 2'), 'class'] = 'Class 2'
 # data.loc[data['class'].str.contains('Class 3'), 'class'] = 'Class 3'
@@ -142,25 +201,25 @@ logging.debug(np.shape(r.data))
 # scaler = MinMaxScaler()
 # X_train_scaled = scaler.fit_transform(X_train)
 
-# model = linear_model.LinearRegression()
-# model.fit(X_train_scaled, y_train)
+model = linear_model.LinearRegression()
+model.fit(X_train, y_train)
 
 # X_test_scaled = scaler.transform(X_test)
-# y_pred = model.predict(X_test_scaled)
+y_pred = model.predict(X_test)
 
-# # The coefficients
-# # print('Coefficients: \n', regr.coef_)
-# # The mean squared error
-# print("Mean squared error: %.2f"
-#       % mean_squared_error(y_test, y_pred))
-# # Explained variance score: 1 is perfect prediction
-# print('Variance score: %.2f' % r2_score(y_test, y_pred))
+# The coefficients
+# print('Coefficients: \n', regr.coef_)
+# The mean squared error
+print("Mean squared error: %.2f"
+      % mean_squared_error(y_test, y_pred))
+# Explained variance score: 1 is perfect prediction
+print('Variance score: %.2f' % r2_score(y_test, y_pred))
 # # Plot outputs
 
-# # plt.scatter(y_test, y_pred)
-# # plt.ylim(68000, 73000)
-# # plt.xlim(68000, 73000)
-# # plt.show()
+plt.scatter(y_test, y_pred)
+# plt.ylim(68000, 73000)
+# plt.xlim(68000, 73000)
+plt.show()
 
 # X_test_original['p_finishTime'] = y_pred
 
