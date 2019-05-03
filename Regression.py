@@ -18,12 +18,12 @@ import matplotlib.pyplot as plt
 import time
 import logging
 from sklearn.preprocessing import MinMaxScaler
-
+import seaborn as sns
 
 class Regression:
 
     logging.basicConfig(filename='WebCrawling.log', format='%(asctime)s %(levelname)s %(message)s',
-                        datefmt='%Y-%m-%d %H:%M:%S ', level=logging.DEBUG)
+                        datefmt='%Y-%m-%d %H:%M:%S ', level=logging.INFO)
 
     def __init__(self, data):
         self.data = data
@@ -92,29 +92,149 @@ class Regression:
         return self.data
 
 
-# Read CSV file
-data = pd.read_csv('history_bak.csv', header=0)
-logging.debug(np.shape(data))
+raceCource = 'ST'
+classes = 'Class 5'
+dist = '1200M'
 
-r = Regression(data)
-r.removeEmpty()
-logging.debug(np.shape(r.data))
+# ========= Read CSV file =========
+data = pd.read_csv('history_adv.csv', header=0)
+data = data.iloc[::-1]
+logging.info('Original CSV Size, %s', str(np.shape(data)))
 
-X = r.data.drop(['finishTime'], axis=1)
-y = r.data['finishTime']
 
+# ========= Group data =========
+data.loc[data['class'].str.contains('Class 2'), 'class'] = 'Class 2'
+data.loc[data['class'].str.contains('Class 3'), 'class'] = 'Class 3'
+data.loc[data['class'].str.contains('Class 4'), 'class'] = 'Class 4'
+data = data[(data['class'] == 'Class 2') | (
+    data['class'] == 'Class 3') | (data['class'] == 'Class 4') | (data['class'] == 'Class 5') | (data['class'] == 'Class 1')]
+data.loc[data['road'].str.contains('"A+'), 'road'] = 'TURF - "A" Course'
+data.loc[data['road'].str.contains('"B+'), 'road'] = 'TURF - "B" Course'
+data.loc[data['road'].str.contains('"C+'), 'road'] = 'TURF - "C" Course'
+
+
+# ========= Remove '---' value in finishTime =========
+data = data[data.finishTime != '---']
+
+
+# ========= Convert finishTime from String to float =========
+data['finishTime'] = (pd.to_datetime(
+    data['finishTime'], format="%M:%S.%f") - datetime(1900, 1, 1))/timedelta(milliseconds=1)
+
+
+# ========= Remove Useless data =========
+data = data[(data['dist']==dist)]
+# data = data[(data['class']==classes)]
+# data = data[(data['raceCource']==raceCource)]
+
+
+# ========= Remove outlier data =========
+q = data["finishTime"].quantile(0.99)
+data = data[data["finishTime"] < q]
+
+
+
+data_original = data.copy()
+
+data = data[['dist', 'draw', 'finishTime','going','class','# Age']]
+
+logging.info('Selected CSV Size, %s', str(np.shape(data)))
+
+
+# ========= Convert Categories to 0 1 =========
+data = pd.get_dummies(data, columns=[
+    'dist'], prefix=['dist'])
+
+# data = pd.get_dummies(data, columns=[
+#     'draw'], prefix=['draw'])    
+
+data = pd.get_dummies(
+    data, columns=['going'], prefix=['going'])
+
+data = pd.get_dummies(
+    data, columns=['class'], prefix=['class'])    
+# data = pd.get_dummies(
+    # data, columns=['Country Of Origin'], prefix=['Country Of Origin'])    
+# data = pd.get_dummies(
+    # data, columns=['Sire'], prefix=['Sire'])    
+logging.info('After converted categories Size, %s', str(np.shape(data)))
+# logging.info('\n {}'.format(data.head()))
+
+
+
+# ========= Prepare X Y =========
+X = data.drop(['finishTime'], axis=1)
+y = data[['finishTime']]
+
+# ========= split train and test =========
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.01, random_state=0)
+    X, y, test_size=0.20, shuffle=False)
 
-sc_X = StandardScaler()
-print(X_train)
-X_train = sc_X.fit_transform(X_train)
-X_test = sc_X.transform(X_test)
-print(X_train)
-sc_y = StandardScaler()
-y_train = y_train.values.reshape((len(y_train), 1))
-y_train = sc_y.fit_transform(y_train)
-y_train = y_train.ravel()
+# ========= Standardization for data =========
+scalerX = StandardScaler().fit(X_train)
+scalery = StandardScaler().fit(y_train)
+X_train = scalerX.transform(X_train)
+y_train = scalery.transform(y_train)
+X_test = scalerX.transform(X_test)
+# y_test = scalery.transform(y_test)
+
+# X_train = scalerX.fit_transform(X_train)
+# X_test = scalery.fit_transform(X_test)
+
+
+# ========= Regression Model =========
+model = linear_model.LinearRegression()
+model.fit(X_train, y_train)
+
+# ========= Prediction =========
+y_pred = model.predict(X_test)
+
+
+y_pred = scalery.inverse_transform(y_pred)
+logging.info(y_pred[:5])
+logging.info(y_test[:5])
+
+
+# The coefficients
+# print('Coefficients: \n', model.coef_)
+# The mean squared error
+logging.info("Mean squared error: %.2f"
+             % mean_squared_error(y_test, y_pred))
+# Explained variance score: 1 is perfect prediction
+logging.info('Variance score: %.2f' % r2_score(y_test, y_pred))
+
+
+X_test = scalerX.inverse_transform(X_test)
+print(np.shape(y_test))
+print(np.shape(y_pred))
+print(np.shape(X_test))
+y_test['y_pred'] = y_pred
+# print(y_test)
+df_out = pd.merge(data_original,y_test,how = 'left',left_index = True, right_index = True)
+df_out["Rank"] = df_out.groupby(['date','raceNo'])["y_pred"].rank() 
+
+headers = ','.join(map(str, df_out.columns.values))
+np.savetxt('regression_report.csv', df_out.round(0),
+           delimiter=',', fmt='%s', header=headers)
+# r = Regression(data)
+# r.removeEmpty()
+# logging.debug(np.shape(r.data))
+
+# X = r.data.drop(['finishTime'], axis=1)
+# y = r.data['finishTime']
+
+# X_train, X_test, y_train, y_test = train_test_split(
+#     X, y, test_size=0.01, random_state=0)
+
+# sc_X = StandardScaler()
+# print(X_train)
+# X_train = sc_X.fit_transform(X_train)
+# X_test = sc_X.transform(X_test)
+# print(X_train)
+# sc_y = StandardScaler()
+# y_train = y_train.values.reshape((len(y_train), 1))
+# y_train = sc_y.fit_transform(y_train)
+# y_train = y_train.ravel()
 
 # # Group category
 # data.loc[data['class'].str.contains('Class 2'), 'class'] = 'Class 2'
@@ -201,25 +321,25 @@ y_train = y_train.ravel()
 # scaler = MinMaxScaler()
 # X_train_scaled = scaler.fit_transform(X_train)
 
-model = linear_model.LinearRegression()
-model.fit(X_train, y_train)
+# model = linear_model.LinearRegression()
+# model.fit(X_train, y_train)
 
 # X_test_scaled = scaler.transform(X_test)
-y_pred = model.predict(X_test)
+# y_pred = model.predict(X_test)
 
 # The coefficients
 # print('Coefficients: \n', regr.coef_)
 # The mean squared error
-print("Mean squared error: %.2f"
-      % mean_squared_error(y_test, y_pred))
-# Explained variance score: 1 is perfect prediction
-print('Variance score: %.2f' % r2_score(y_test, y_pred))
+# print("Mean squared error: %.2f"
+#       % mean_squared_error(y_test, y_pred))
+# # Explained variance score: 1 is perfect prediction
+# print('Variance score: %.2f' % r2_score(y_test, y_pred))
 # # Plot outputs
 
-plt.scatter(y_test, y_pred)
+# plt.scatter(y_test, y_pred)
 # plt.ylim(68000, 73000)
 # plt.xlim(68000, 73000)
-plt.show()
+# plt.show()
 
 # X_test_original['p_finishTime'] = y_pred
 

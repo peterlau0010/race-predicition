@@ -29,7 +29,14 @@ class MongoDB:
         return history
 
 db = MongoDB()
-history = pandas.DataFrame(list(db.queryhistory()))
 
-headers = ','.join(map(str, history.columns.values))
-numpy.savetxt('history_adv.csv', history, delimiter=',', fmt='%s',header=headers)
+# ===========Add data to DB===================
+# db.updatehistory()
+# history = pandas.DataFrame(list(db.queryhistory()))
+
+# headers = ','.join(map(str, history.columns.values))
+# numpy.savetxt('history_adv.csv', history, delimiter=',', fmt='%s',header=headers)
+
+
+
+horseCSV = pandas.read_csv('regression_report.csv', sep=',')
