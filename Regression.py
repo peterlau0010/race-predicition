@@ -20,6 +20,7 @@ import logging
 from sklearn.preprocessing import MinMaxScaler
 import seaborn as sns
 
+
 class Regression:
 
     logging.basicConfig(filename='WebCrawling.log', format='%(asctime)s %(levelname)s %(message)s',
@@ -111,16 +112,26 @@ data = data[(data['class'] == 'Class 2') | (
 data.loc[data['road'].str.contains('"A+'), 'road'] = 'TURF - "A" Course'
 data.loc[data['road'].str.contains('"B+'), 'road'] = 'TURF - "B" Course'
 data.loc[data['road'].str.contains('"C+'), 'road'] = 'TURF - "C" Course'
-
+data.loc[data['plc'].str.contains('3 DH'), 'plc'] = '3'
+data.loc[data['plc'].str.contains('2 DH'), 'plc'] = '2'
+data.loc[data['plc'].str.contains('1 DH'), 'plc'] = '1'
+data.loc[data['plc'].str.contains('4 DH'), 'plc'] = '4'
+data.loc[data['plc'].str.contains('5 DH'), 'plc'] = '5'
+data.loc[data['plc'].str.contains('6 DH'), 'plc'] = '6'
+data.loc[data['plc'].str.contains('7 DH'), 'plc'] = '7'
+data.loc[data['plc'].str.contains('8 DH'), 'plc'] = '8'
+data.loc[data['plc'].str.contains('9 DH'), 'plc'] = '9'
+data.loc[data['plc'].str.contains('10 DH'), 'plc'] = '10'
 
 # ========= Remove '---' value in finishTime =========
 data = data[data.finishTime != '---']
+data = data[data.plc != 'DISQ']
 
 
 # ========= Convert finishTime from String to float =========
 data['finishTime'] = (pd.to_datetime(
     data['finishTime'], format="%M:%S.%f") - datetime(1900, 1, 1))/timedelta(milliseconds=1)
-
+data['plc'] = data['plc'].astype(float)
 
 # ========= Remove Useless data =========
 data = data[(data['dist']==dist)]
@@ -133,10 +144,9 @@ q = data["finishTime"].quantile(0.99)
 data = data[data["finishTime"] < q]
 
 
-
 data_original = data.copy()
 
-data = data[['dist', 'draw', 'finishTime','going','class','# Age']]
+data = data[['dist', 'draw', 'finishTime', 'going', 'class', '# Age', 'Dam','Sire']]
 
 logging.info('Selected CSV Size, %s', str(np.shape(data)))
 
@@ -146,20 +156,21 @@ data = pd.get_dummies(data, columns=[
     'dist'], prefix=['dist'])
 
 # data = pd.get_dummies(data, columns=[
-#     'draw'], prefix=['draw'])    
+#     'draw'], prefix=['draw'])
 
 data = pd.get_dummies(
     data, columns=['going'], prefix=['going'])
 
 data = pd.get_dummies(
-    data, columns=['class'], prefix=['class'])    
+    data, columns=['class'], prefix=['class'])
 # data = pd.get_dummies(
-    # data, columns=['Country Of Origin'], prefix=['Country Of Origin'])    
-# data = pd.get_dummies(
-    # data, columns=['Sire'], prefix=['Sire'])    
+# data, columns=['Country Of Origin'], prefix=['Country Of Origin'])
+data = pd.get_dummies(
+data, columns=['Sire'], prefix=['Sire'])
+data = pd.get_dummies(
+    data, columns=['Dam'], prefix=['Dam'])
 logging.info('After converted categories Size, %s', str(np.shape(data)))
 # logging.info('\n {}'.format(data.head()))
-
 
 
 # ========= Prepare X Y =========
@@ -194,28 +205,37 @@ y_pred = scalery.inverse_transform(y_pred)
 logging.info(y_pred[:5])
 logging.info(y_test[:5])
 
-
-# The coefficients
-# print('Coefficients: \n', model.coef_)
-# The mean squared error
-logging.info("Mean squared error: %.2f"
-             % mean_squared_error(y_test, y_pred))
-# Explained variance score: 1 is perfect prediction
-logging.info('Variance score: %.2f' % r2_score(y_test, y_pred))
-
-
 X_test = scalerX.inverse_transform(X_test)
 print(np.shape(y_test))
 print(np.shape(y_pred))
 print(np.shape(X_test))
 y_test['y_pred'] = y_pred
 # print(y_test)
-df_out = pd.merge(data_original,y_test,how = 'left',left_index = True, right_index = True)
-df_out["Rank"] = df_out.groupby(['date','raceNo'])["y_pred"].rank() 
+df_out = pd.merge(data_original, y_test, how='left',
+                  left_index=True, right_index=True)
+df_out["y_Rank"] = df_out.groupby(['date', 'raceNo'])["y_pred"].rank()
+df_out["x_Rank"] = df_out.groupby(['date', 'raceNo'])["plc"].rank()
+
+df_out = df_out.sort_values(['date', 'raceNo','plc'], ascending=[True, False,True])
 
 headers = ','.join(map(str, df_out.columns.values))
 np.savetxt('regression_report.csv', df_out.round(0),
            delimiter=',', fmt='%s', header=headers)
+
+logging.info(np.shape(df_out))
+df_out = df_out[df_out.plc.notnull()]
+df_out = df_out[df_out.y_Rank.notnull()]
+logging.info(np.shape(df_out))
+# The coefficients
+logging.info('Coefficients: \n %s', model.coef_)
+# The mean squared error
+logging.info("Mean squared error: %.2f"
+             % mean_squared_error(df_out['x_Rank'], df_out['y_Rank']))
+# Explained variance score: 1 is perfect prediction
+logging.info('Variance score: %.2f' %
+             r2_score(df_out['x_Rank'], df_out['y_Rank']))
+
+
 # r = Regression(data)
 # r.removeEmpty()
 # logging.debug(np.shape(r.data))
