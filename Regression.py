@@ -93,12 +93,13 @@ class Regression:
         return self.data
 
 
-raceCource = 'ST'
-classes = 'Class 5'
+raceCource = 'HV'
+classes = 'Class 4'
 dist = '1200M'
+road = 'TURF - A Course'
 
 # ========= Read CSV file =========
-data = pd.read_csv('history_adv.csv', header=0)
+data = pd.read_csv('history_adv15161718.csv', header=0)
 data = data.iloc[::-1]
 logging.info('Original CSV Size, %s', str(np.shape(data)))
 
@@ -122,6 +123,7 @@ data.loc[data['plc'].str.contains('7 DH'), 'plc'] = '7'
 data.loc[data['plc'].str.contains('8 DH'), 'plc'] = '8'
 data.loc[data['plc'].str.contains('9 DH'), 'plc'] = '9'
 data.loc[data['plc'].str.contains('10 DH'), 'plc'] = '10'
+# data.loc[data['trainer']=='J Moore' ,'trainerrank'] = 1
 
 # ========= Remove '---' value in finishTime =========
 data = data[data.finishTime != '---']
@@ -134,9 +136,10 @@ data['finishTime'] = (pd.to_datetime(
 data['plc'] = data['plc'].astype(float)
 
 # ========= Remove Useless data =========
-data = data[(data['dist']==dist)]
-# data = data[(data['class']==classes)]
-# data = data[(data['raceCource']==raceCource)]
+data = data[(data['dist'] == dist)]
+data = data[(data['road']==road)]
+data = data[(data['class']==classes)]
+data = data[(data['raceCource']==raceCource)]
 
 
 # ========= Remove outlier data =========
@@ -146,7 +149,8 @@ data = data[data["finishTime"] < q]
 
 data_original = data.copy()
 
-data = data[['dist', 'draw', 'finishTime', 'going', 'class', '# Age', 'Dam','Sire']]
+data = data[['dist', 'draw', 'finishTime',
+             'going', 'class', '# # Age','Win_y','Win_x']]
 
 logging.info('Selected CSV Size, %s', str(np.shape(data)))
 
@@ -156,7 +160,7 @@ data = pd.get_dummies(data, columns=[
     'dist'], prefix=['dist'])
 
 # data = pd.get_dummies(data, columns=[
-#     'draw'], prefix=['draw'])
+#     'road'], prefix=['road'])
 
 data = pd.get_dummies(
     data, columns=['going'], prefix=['going'])
@@ -165,10 +169,14 @@ data = pd.get_dummies(
     data, columns=['class'], prefix=['class'])
 # data = pd.get_dummies(
 # data, columns=['Country Of Origin'], prefix=['Country Of Origin'])
-data = pd.get_dummies(
-data, columns=['Sire'], prefix=['Sire'])
-data = pd.get_dummies(
-    data, columns=['Dam'], prefix=['Dam'])
+# data = pd.get_dummies(
+#     data, columns=['Sire'], prefix=['Sire'])
+# data = pd.get_dummies(
+#     data, columns=['Dam'], prefix=['Dam'])
+# data = pd.get_dummies(
+#     data, columns=['jockey'], prefix=['jockey'])
+# data = pd.get_dummies(
+#     data, columns=['trainer'], prefix=['trainer'])
 logging.info('After converted categories Size, %s', str(np.shape(data)))
 # logging.info('\n {}'.format(data.head()))
 
@@ -206,17 +214,21 @@ logging.info(y_pred[:5])
 logging.info(y_test[:5])
 
 X_test = scalerX.inverse_transform(X_test)
-print(np.shape(y_test))
-print(np.shape(y_pred))
-print(np.shape(X_test))
-y_test['y_pred'] = y_pred
+
+# ========= Prepare output csv ==========
+y_test.loc[:,'y_pred'] = y_pred
 # print(y_test)
 df_out = pd.merge(data_original, y_test, how='left',
                   left_index=True, right_index=True)
+
+df_out = df_out[(df_out['y_pred'] > 0) & (df_out['y_pred'] < 200000)]
 df_out["y_Rank"] = df_out.groupby(['date', 'raceNo'])["y_pred"].rank()
 df_out["x_Rank"] = df_out.groupby(['date', 'raceNo'])["plc"].rank()
 
-df_out = df_out.sort_values(['date', 'raceNo','plc'], ascending=[True, False,True])
+df_out = df_out.sort_values(
+    ['date', 'raceNo', 'plc'], ascending=[True, False, True])
+
+df_out = df_out[(df_out['y_Rank'] <= 1)]
 
 headers = ','.join(map(str, df_out.columns.values))
 np.savetxt('regression_report.csv', df_out.round(0),
@@ -226,6 +238,8 @@ logging.info(np.shape(df_out))
 df_out = df_out[df_out.plc.notnull()]
 df_out = df_out[df_out.y_Rank.notnull()]
 logging.info(np.shape(df_out))
+
+
 # The coefficients
 logging.info('Coefficients: \n %s', model.coef_)
 # The mean squared error
