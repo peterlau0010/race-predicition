@@ -230,8 +230,11 @@ df_out = df_out.sort_values(
 
 df_out = df_out[(df_out['y_Rank'] <= 1)]
 
-headers = ','.join(map(str, df_out.columns.values))
-np.savetxt('regression_report.csv', df_out.round(0),
+regression_report = df_out[['# # Age', 'Chinese Name', 'Code', 'finishTime_y', '# Trainer', '# Jockey',
+                            'plc', 'odds', 'finishTime_x', 'plc', 'odds', 'finishTime_x', 'finishTime_y', 'y_pred', 'y_Rank', 'x_Rank']]
+
+headers = ','.join(map(str, regression_report.columns.values))
+np.savetxt('regression_report.csv', regression_report.round(0),
            delimiter=',', fmt='%s', header=headers)
 
 logging.info(np.shape(df_out))
