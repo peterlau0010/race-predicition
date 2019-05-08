@@ -19,8 +19,7 @@ import time
 import logging
 from sklearn.preprocessing import MinMaxScaler
 import seaborn as sns
-
-
+pd.set_option('mode.chained_assignment', None)
 class Regression:
 
     logging.basicConfig(filename='WebCrawling.log', format='%(asctime)s %(levelname)s %(message)s',
@@ -180,6 +179,7 @@ data = pd.get_dummies(
 logging.info('After converted categories Size, %s', str(np.shape(data)))
 # logging.info('\n {}'.format(data.head()))
 
+data = data.astype(float)
 
 # ========= Prepare X Y =========
 X = data.drop(['finishTime'], axis=1)
@@ -193,7 +193,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 scalerX = StandardScaler().fit(X_train)
 scalery = StandardScaler().fit(y_train)
 X_train = scalerX.transform(X_train)
-y_train = scalery.transform(y_train)
+# y_train = scalery.transform(y_train)
 X_test = scalerX.transform(X_test)
 # y_test = scalery.transform(y_test)
 
@@ -209,7 +209,7 @@ model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
 
 
-y_pred = scalery.inverse_transform(y_pred)
+# y_pred = scalery.inverse_transform(y_pred)
 logging.info(y_pred[:5])
 logging.info(y_test[:5])
 
@@ -252,136 +252,3 @@ logging.info("Mean squared error: %.2f"
 logging.info('Variance score: %.2f' %
              r2_score(df_out['x_Rank'], df_out['y_Rank']))
 
-
-# r = Regression(data)
-# r.removeEmpty()
-# logging.debug(np.shape(r.data))
-
-# X = r.data.drop(['finishTime'], axis=1)
-# y = r.data['finishTime']
-
-# X_train, X_test, y_train, y_test = train_test_split(
-#     X, y, test_size=0.01, random_state=0)
-
-# sc_X = StandardScaler()
-# print(X_train)
-# X_train = sc_X.fit_transform(X_train)
-# X_test = sc_X.transform(X_test)
-# print(X_train)
-# sc_y = StandardScaler()
-# y_train = y_train.values.reshape((len(y_train), 1))
-# y_train = sc_y.fit_transform(y_train)
-# y_train = y_train.ravel()
-
-# # Group category
-# data.loc[data['class'].str.contains('Class 2'), 'class'] = 'Class 2'
-# data.loc[data['class'].str.contains('Class 3'), 'class'] = 'Class 3'
-# data.loc[data['class'].str.contains('Class 4'), 'class'] = 'Class 4'
-# data.loc[data['road'].str.contains('"A+'), 'road'] = 'TURF - "A" Course'
-# data.loc[data['road'].str.contains('"B+'), 'road'] = 'TURF - "B" Course'
-# data.loc[data['road'].str.contains('"C+'), 'road'] = 'TURF - "C" Course'
-
-# # Remove '---' value
-# data = data[data.finishTime != '---']
-# # data = data[data.awt != '---']
-# # data = data[data.dhw != '---']
-# # data = data[(data['class'] == 'Class 2') | (
-# #     data['class'] == 'Class 3') | (data['class'] == 'Class 4') | (data['class'] == 'Class 5') | (data['class'] == 'Class 1')]
-
-# # data = data[(data['trainer'] != 'J M Moore') & (
-# #     data['trainer'] != 'M C Tam') & (data['trainer'] != 'P Leyshan') & (data['trainer'] != 'S H Cheong') & (data['trainer'] != 'W H Tse') & (data['trainer'] != 'Y C Fung') & (data['trainer'] != 'K C Chong')]
-
-# # jockeylist = data['jockey'].value_counts()
-# # jockeylist = jockeylist[jockeylist > 300]
-# # data = data[data['jockey'].isin(jockeylist.index.values.tolist())]
-
-# # trainerlist = data['trainer'].value_counts()
-# # trainerlist = trainerlist[trainerlist > 30]
-# # data = data[data['trainer'].isin(trainerlist.index.values.tolist())]
-
-# logging.debug(np.shape(data))
-
-# # print(data.head())
-# # data.groupby('trainer')['horseName'].nunique().plot(kind='bar')
-# # plt.show()
-# # exit()
-
-
-# # Match information
-# # data = data[data.dist == dist]
-# # data = data[data.going == going]
-
-
-# # Prepare reformat data
-# reformat_data = data.copy()
-
-# # Covert finishTime from string to float
-# reformat_data['finishTime'] = (pd.to_datetime(
-#     reformat_data['finishTime'], format="%M:%S.%f") - datetime(1900, 1, 1))/timedelta(milliseconds=1)
-
-# X_train_original, X_test_original, y_train_original, y_test_original = train_test_split(
-#     reformat_data, reformat_data, test_size=0.10)
-
-# # Process Category data
-# reformat_data = pd.get_dummies(
-#     reformat_data, columns=['raceCource'], prefix=['raceCource'])
-# reformat_data = pd.get_dummies(
-#     reformat_data, columns=['going'], prefix=['going'])
-# reformat_data = pd.get_dummies(
-#     reformat_data, columns=['jockey'], prefix=['jockey'])
-# reformat_data = pd.get_dummies(
-#     reformat_data, columns=['trainer'], prefix=['trainer'])
-# reformat_data = pd.get_dummies(reformat_data, columns=[
-#     'draw'], prefix=['draw'])
-# reformat_data = pd.get_dummies(
-#     reformat_data, columns=['class'], prefix=['class'])
-# # reformat_data = pd.get_dummies(reformat_data, columns=[
-# #     'money'], prefix=['money'])
-# reformat_data = pd.get_dummies(reformat_data, columns=[
-#     'road'], prefix=['road'])
-# reformat_data = pd.get_dummies(reformat_data, columns=[
-#                                'dist'], prefix=['dist'])
-# # Split train and test
-# X = reformat_data.drop(['finishTime', 'date', 'raceNo', 'raceName',
-#                         'plc', 'horseNo', 'lbw', 'runPos', 'odds', 'horseName', 'money','code' ], axis=1)
-# y = reformat_data['finishTime']
-
-# # X_train, X_test, y_train, y_test = train_test_split(
-#     # X, y, test_size=0.10)
-
-# # print(X_train.columns.values)
-
-# # Create linear regression object
-
-# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.10, random_state=0)
-
-# scaler = MinMaxScaler()
-# X_train_scaled = scaler.fit_transform(X_train)
-
-# model = linear_model.LinearRegression()
-# model.fit(X_train, y_train)
-
-# X_test_scaled = scaler.transform(X_test)
-# y_pred = model.predict(X_test)
-
-# The coefficients
-# print('Coefficients: \n', regr.coef_)
-# The mean squared error
-# print("Mean squared error: %.2f"
-#       % mean_squared_error(y_test, y_pred))
-# # Explained variance score: 1 is perfect prediction
-# print('Variance score: %.2f' % r2_score(y_test, y_pred))
-# # Plot outputs
-
-# plt.scatter(y_test, y_pred)
-# plt.ylim(68000, 73000)
-# plt.xlim(68000, 73000)
-# plt.show()
-
-# X_test_original['p_finishTime'] = y_pred
-
-# # print(X_test_original.head())
-# headers = ','.join(map(str, X_test_original.columns.values))
-
-# np.savetxt('regression_report.csv', X_test_original.round(0),
-#            delimiter=',', fmt='%s', header=headers)
