@@ -151,5 +151,6 @@ finally:
 
     logging.info('Ready to write csv with histroy shape: %s',
                  numpy.shape(history))
-    numpy.savetxt('history.csv', history, delimiter=',', fmt='%s')
+    headers = ['date','raceCource','raceNo','going','raceName','road','money','class','dist','plc','horseNo','horseName','jockey','trainer','awt','dhw','draw','lbw','runPos','finishTime','odds']
+    numpy.savetxt('history.csv', history, delimiter=',', fmt='%s',header=headers, comments='')
     logging.info('Finished write csv')
