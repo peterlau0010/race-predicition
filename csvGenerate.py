@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-data = pd.read_csv('history_csv_merged.csv', header=0)
+data = pd.read_csv('Processed Data/history_csv_merged.csv', header=0)
 data = data[data.finishTime != '---']
 data = data[data.plc != 'DISQ']
 data.loc[data['plc'].str.contains('3 DH'), 'plc'] = '3'
@@ -29,7 +29,7 @@ winrate.columns = ['Sire','SireRank']
 
 headers = ','.join(map(str, winrate.columns.values))
 
-np.savetxt('sireRank.csv', winrate.round(0),
+np.savetxt('./Processed Data/sireRank.csv', winrate.round(0),
            delimiter=',', fmt='%s', header=headers, comments='')
 
 
@@ -42,5 +42,5 @@ winrate.columns = ['Dam','DamRank']
 
 headers = ','.join(map(str, winrate.columns.values))
 
-np.savetxt('damRank.csv', winrate.round(0),
+np.savetxt('./Processed Data/damRank.csv', winrate.round(0),
            delimiter=',', fmt='%s', header=headers, comments='')

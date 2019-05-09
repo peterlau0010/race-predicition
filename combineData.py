@@ -2,22 +2,22 @@ import pandas as pd
 import numpy as np
 
 # ======= Read CSV ==========
-history_csv = pd.read_csv('history.csv', sep=',', parse_dates=['date'])
-horse_csv = pd.read_csv('horse.csv', sep=',', parse_dates=['Foaling Date'])
+history_csv = pd.read_csv('./Raw Data/history.csv', sep=',', parse_dates=['date'])
+horse_csv = pd.read_csv('./Raw Data/horse.csv', sep=',', parse_dates=['Foaling Date'])
 
-jockeyList_csv = pd.read_csv('jockeyList.csv', sep=',')
-trainerList_csv = pd.read_csv('trainerList.csv', sep=',')
+jockeyList_csv = pd.read_csv('./Raw Data/jockeyList.csv', sep=',')
+trainerList_csv = pd.read_csv('./Raw Data/trainerList.csv', sep=',')
 
-jockey_csv_1718 = pd.read_csv('jockey1718.csv', sep=',')
-jockey_csv_1617 = pd.read_csv('jockey1617.csv', sep=',')
-jockey_csv_1516 = pd.read_csv('jockey1516.csv', sep=',')
+jockey_csv_1718 = pd.read_csv('./Raw Data/jockey1718.csv', sep=',')
+jockey_csv_1617 = pd.read_csv('./Raw Data/jockey1617.csv', sep=',')
+jockey_csv_1516 = pd.read_csv('./Raw Data/jockey1516.csv', sep=',')
 
-trainer_csv_1718 = pd.read_csv('trainer1718.csv', sep=',')
-trainer_csv_1617 = pd.read_csv('trainer1617.csv', sep=',')
-trainer_csv_1516 = pd.read_csv('trainer1516.csv', sep=',')
+trainer_csv_1718 = pd.read_csv('./Raw Data/trainer1718.csv', sep=',')
+trainer_csv_1617 = pd.read_csv('./Raw Data/trainer1617.csv', sep=',')
+trainer_csv_1516 = pd.read_csv('./Raw Data/trainer1516.csv', sep=',')
 
-sireRank_csv = pd.read_csv('sireRank.csv', sep=',')
-damRank_csv = pd.read_csv('damRank.csv', sep=',')
+sireRank_csv = pd.read_csv('./Processed Data/sireRank.csv', sep=',')
+damRank_csv = pd.read_csv('./Processed Data/damRank.csv', sep=',')
 
 
 # ======= Trim CSV ==========
@@ -96,5 +96,5 @@ history_csv_merged = pd.merge(history_csv_merged, sireRank_csv, how='left',
 
 # ========== Save as history_csv_merged.csv =====================
 headers = ','.join(map(str, history_csv_merged.columns.values))
-np.savetxt('history_csv_merged.csv', history_csv_merged.round(0),
+np.savetxt('./Processed Data/history_csv_merged.csv', history_csv_merged.round(0),
            delimiter=',', fmt='%s', header=headers, comments='')

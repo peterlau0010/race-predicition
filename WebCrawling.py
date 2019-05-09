@@ -13,7 +13,7 @@ import pandas
 
 
 class WebCrawling:
-    logging.basicConfig(filename='WebCrawling.log', format='%(asctime)s %(levelname)s %(message)s',
+    logging.basicConfig(filename='./Log/WebCrawling.log', format='%(asctime)s %(levelname)s %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S ', level=logging.INFO)
 
     def __init__(self):
@@ -107,7 +107,7 @@ class WebCrawling:
 
 
 history = numpy.zeros(shape=(0, 21))
-matchCSV = pandas.read_csv('matchDate.csv', sep=',')
+matchCSV = pandas.read_csv('./Raw Data/matchDate.csv', sep=',')
 matchCSV = pandas.DataFrame(matchCSV)
 
 try:
@@ -152,5 +152,6 @@ finally:
     logging.info('Ready to write csv with histroy shape: %s',
                  numpy.shape(history))
     headers = ['date','raceCource','raceNo','going','raceName','road','money','class','dist','plc','horseNo','horseName','jockey','trainer','awt','dhw','draw','lbw','runPos','finishTime','odds']
-    numpy.savetxt('history.csv', history, delimiter=',', fmt='%s',header=headers, comments='')
+    headers = ','.join(headers)
+    numpy.savetxt('./Raw Data/history.csv', history, delimiter=',', fmt='%s',header=headers, comments='')
     logging.info('Finished write csv')

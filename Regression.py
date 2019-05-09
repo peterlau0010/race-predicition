@@ -24,7 +24,7 @@ pd.set_option('mode.chained_assignment', None)
 
 class Regression:
 
-    logging.basicConfig(filename='WebCrawling.log', format='%(asctime)s %(levelname)s %(message)s',
+    logging.basicConfig(filename='./Log/Regression.log', format='%(asctime)s %(levelname)s %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S ', level=logging.INFO)
 
     def __init__(self, data, raceCource, classes, dist, road):
@@ -96,7 +96,7 @@ raceCource, classes, dist, road = None, None, None, None
 # road = 'TURF - A Course'
 
 # ========= Read CSV file =========
-data = pd.read_csv('history_csv_merged.csv', header=0)
+data = pd.read_csv('./Processed Data/history_csv_merged.csv', header=0)
 data = data.iloc[::-1]
 logging.info('Original CSV Size, %s', str(np.shape(data)))
 
@@ -199,7 +199,7 @@ regression_report = df_out[['Age', 'Chinese Name', 'Code', 'Trainer', 'Jockey',
                             'plc', 'odds','finishTime_x', 'y_pred', 'y_Rank', 'x_Rank']]
 
 headers = ','.join(map(str, regression_report.columns.values))
-np.savetxt('regression_report.csv', regression_report.round(0),
+np.savetxt('./Report/regression_report.csv', regression_report.round(0),
            delimiter=',', fmt='%s', header=headers, comments='')
 
 logging.info(np.shape(df_out))
