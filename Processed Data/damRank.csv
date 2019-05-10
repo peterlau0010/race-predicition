@@ -1,308 +1,625 @@
 Dam,DamRank
-A Class Act,1.0
-Acid Test,5.0
-Across The Moon,7.0
-Adja,2.0
-Afnoon,11.0
-Agi Gu Li,8.0
-Alberton Park,11.0
-Alleyrun,1.0
-Amenixa,7.0
-Angora,13.0
-Annie Daly,6.0
-Applause,14.0
-Aqua d'Amore,7.0
-Arms Wide Open,2.0
-Around The Clock,11.0
-Arthurs Princess,2.0
-Authentic Desire,5.0
+A Class Act,12.0
+Absolute Dream,12.0
+Across The Moon,14.0
+Adulterer,6.0
+Aemilee,3.0
+Aeronwy,7.0
+Afnoon,8.0
+Aga Panther,1.0
+Agnetha,9.0
+Al Anood,12.0
+Al Basar,3.0
+Alamagna,11.0
+Albacora,9.0
+Aliyana Tilde,6.0
+Allegra,9.0
+Alleyrun,8.0
+Allure,7.0
+Alluring Belle,11.0
+Althea Rose,6.0
+Amarazetti,13.0
+Amazing Tale,2.0
+Amber Bouquet,13.0
+Ambitious Lady,9.0
+Amitola,8.0
+Andorra,14.0
+Angora,1.0
+Aniarnota,6.0
+Anjella,13.0
+Annalee,8.0
+Anne Of Kiev,7.0
+Annee Lumiere,4.0
+Apocrypha,10.0
+Aqua d'Amore,9.0
+Arabian Art,2.0
+Are You Devious,5.0
+Aringarosa,6.0
+Around The Clock,6.0
+Arthurs Princess,1.0
+Ashalanda,1.0
+Astilbe,12.0
+Astronomy Domine,1.0
+Atlantic Slew,8.0
+Attilia,8.0
+Aucilla,8.0
+Aurora's Hot,5.0
+Aussie Christmas,4.0
+Aussie Opera,9.0
+Authentic Desire,11.0
 Avoid,9.0
-Awjila,10.0
-Baahama,6.0
+Awesome,11.0
+Awjila,12.0
+Axiom,1.0
 Baby Boom,7.0
-Ballet Society,3.0
-Bannisters,7.0
-Bantry Bay,7.0
-Bargouzine,5.0
-Batroun,4.0
-Bedizened,11.0
-Belle d'Orleans,9.0
-Betty Brown,3.0
-Biz Bar,9.0
-Black Beauty,4.0
-Blue Fairy Wren,11.0
-Boldina,4.0
-Box Of Frogs,7.0
+Bail Out,7.0
+Ballet Society,2.0
+Bantry Bay,2.0
+Barathea Dancer,12.0
+Batroun,8.0
+Beaten By The Bel,8.0
+Bedizened,9.0
+Bella Bellucci,4.0
+Bella Rosalia,2.0
+Betty Brown,4.0
+Bexley,6.0
+Black Mamba,4.0
+Blue Fairy Wren,9.0
+Bokissa,3.0
+Bonifacio,3.0
+Borobodur,2.0
+Box Of Frogs,10.0
+Brave And Bold,8.0
+Brave Soul,8.0
 Break Of Dawn,1.0
-Bright Snow,1.0
-Bronislava,10.0
-Bush Triumph,7.0
-Candy Ride,3.0
-Caralowe,1.0
-Cariad,3.0
-Celestina Agostino,12.0
-Chanter,9.0
-Charangas,5.0
-Charmed Lady,4.0
-Chichi Romero,6.0
-China Choice,6.0
-Chinese White,8.0
-Christinas Letter,5.0
-Clinical,7.0
-Close To The Edge,1.0
-Coimbra,4.0
-Colorado Claire,2.0
-Comme Tu Veux,11.0
-Compelling,10.0
-Coonac,7.0
-Cortina Gal,1.0
-County Mayo,2.0
-Covertly,2.0
-Creative Plan,9.0
-Creil,10.0
-Cromac,3.0
-Daly Charm,1.0
-Dame Hester,8.0
-Dance Hit,6.0
-Dancescape,9.0
-Dandify,1.0
-Dangerous Dancer,6.0
+Bright Abyss,4.0
+Bright Heart,7.0
+Brooklyn Roads,5.0
+Brookster,11.0
+Brunch Bellini,12.0
+Buchanan Girl,4.0
+Buck 'N' Jazz,8.0
+Bush Triumph,8.0
+Caldine,8.0
+Candy Ride,8.0
+Canterbury Lace,7.0
+Cape Princess,1.0
+Capichera,10.0
+Captivating Lady,1.0
+Cariad,4.0
+Carnebelle,8.0
+Cassata,8.0
+Cassie May,8.0
+Casual Chick,6.0
+Casual Glance,3.0
+Celebria,8.0
+Celebrity Appeal,1.0
+Celtic Dream,12.0
+Centreofattention,4.0
+Chameleon,6.0
+Charangas,1.0
+Charmed Lady,9.0
+Charming Elle,13.0
+Check In Time,11.0
+Cheer Girl,5.0
+Chichi Romero,2.0
+China Choice,3.0
+Chinese White,1.0
+Chockaholic,1.0
+Choice Words,10.0
+Christinas Letter,7.0
+Cinnadream,11.0
+Claiomh Solais,9.0
+Classy Fashion,10.0
+Clenaghcastle Lady,13.0
+Clinical,2.0
+Cloanthy,5.0
+Close To The Edge,5.0
+Coimbra,6.0
+Comme Tu Veux,2.0
+Compact Pussycat,5.0
+Compelling,4.0
+Connote,3.0
+Contented,6.0
+Contrary,2.0
+Count Your Fingers,9.0
+County Tale,2.0
+Covenant,9.0
+Creative Plan,6.0
+Creil,11.0
+Crest Of The Wave,12.0
+Cristallo,1.0
+Cromac,12.0
+Cuilaphuca,11.0
+Cyclone Stacey,5.0
+Daly Charm,4.0
+Dama de Noche,1.0
+Damascus Charmer,11.0
+Dance Hit,2.0
+Dance Idol,3.0
+Dance Move,7.0
+Dancescape,6.0
+Dandify,10.0
+Danesty,9.0
+Dangerous Dancer,4.0
 Dantessa,10.0
-De Right Stuff,7.0
-Deal Or No Deal,9.0
-Dearness,6.0
-Definite Opinion,5.0
-Delarouze,11.0
-Dellwood Diva,7.0
-Derrycarna,9.0
-Divine Lady,11.0
-Divine Miss Em,11.0
-Dizelle,3.0
-Dontwaltzme,9.0
-Dosh,6.0
-Drops,7.0
-Dyna Slam,1.0
-Eden,8.0
-Emma Princess,8.0
-Empire Rose,3.0
+De Groove,5.0
+Deal Or No Deal,4.0
+Dearness,10.0
+Defy The Odds,6.0
+Dellwood Diva,4.0
+Demandehere,2.0
+Derrycarna,3.0
+Desert Berry,1.0
+Desert Gardens,4.0
+Dica,10.0
+Distinctive Dane,11.0
+Disturbingthepeace,3.0
+Ditas,3.0
+Divine Lady,3.0
+Divine Miss Em,9.0
+Dizelle,10.0
+Don't Blink,8.0
+Dosh,7.0
+Doubrovska,12.0
+Dream Leica,12.0
+Dreamaway,1.0
+Dreamworker,2.0
+Drops,5.0
+Dubai Me Diamonds,8.0
+Dublin Me Bet,6.0
+Dyna Slam,9.0
+Ebadiyla,6.0
+Ebony Flyer,9.0
+Eden,9.0
+Egeria,6.0
+Elahi,2.0
+Elle Labelle,6.0
+Emerald Beauty,5.0
 Enchant,8.0
-Enciamo,1.0
-Eroica,4.0
-Eugenie Gold,1.0
-Evening Pleasures,6.0
-Everswindell,5.0
-Exelante,10.0
-Extension Of Time,2.0
-Fain,1.0
-Fairly Feline,7.0
-Fantastic Flo Jo,1.0
-Fiammarosa,11.0
-Fidele,7.0
-Fine Stem,4.0
+Enciamo,2.0
+Enzed,7.0
+Eurostorm,3.0
+Everswindell,1.0
+Exedra,7.0
+Exelante,8.0
+Extension Of Time,1.0
+Fairchild,12.0
+Fairly Feline,2.0
+Fairy Tree,5.0
+Fandanita,9.0
+Fantastic Flo Jo,7.0
+Fantastic Glen,1.0
+Far Far Away,6.0
+Fast Fame,6.0
+Fast Fleet,4.0
+Fille The Joy,12.0
+Fine Jade,4.0
 Fire Song,3.0
-Fleeting Touch,3.0
-Flying Success,12.0
-Fromage,8.0
-Gemadaily,12.0
-Gentle On My Mind,7.0
-Gingerbread,6.0
-Girl Hussler,5.0
-Girl Power,2.0
-Girls On Top,3.0
-Glam Slam,11.0
-Grace And Eva,10.0
-Graces Spirit,11.0
-Grantsville,14.0
-Grey Deceiver,4.0
-Grilse,3.0
-Gwyllion,10.0
-Gypsy Carnival,5.0
-Gypsy Mai,9.0
-Hassaya,6.0
-Heaven Beneath,1.0
-Heaven Sent,10.0
-Heavens Peak,2.0
-Here To Eternity,1.0
-Hidden Spirit,10.0
-High Aspirations,3.0
-Holiday In Goa,1.0
-Hope So,2.0
-Hush Up,4.0
-Idea,6.0
-Idriess,1.0
+Fleur de Lion,6.0
+Flion Fenena,2.0
+Flower Fest,2.0
+Flutter,12.0
+Flying Jet,11.0
+Flying Success,2.0
+Follonica,11.0
+Fonteyn Star,12.0
+Forget Ima Lady,2.0
+Former Glory,7.0
+Frabjous,6.0
+Frequent Flyer,10.0
+Friskee,1.0
+Full Snow Moon,6.0
+Further,8.0
+Future Choice,1.0
+Gathering Gold,8.0
+Gaudeamus,1.0
+Gee Kel,3.0
+Gemadaily,11.0
+Gemima,8.0
+Gemstone Peak,8.0
+Gender Dance,3.0
+Gingerbread,5.0
+Girl Power,4.0
+Girls On Top,5.0
+Glyndebourne,11.0
+Godspell,12.0
+Golden Gamble,8.0
+Goldfinger,4.0
+Gondola Girl,14.0
+Gone Wild,5.0
+Grace And Eva,9.0
+Graces Spirit,6.0
+Grand Belt,3.0
+Grand Princess,2.0
+Grantsville,8.0
+Great News,4.0
+Green Mirage,4.0
+Greta's Yarn,1.0
+Grey Deceiver,5.0
+Grey Swallow,12.0
+Grey Swan,7.0
+Grojsman,13.0
+Gulfstream,7.0
+Gunawati,4.0
+Gwyllion,2.0
+Gypsy Carnival,10.0
+Gypsy Marauder,11.0
+Haberdashery,2.0
+Hassaya,10.0
+Hayley's Thunder,10.0
+Healing Dream,6.0
+Heaven Beneath,12.0
+Heaven Sent,5.0
+Heavenly Dreamer,11.0
+Heir Today,10.0
+Heliograph,7.0
+Here To Eternity,8.0
+High Aspirations,1.0
+Highland Daughter,3.0
+Hint Of Glory,7.0
+Holiday In Goa,2.0
+Honeymoonzova,10.0
+Horkins Nancy,10.0
+Hosiery,5.0
+Hot Diamond,5.0
+Hyades,10.0
+Hypoteneuse,12.0
+I'llthinkaboutit,6.0
+Ice Cold Crownie,3.0
+Iltizaam,5.0
 Imitation,2.0
-Innovation Girl,10.0
-Irish Hut,8.0
-Isn't She Fabulous,2.0
-Isola Di Capri,8.0
-Jarada,6.0
-Jemison,7.0
-Jessepic,6.0
-Jeunes Knight,2.0
-Joy In Winning,10.0
-Judicial Queen,4.0
-Just A Dream,5.0
+In The Mood,5.0
+Inchberry,12.0
+Indian Song,11.0
+Indy Star,2.0
+Innovation Girl,4.0
+Instant Memories,4.0
+Inzabeel,4.0
+Irish Dream,5.0
+Isn't She Fabulous,12.0
+Jambalaya,13.0
+Jarhes,12.0
+Je Suis,12.0
+Jester's Girl,9.0
+Jeunes Knight,7.0
+Jillolini,4.0
+Joy In Winning,7.0
+Jugadora,2.0
+Jujube,4.0
+Just Hilda,8.0
 Just Stunning,10.0
-Kaimana,4.0
-Kate Of Clonmel,13.0
-Keeper Quiet,6.0
-Keeperinthemyst,12.0
-Kiss 'N Chase,6.0
+Kakakakatie,5.0
+Kammaan,10.0
+Karedane,8.0
+Karjera,13.0
+Karmann Ghia,14.0
+Kate Of Clonmel,8.0
+Kathy O'Reilly,5.0
+Keep Alight,12.0
+Keep The Peace,6.0
+Keeper Quiet,8.0
+Keeperinthemyst,6.0
+King Luna,8.0
+Kiss 'N Chase,9.0
 Kiss And Cuddle,6.0
-Krysia,8.0
-Kuda Cepat,8.0
-Kushnarenkovo,5.0
-Kvarena,1.0
-Kylie's Way,8.0
-La Campanella,4.0
-La Memoire,8.0
-Lacandona,2.0
-Lalectra,3.0
-Lana Girl,1.0
-Langs Lash,10.0
-Lapland,3.0
-Lava Lady,3.0
-Letter From France,10.0
-Li'l Miss Hayley,4.0
-Lights Off,5.0
-Lilli Marlane,5.0
-Limelight,8.0
-Loch Maryanne,12.0
-Luas Line,8.0
-Lucida,12.0
-Lucky Beauty,12.0
-Lucky Norwegian,4.0
+Kiss Me Goodbye,5.0
+Kramer Drive,4.0
+Krysia,6.0
+Kvarena,10.0
+Kylie's Way,3.0
+La Bella Dama,11.0
+La Campanella,3.0
+La Gifted,6.0
+La Praline,12.0
+La Serenissime,9.0
+Lacada,7.0
+Lacandona,10.0
+Lady Jaguar,2.0
+Lafleur,1.0
+Lake Moon,11.0
+Lakemba Gold,9.0
+Lana Girl,6.0
+Langs Lash,3.0
+Lausanne,8.0
+Leesing,11.0
+Leica Gossip,7.0
+Leigh Valley,9.0
+Leopard Skin,9.0
+Less Crazy,2.0
+Leyenda,3.0
+Li'l Miss Hayley,9.0
+Libor Lady,11.0
+Lidana,8.0
+Light And Airy,13.0
+Like The Wind,10.0
+Liliside,3.0
+Lilium,12.0
+Lilli Marlane,2.0
+Limelight,5.0
+Line Of Flight,2.0
+Little Audio,8.0
+Little Big Horse,1.0
+Little Less Lip,2.0
+Loch Jipp,10.0
+Loch Maryanne,8.0
+London Plane,10.0
+Love The Moment,5.0
+Lovemelikearock,11.0
+Lovingthelimelight,14.0
+Lucida,8.0
+Lucky Beauty,3.0
+Lucky Norwegian,6.0
 Lucy Diamonds,3.0
-Luscious Legs,10.0
-Lush Liaison,4.0
-Maid In Secret,5.0
-Many Hearts,3.0
-Matilda Grace,5.0
-Meddle,2.0
-Medrano,7.0
-Metung Belle,3.0
-Mi Centie,7.0
-Michelle Shift,8.0
-Midnight Mystique,9.0
-Miguelita,4.0
-Mill Duckie,5.0
-Miranda Miss,4.0
-Miss Bellezza,1.0
-Miss Bling,7.0
-Miss Galileo,11.0
-Miss Marielle,13.0
-Miss Raggedy Ann,7.0
-Miss Riviera,9.0
-Missun,8.0
-Moment Juste,5.0
-More Respect,4.0
-Morning Dews,5.0
-Mosoru,9.0
-Mota,4.0
-Mowazana,7.0
-Mrs Squillionaire,13.0
-Music Review,9.0
+Madame Rouge,7.0
+Magic Nera,13.0
+Magic Nymph,12.0
+Maid For Winning,4.0
+Maid In Secret,9.0
+Malta,2.0
+Mariana Sunset,12.0
+Marine City,11.0
+Marjorie,9.0
+Matilda Grace,8.0
+Matter,4.0
+Maziona,8.0
+Meddle,1.0
+Meeting In Paris,6.0
+Melbourne Memories,10.0
+Metung Belle,4.0
+Mezentseva,12.0
+Mi Centie,6.0
+Michelle Shift,1.0
+Midnight Mystique,6.0
+Midnight Reigns,3.0
+Mighty Lion,10.0
+Mimi Lebrock,6.0
+Miraculous Miss,1.0
+Miraflores,11.0
+Miss Bellezza,6.0
+Miss Ireland,11.0
+Miss Love,5.0
+Miss Marielle,9.0
+Miss Midas,6.0
+Miss Raggedy Ann,12.0
+Miss Rimex,6.0
+Miss Riviera,4.0
+Miss Tizzy,8.0
+Mitzi,6.0
+Mont Fay,2.0
+Montaza,5.0
+Montjeu Way,12.0
+More Respect,7.0
+More Than Pronto,4.0
+Morzine,14.0
+Mosoru,6.0
+Mowazana,3.0
+Mrs Squillionaire,6.0
+Mrs Zoff,3.0
+Mumtaz,10.0
 My Central,6.0
-Mystery Creek,12.0
-Nandi,4.0
-Navajo Queen,3.0
-Nisriyna,9.0
-Now The World,9.0
-Oasis Jade,6.0
-On The Loose,9.0
-One Love,2.0
-Our Contessina,9.0
-Party Queen,2.0
-Pearl Dance,8.0
-Pediment,14.0
-Perfect Promise,9.0
-Plain Crazy,6.0
-Plaything,10.0
-Port Providence,6.0
-Portelet,1.0
-Prompt,2.0
-Purde,6.0
-Puzzling,8.0
-Pyramisa's Lass,6.0
-Quatro,12.0
-Queen Of The Falls,5.0
-Queen Of Troy,1.0
-Queen To Be,2.0
-Raewyn,11.0
-Ramamara,1.0
-Really Ransom,5.0
-Red Boots,6.0
-Rip Trice,3.0
-Rock Of Fortune,1.0
-Rondalla,8.0
-Rose Of Hallowell,2.0
+Mythical Play,5.0
+Navajo Queen,1.0
+Negotiate,1.0
+Nepro,6.0
+Nesmeh,13.0
+Neuquen,4.0
+Nevaloveduanyway,5.0
+Next Century,11.0
+Next Holy,11.0
+Nina Celebre,4.0
+Nisriyna,8.0
+Noble One,7.0
+Noozhah,6.0
+North Pole Dancer,13.0
+O'Right,12.0
+Oasis Jade,2.0
+Ocean Pearl,4.0
+Oh Eight Hundred,13.0
+Olga Palosky,8.0
+On Her Way,13.0
+On The Board,2.0
+Once More,8.0
+One Nite Stand,5.0
+Our Contessina,7.0
+Our Foil,4.0
+Out Of Egypt,2.0
+Paramount,10.0
+Pearl Of The Sea,4.0
+Pediment,6.0
+Pennacchio,2.0
+Perfect Promise,7.0
+Perfect Truth,6.0
+Perlight,10.0
+Phaedra,5.0
+Photograph,13.0
+Pilya,2.0
+Pineau,14.0
+Pinocchio,1.0
+Plain Crazy,2.0
+Plaything,1.0
+Porschalaine,5.0
+Pride And Passion,3.0
+Pride Of The Class,2.0
+Princesa,8.0
+Princess Biscotte,10.0
+Princess Carolina,3.0
+Princess Laya,3.0
+Princess Natural,5.0
+Princess Quality,3.0
+Private,12.0
+Promise To Rock,11.0
+Prompt,5.0
+Pyramisa's Lass,5.0
+Pyrotechnics,4.0
+Quality Dream,5.0
+Quality Impulse,7.0
+Quatro,10.0
+Queen Of Avalon,9.0
+Queenie Keen,4.0
+Quenching,10.0
+Ramamara,10.0
+Ready To Please,6.0
+Red Bloom,3.0
+Red Boots,4.0
+Reizend,6.0
+Rekindled Applause,7.0
+Rip Trice,5.0
+Rita Moreno,7.0
+Riyaba,10.0
+Rondalla,2.0
+Rose Of Hallowell,9.0
+Rosenreihe,5.0
+Rosmarino,5.0
 Royal Ambition,8.0
-Ruby's Realm,6.0
-Rule The Waves,2.0
-Ruqqaya,3.0
-Russian Belle,8.0
-Saaleland,4.0
-Sadler's Girl,3.0
-Sahara Sky,12.0
-Sarada,1.0
-Sassy Gal,10.0
-Savabeel Star,10.0
-Schapelle,6.0
-Seamstress,4.0
-Secret Key,11.0
-Senorita Rosay,3.0
-Senorita de Lago,8.0
-Set,1.0
-Shakaleena,5.0
-Shalt Not,2.0
-Shared Reflections,12.0
-Shezgonewest,11.0
-Show Exhibit,4.0
-Singapore Sling,3.0
-Sister Livia,11.0
-Smart 'n Special,3.0
-Snow Flight,2.0
-Sobraine,13.0
-Sogno,5.0
-Some Girls Do,7.0
-Sommerflora,5.0
-Sorbello,2.0
-Sotela,10.0
-Sparkling Rock,14.0
-Speedalot,6.0
-Spiriting,5.0
-Sprung,2.0
-Stand By Your Man,8.0
-Starship,7.0
-Stolen Girlfriend,7.0
-Strikeline,7.0
-Striking Sneek,6.0
+Royal Feeling,10.0
+Ruddigore,3.0
+Rule The Waves,9.0
+Run Brony Run,6.0
+Rupa,5.0
+Ruqqaya,8.0
+Russian Belle,4.0
+Sadler's Girl,5.0
+Sahara Sky,7.0
+Salamander Bay,8.0
+San Cristobel,3.0
+Saoire,9.0
+Sarada,3.0
+Sarasota,3.0
+Savabeel Star,4.0
+Savamour,8.0
+Schapelle,3.0
+Schooner Bay,3.0
+Se La Vie,9.0
+Secret Key,3.0
+Secret Liaison,5.0
+Sedoso,1.0
+Selenus,8.0
+Senorita de Lago,2.0
+Set,3.0
+Shabamalam,11.0
+Shades Of Silk,12.0
+Shalt Not,8.0
+Shared Reflections,1.0
+Sharp Point,4.0
+Sharp Secretary,14.0
+She's Assertive,5.0
+She's Due,2.0
+She's The One,11.0
+Sheerama,9.0
+Shezgonewest,9.0
+Showerproof,4.0
+Shuswap,10.0
+Silvara,9.0
+Silver Cent,4.0
+Silver Star,2.0
+Sing Dixie Sing,3.0
+Singapore Sling,8.0
+Sister Livia,8.0
+Sister Madrid,7.0
+Skite,1.0
+Sky Alert,8.0
+Smart 'n Special,9.0
+Snaps,1.0
+Snow Flight,5.0
+Snowtime,9.0
+Snowy World,8.0
+Sogno,7.0
+Solo Piano,3.0
+Some Girls Do,5.0
+Sommerflora,10.0
+Sorbello,4.0
+Sotela,1.0
+Spamalot,7.0
+Sparks Fly,7.0
+Special Cuvee,7.0
+Speedalot,8.0
+Spirit Of Rose,11.0
+Spiriting,9.0
+Sport's Chestnut,2.0
+Spyglass Hill,8.0
+Starship,4.0
+Startling Pleasure,9.0
+Staryn Glenn,6.0
+Stole,10.0
+Storma,6.0
+Stormy Choice,10.0
+Stream Royale,3.0
+Street Storm,9.0
+Strikeline,4.0
+Striking Sneek,7.0
+Stylish Bel,1.0
+Subtle Affair,6.0
+Sugar Moon,5.0
+Suite,6.0
+Summer Eternity,1.0
 Sunburnt,1.0
-Supernal,1.0
-Sutology,5.0
-Suzie Temple,5.0
-Sweet Maggie,10.0
-Sweet Vibes,3.0
-Sweet Virginia,4.0
-Syrian Bride,10.0
-Talkin Kate,4.0
-Tango's Choice,4.0
-Tennessee Love,10.0
-The Girlfriend,8.0
-The Quarewan,6.0
-Thebe,2.0
-Thunder Belle,5.0
-Tintoretto,8.0
-Tora Bora,9.0
-Trail Of Secrets,4.0
-Truly Kissed,10.0
-Twirling Heights,2.0
-Umoya,13.0
-Uno Sayuri,6.0
-Ursula Minor,11.0
-Valkyrie Diva,3.0
-Venetian Lady,9.0
-Viva Dubai,1.0
-Vogue Beauty,4.0
-Volkara,1.0
-Whisper Her Name,3.0
+Sunday Service,6.0
+Surreptitiously,1.0
+Sutology,6.0
+Suzy Smart,10.0
+Swan Lake,2.0
+Sweet Dreams Baby,8.0
+Sweet Fascination,3.0
+Sweet Scene,13.0
+Taatyana,6.0
+Takarna,7.0
+Tallulah Bell,6.0
+Talulla,9.0
+Tancreda,12.0
+Tango's Choice,8.0
+Tarlaquena,14.0
+Tatt's Lucky,10.0
+Tea Chest,6.0
+Tell Someone,2.0
+Tennessee Love,9.0
+The Baroness,6.0
+The Dazzler,10.0
+The Myth,12.0
+The Quarewan,7.0
+The Taj,10.0
+Thebe,8.0
+Third Choice,4.0
+Thirst,6.0
+Thunder Belle,4.0
+Tipperary Honor,2.0
+Torentosa,10.0
+Torrini,14.0
+Touch Of Greatness,6.0
+Trading Halt,13.0
+Trail Of Secrets,2.0
+Tricilo,9.0
+Trip To The Moon,4.0
+True Grace,6.0
+True Roman,10.0
+Truly Kissed,4.0
+Tsukioka,5.0
+Twirling Heights,3.0
+Umoya,4.0
+Upgrading,1.0
+Valdovino,4.0
+Venetian Lady,11.0
+Very Edgy,6.0
+Victoria Bay,2.0
+Vintage Rock,5.0
+Viva Dubai,11.0
+Vogue Beauty,6.0
+Volkara,8.0
+Wahaha,13.0
+Wanaka,10.0
+Wedgetail Eagle,6.0
+Whatsaname,3.0
+Whisper Her Name,12.0
+White Diamonds,2.0
+Wildcat Woman,3.0
+Wildly Entertained,7.0
+With Apologies,9.0
+With Fervour,3.0
+Yajala,11.0
+You'll Be Mine,13.0
+Young American,2.0
+Ysa Post,9.0
+Zalass,10.0
+Zaquabeel,8.0
+Zazie,1.0
+Zipanese,5.0

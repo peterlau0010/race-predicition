@@ -123,7 +123,7 @@ logging.info('After removeOutlier Size, %s', str(np.shape(data)))
 data_original = data.copy()
 
 data = data[['road', 'dist', 'class', 'draw', 'finishTime',
-             'going', 'Age', 'Win%_y', 'Win%_x', 'DamRank', 'SireRank']]
+             'going', 'Age', 'Win%_y', 'Win%_x', 'DamRank', 'SireRank','awt','dhw','raceCource']]
 
 logging.info('Selected CSV Size, %s', str(np.shape(data)))
 
@@ -141,8 +141,8 @@ data = pd.get_dummies(
 data = pd.get_dummies(
     data, columns=['class'], prefix=['class'])
 
-# data = pd.get_dummies(
-# data, columns=['Country Of Origin'], prefix=['Country Of Origin'])
+data = pd.get_dummies(
+data, columns=['raceCource'], prefix=['raceCource'])
 
 logging.info('After converted categories Size, %s', str(np.shape(data)))
 
@@ -156,7 +156,7 @@ y = data[['finishTime']]
 
 # ========= split train and test =========
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.40, shuffle=False)
+    X, y, test_size=0.20, shuffle=False)
 # ========= Standardization for data =========
 scalerX = StandardScaler().fit(X_train)
 scalery = StandardScaler().fit(y_train)
@@ -210,6 +210,8 @@ logging.info(np.shape(df_out))
 logging.info(X.columns.values)
 # The coefficients
 logging.info('Coefficients: \n %s', model.coef_)
+for idx, col_name in enumerate(X.columns):
+    logging.info("The coefficient for {} is {}".format(col_name, model.coef_[0][idx]))
 # The mean squared error
 logging.info("Mean squared error: %.2f"
              % mean_squared_error(df_out['x_Rank'], df_out['y_Rank']))

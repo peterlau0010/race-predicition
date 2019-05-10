@@ -37,6 +37,7 @@ np.savetxt('./Processed Data/sireRank.csv', winrate.round(0),
 sumOfPlc = data.groupby(['Dam'])['plc'].sum()
 noOfMatch = data.groupby(['Dam'])['finishTime'].count()
 winrate = sumOfPlc/noOfMatch
+
 winrate = winrate.reset_index()
 winrate.columns = ['Dam','DamRank']
 
