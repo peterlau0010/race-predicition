@@ -156,7 +156,7 @@ y = data[['finishTime']]
 
 # ========= split train and test =========
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.20, shuffle=False)
+    X, y, test_size=0.30, shuffle=False)
 # ========= Standardization for data =========
 scalerX = StandardScaler().fit(X_train)
 scalery = StandardScaler().fit(y_train)
