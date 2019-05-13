@@ -19,6 +19,9 @@ import time
 import logging
 from sklearn.preprocessing import MinMaxScaler
 import seaborn as sns
+
+from joblib import dump, load
+
 pd.set_option('mode.chained_assignment', None)
 
 
@@ -123,7 +126,7 @@ logging.info('After removeOutlier Size, %s', str(np.shape(data)))
 data_original = data.copy()
 
 data = data[['road', 'dist', 'class', 'draw', 'finishTime',
-             'going', 'Age', 'Win%_y', 'Win%_x', 'DamRank', 'SireRank','awt','dhw','raceCource']]
+             'going', 'Age', 'Win%_y', 'Win%_x', 'DamRank', 'SireRank', 'awt', 'dhw', 'raceCource']]
 
 logging.info('Selected CSV Size, %s', str(np.shape(data)))
 
@@ -142,7 +145,7 @@ data = pd.get_dummies(
     data, columns=['class'], prefix=['class'])
 
 data = pd.get_dummies(
-data, columns=['raceCource'], prefix=['raceCource'])
+    data, columns=['raceCource'], prefix=['raceCource'])
 
 logging.info('After converted categories Size, %s', str(np.shape(data)))
 
@@ -152,14 +155,21 @@ data.fillna(data.mean(), inplace=True)
 
 # ========= Prepare X Y =========
 X = data.drop(['finishTime'], axis=1)
+headers = ','.join(map(str, X.columns.values))
+
+
 y = data[['finishTime']]
 
 # ========= split train and test =========
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.30, shuffle=False)
+    X, y, test_size=0.05, shuffle=False)
+
+np.savetxt('./Report/predicitValue.csv', X_test.round(0),
+           delimiter=',', fmt='%s', header=headers, comments='')
 # ========= Standardization for data =========
 scalerX = StandardScaler().fit(X_train)
-scalery = StandardScaler().fit(y_train)
+dump(scalerX, 'scaler.sav')
+# scalery = StandardScaler().fit(y_train)
 X_train = scalerX.transform(X_train)
 # y_train = scalery.transform(y_train)
 X_test = scalerX.transform(X_test)
@@ -173,6 +183,7 @@ X_test = scalerX.transform(X_test)
 
 model = linear_model.LinearRegression()
 model.fit(X_train, y_train)
+dump(model, 'regressioin_model.sav')
 
 # ========= Prediction =========
 y_pred = model.predict(X_test)
@@ -195,8 +206,8 @@ df_out = df_out.sort_values(
 
 # df_out = df_out[(df_out['y_Rank'] <= 1)]
 
-regression_report = df_out[['Age', 'Chinese Name', 'Code', 'Trainer', 'Jockey',
-                            'plc', 'odds','finishTime_x', 'y_pred', 'y_Rank', 'x_Rank']]
+regression_report = df_out[['Age', 'draw','Chinese Name', 'Code', 'Trainer', 'Jockey',
+                            'plc', 'odds', 'finishTime_x', 'y_pred', 'y_Rank', 'x_Rank']]
 
 headers = ','.join(map(str, regression_report.columns.values))
 np.savetxt('./Report/regression_report.csv', regression_report.round(0),
@@ -211,7 +222,8 @@ logging.info(X.columns.values)
 # The coefficients
 logging.info('Coefficients: \n %s', model.coef_)
 for idx, col_name in enumerate(X.columns):
-    logging.info("The coefficient for {} is {}".format(col_name, model.coef_[0][idx]))
+    logging.info("The coefficient for {} is {}".format(
+        col_name, model.coef_[0][idx]))
 # The mean squared error
 logging.info("Mean squared error: %.2f"
              % mean_squared_error(df_out['x_Rank'], df_out['y_Rank']))
