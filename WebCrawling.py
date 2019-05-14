@@ -41,10 +41,10 @@ class WebCrawling:
         # Trim space, remove line break, remove double space
         return re.sub(' +', ' ', text.replace('\n', ' ').replace('\r', '').replace(',', '').replace('HK$ ', '').strip())
 
-    def getHistory(self, day, racecource, raceno):
+    def getHistory(self, day, racecourse, raceno):
         url_base = 'https://racing.hkjc.com/racing/information/English/Racing/LocalResults.aspx?'
         url_raceDate = 'RaceDate=' + day
-        url_raceCourse = '&Racecourse=' + racecource
+        url_raceCourse = '&Racecourse=' + racecourse
         url_raceNo = '&RaceNo=' + raceno
         url = url_base + url_raceDate + url_raceCourse + url_raceNo
 
@@ -66,7 +66,7 @@ class WebCrawling:
 
         # Add Index value to history
         history_header.append(day)
-        history_header.append(racecource)
+        history_header.append(racecourse)
         history_header.append(raceno)
 
         # Add Match Detail to history
@@ -124,13 +124,13 @@ try:
 
             day = '{:0>4d}'.format(row['RaceDate1']) + '/' + '{:0>2d}'.format(
                 row['RaceDate2']) + '/' + '{:0>2d}'.format(row['RaceDate3'])
-            racecource = row['Racecourse']
+            racecourse = row['Racecourse']
             raceno = str(matchIndex + 1)
 
-            logging.info('Access web with parameters, day = %s, racecource=%s, raceno = %s ',
-                         day, racecource, raceno)
+            logging.info('Access web with parameters, day = %s, racecourse=%s, raceno = %s ',
+                         day, racecourse, raceno)
 
-            temp_history = webCrawling.getHistory(day, racecource, raceno)
+            temp_history = webCrawling.getHistory(day, racecourse, raceno)
             logging.info('Get history record with shpe: %s',
                          numpy.shape(temp_history))
 
@@ -151,7 +151,7 @@ finally:
 
     logging.info('Ready to write csv with histroy shape: %s',
                  numpy.shape(history))
-    headers = ['date','raceCource','raceNo','going','raceName','road','money','class','dist','plc','horseNo','horseName','jockey','trainer','awt','dhw','draw','lbw','runPos','finishTime','odds']
+    headers = ['date','raceCourse','raceNo','going','raceName','road','money','class','dist','plc','horseNo','horseName','jockey','trainer','awt','dhw','draw','lbw','runPos','finishTime','odds']
     headers = ','.join(headers)
     numpy.savetxt('./Raw Data/history.csv', history, delimiter=',', fmt='%s',header=headers, comments='')
     logging.info('Finished write csv')

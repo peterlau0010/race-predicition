@@ -30,10 +30,10 @@ class Regression:
     logging.basicConfig(filename='./Log/Regression.log', format='%(asctime)s %(levelname)s %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S ', level=logging.INFO)
 
-    def __init__(self, data, raceCource, classes, dist, road):
+    def __init__(self, data, raceCourse, classes, dist, road):
         self.data = data
         self.originaldata = data
-        self.raceCource = raceCource
+        self.raceCourse = raceCourse
         self.classes = classes
         self.dist = dist
         self.road = road
@@ -81,8 +81,8 @@ class Regression:
         data = data if self.road is None else data[(data['road'] == self.road)]
         data = data if self.classes is None else data[(
             data['class'] == self.classes)]
-        data = data if self.raceCource is None else data[(
-            data['raceCource'] == self.raceCource)]
+        data = data if self.raceCourse is None else data[(
+            data['raceCourse'] == self.raceCourse)]
         return data
 
     def removeOutlier(self, data):
@@ -91,9 +91,9 @@ class Regression:
         return data
 
 
-raceCource, classes, dist, road = None, None, None, None
+raceCourse, classes, dist, road = None, None, None, None
 
-# raceCource = 'HV'
+# raceCourse = 'HV'
 # classes = 'Class 4'
 # dist = '1200M'
 # road = 'TURF - A Course'
@@ -104,7 +104,7 @@ data = data.iloc[::-1]
 logging.info('Original CSV Size, %s', str(np.shape(data)))
 
 # ======== initial Regression Class ============
-r = Regression(data, raceCource, classes, dist, road)
+r = Regression(data, raceCourse, classes, dist, road)
 
 # ======== Prepare Data ==============
 data = r.groupData(data)
@@ -126,7 +126,7 @@ logging.info('After removeOutlier Size, %s', str(np.shape(data)))
 data_original = data.copy()
 
 data = data[['road', 'dist', 'class', 'draw', 'finishTime',
-             'going', 'Age', 'Win%_y', 'Win%_x', 'DamRank', 'SireRank', 'awt', 'dhw', 'raceCource']]
+             'going', 'Age', 'Win%_y', 'Win%_x', 'DamRank', 'SireRank', 'awt', 'dhw', 'raceCourse']]
 
 logging.info('Selected CSV Size, %s', str(np.shape(data)))
 
@@ -145,7 +145,7 @@ data = pd.get_dummies(
     data, columns=['class'], prefix=['class'])
 
 data = pd.get_dummies(
-    data, columns=['raceCource'], prefix=['raceCource'])
+    data, columns=['raceCourse'], prefix=['raceCourse'])
 
 logging.info('After converted categories Size, %s', str(np.shape(data)))
 
@@ -162,7 +162,7 @@ y = data[['finishTime']]
 
 # ========= split train and test =========
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.05, shuffle=False)
+    X, y, test_size=0.20, shuffle=False)
 
 np.savetxt('./Report/predicitValue.csv', X_test.round(0),
            delimiter=',', fmt='%s', header=headers, comments='')

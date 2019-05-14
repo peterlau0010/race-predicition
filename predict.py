@@ -92,8 +92,15 @@ if 'going_GOOD' not in X_test:
 if 'going_GOOD TO FIRM' not in X_test:
     X_test['going_GOOD TO FIRM'] = np.NaN
 
-if 'rgoing_GOOD TO YIELDING' not in X_test:
+if 'going_GOOD TO YIELDING' not in X_test:
     X_test['going_GOOD TO YIELDING'] = np.NaN
+
+if 'going_YIELDING' not in X_test:
+    X_test['going_YIELDING'] = np.NaN
+
+if 'going_WET SLOW' not in X_test:
+    X_test['going_WET SLOW'] = np.NaN
+
 
 if 'class_Class 1' not in X_test:
     X_test['class_Class 1'] = np.NaN
@@ -131,8 +138,8 @@ X_test = X_test.rename(
 
 
 # ========== Select required Column ================
-X_test = X_test[['draw','Age','Win%_y','Win%_x','DamRank','SireRank','awt','dhw','dist_1000M','dist_1200M','dist_1400M','dist_1600M','dist_1650M','dist_1800M','dist_2000M','road_ALL WEATHER TRACK','road_TURF - A Course','road_TURF - B Course','road_TURF - C Course','going_GOOD','going_GOOD TO FIRM','going_GOOD TO YIELDING','class_Class 1','class_Class 2','class_Class 3','class_Class 4','class_Class 5','raceCourse_HV','raceCourse_ST']]
-
+X_test = X_test[['draw', 'Age', 'Win%_y', 'Win%_x', 'DamRank', 'SireRank', 'awt', 'dhw', 'dist_1000M', 'dist_1200M', 'dist_1400M', 'dist_1600M', 'dist_1650M', 'dist_1800M', 'dist_2000M', 'road_ALL WEATHER TRACK', 'road_TURF - A Course', 'road_TURF - B Course',
+                 'road_TURF - C Course', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_WET SLOW', 'going_YIELDING', 'class_Class 1', 'class_Class 2', 'class_Class 3', 'class_Class 4', 'class_Class 5', 'raceCourse_HV', 'raceCourse_ST']]
 logging.info('X_test: %s \n %s', np.shape(X_test), X_test)
 
 
