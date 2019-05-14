@@ -168,11 +168,11 @@ damRank = pd.read_csv('./Processed Data/damRank.csv', sep=',')
 jockey = pd.read_csv('./Raw Data/jockey1819.csv', sep=',')
 # ---------------- below 2 lines should be removed --------
 jockey['Jockey'] = jockey['Jockey'].str.strip()
-jockey['Win'] = jockey['Win']*100
+jockey['Win'] = jockey['Win']
 
 trainer = pd.read_csv('./Raw Data/trainer1819.csv', sep=',')
 # ---------------- below 1 lines should be removed --------
-trainer['Win'] = trainer['Win']*100
+trainer['Win'] = trainer['Win']
 
 
 # ============== Join required csv with allMatchToday

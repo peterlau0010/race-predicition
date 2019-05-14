@@ -81,7 +81,7 @@ history_csv_merged_1516 = pd.merge(history_csv_merged_1516, jockey_csv_1516, how
 # =========== 18 to 19 ========
 jockey_csv_1819 = jockey_csv_1819[['Jockey', 'Win']]
 jockey_csv_1819['Jockey'] = jockey_csv_1819['Jockey'].str.strip()
-jockey_csv_1819['Win'] = jockey_csv_1819['Win']*100
+jockey_csv_1819['Win'] = jockey_csv_1819['Win']
 jockey_csv_1819 = jockey_csv_1819.rename(columns={'Win': 'Win%'})
 date_after, date_before = pd.Timestamp(2018, 9, 1), pd.Timestamp(2019, 7, 31)
 jockey_csv_1819 = pd.merge(jockey_csv_1819, jockeyList_csv, how='left',left_on=['Jockey'], right_on=['Jockey2'])
@@ -130,7 +130,7 @@ history_csv_merged_1516 = pd.merge(history_csv_merged_1516, trainer_csv_1516, ho
 trainer_csv_1819 = trainer_csv_1819[['Trainer', 'Win']]
 print(trainer_csv_1819.head())
 trainer_csv_1819['Trainer'] = trainer_csv_1819['Trainer'].astype(str).str.strip()
-trainer_csv_1819['Win'] = trainer_csv_1819['Win']*100
+trainer_csv_1819['Win'] = trainer_csv_1819['Win']
 trainer_csv_1819 = trainer_csv_1819.rename(columns={'Win': 'Win%'})
 date_after, date_before = pd.Timestamp(2018, 9, 1), pd.Timestamp(2019, 7, 31)
 print(trainer_csv_1819.head())
