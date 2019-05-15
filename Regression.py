@@ -44,7 +44,9 @@ raceCourse = cfg.param['raceCourse']
 pd.set_option('mode.chained_assignment', None)
 
 
-
+pd.set_option('display.max_rows', 50)
+pd.set_option('display.max_columns', 500)
+pd.set_option('display.width', 1000)
 
 
 
@@ -155,8 +157,8 @@ logging.info('After removeOutlier Size, %s', str(np.shape(data)))
 data_original = data.copy()
 print("','".join(map(str, data_original.columns.values)))
 
-data = data[['road', 'class', 'draw', 'finishTime',
-              'Age', 'J_Win','J_2nd','J_3rd','J_4th','J_5th','Total Rides','J_Stakes Won','T_Win','T_2nd','T_3rd','T_4th','T_5th','Total Runs','T_Stakes Won', 'DamRank', 'SireRank',]]
+# data = data[['road', 'class', 'draw', 'finishTime','Age', 'J_Win','J_2nd','J_3rd','J_4th','J_5th','Total Rides','J_Stakes Won','T_Win','T_2nd','T_3rd','T_4th','T_5th','Total Runs','T_Stakes Won', 'DamRank', 'SireRank',]]
+data = data[[ 'draw', 'finishTime','Age','J_Win','T_Win', 'DamRank', 'SireRank','awt','dhw']]
 
 logging.info('Selected CSV Size, %s', str(np.shape(data)))
 
@@ -168,14 +170,14 @@ logging.info('Selected CSV Size, %s', str(np.shape(data)))
 data = pd.get_dummies(data, columns=[
     'draw'], prefix=['draw'])
 
-data = pd.get_dummies(data, columns=[
-    'road'], prefix=['road'])
+# data = pd.get_dummies(data, columns=[
+#     'road'], prefix=['road'])
 
 # data = pd.get_dummies(
 #     data, columns=['going'], prefix=['going'])
 
-data = pd.get_dummies(
-    data, columns=['class'], prefix=['class'])
+# data = pd.get_dummies(
+#     data, columns=['class'], prefix=['class'])
 
 # data = pd.get_dummies(
 #     data, columns=['raceCourse'], prefix=['raceCourse'])
@@ -195,13 +197,15 @@ y = data[['finishTime']]
 
 # ========= split train and test =========
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.20, shuffle=False)
+    X, y, test_size=0.10, shuffle=False)
 
 np.savetxt('./Report/predicitValue.csv', X_test.round(0),
            delimiter=',', fmt='%s', header=headers, comments='')
 # ========= Standardization for data =========
 scalerX = StandardScaler().fit(X_train)
 dump(scalerX, 'scaler.sav')
+# logging.info('X_train, %s', str(np.shape(X_train)))
+logging.info('X_train: %s \n %s', np.shape(X_train), X_train)
 X_train = scalerX.transform(X_train)
 X_test = scalerX.transform(X_test)
 
@@ -231,7 +235,7 @@ df_out["x_Rank"] = df_out.groupby(['date', 'raceNo'])["plc"].rank()
 df_out = df_out.sort_values(
     ['date', 'raceNo', 'plc'], ascending=[True, False, True])
 
-df_out = df_out[(df_out['y_Rank'] <= 5)]
+df_out = df_out[(df_out['y_Rank'] <= 1)]
 
 regression_report = df_out[['date', 'raceNo','Age', 'draw','Chinese Name', 'Code', 'Trainer', 'Jockey',
                             'plc', 'odds', 'finishTime_x', 'y_pred', 'y_Rank', 'x_Rank']]

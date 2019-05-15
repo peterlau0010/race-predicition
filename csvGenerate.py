@@ -29,6 +29,12 @@ logging.basicConfig(filename='./Log/csvGenerate.log', format='%(asctime)s %(leve
                         datefmt='%Y-%m-%d %H:%M:%S ', level=logging.INFO)
 
 
+def groupData(data):
+    data.loc[data['road'].str.contains('"A+'), 'road'] = 'TURF - A Course'
+    data.loc[data['road'].str.contains('"B+'), 'road'] = 'TURF - B Course'
+    data.loc[data['road'].str.contains('"C+'), 'road'] = 'TURF - C Course'
+    return data
+
 def selectAppropriateData(data,raceCourse,classes,dist,road,going):
     logging.info('SelectAppropriateData dist:  %s',dist)
     logging.info('SelectAppropriateData road:  %s',road)
@@ -64,8 +70,11 @@ data.loc[data['plc'].str.contains('9 DH'), 'plc'] = '9'
 data.loc[data['plc'].str.contains('10 DH'), 'plc'] = '10'
 data['plc'] = data['plc'].astype(float)
 
+data = groupData(data)
 data = selectAppropriateData(data,raceCourse,classes,dist,road,going)
 
+logging.info('After selectAppropriateData data Size : %s \n %s',
+             np.shape(data), data)
 
 # data = data.dropna(subset=['Sire'])
 
