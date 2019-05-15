@@ -19,10 +19,34 @@ import time
 import logging
 from sklearn.preprocessing import MinMaxScaler
 import seaborn as sns
-
+import RaceParam as cfg
 from joblib import dump, load
 
+raceCourse, classes, dist, road = None, None, None, None
+
+# raceCourse = 'HV'
+# classes = 'Class 4'
+# dist = '1200M'
+# road = 'TURF - A Course'
+# going = 'GOOD'
+
+date = cfg.param['date']
+dist = cfg.param['dist']
+road = cfg.param['road']
+going = cfg.param['going']
+classes = cfg.param['classes']
+raceCourse = cfg.param['raceCourse']
+
+
+
+
+
 pd.set_option('mode.chained_assignment', None)
+
+
+
+
+
 
 
 class Regression:
@@ -30,13 +54,14 @@ class Regression:
     logging.basicConfig(filename='./Log/Regression.log', format='%(asctime)s %(levelname)s %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S ', level=logging.INFO)
 
-    def __init__(self, data, raceCourse, classes, dist, road):
+    def __init__(self, data, raceCourse, classes, dist, road,going):
         self.data = data
         self.originaldata = data
         self.raceCourse = raceCourse
         self.classes = classes
         self.dist = dist
         self.road = road
+        self.going = going
 
     def groupData(self, data):
         # ========= Group data =========
@@ -77,12 +102,20 @@ class Regression:
         return data
 
     def selectAppropriateData(self, data):
+        logging.info('SelectAppropriateData dist:  %s',self.dist)
+        logging.info('SelectAppropriateData road:  %s',self.road)
+        logging.info('SelectAppropriateData classes:  %s',self.classes)
+        logging.info('SelectAppropriateData raceCourse:  %s',self.raceCourse)
+        logging.info('SelectAppropriateData going:  %s',self.going)
+
         data = data if self.dist is None else data[(data['dist'] == self.dist)]
         data = data if self.road is None else data[(data['road'] == self.road)]
         data = data if self.classes is None else data[(
             data['class'] == self.classes)]
         data = data if self.raceCourse is None else data[(
             data['raceCourse'] == self.raceCourse)]
+        data = data if self.going is None else data[(
+            data['going'] == self.going)]
         return data
 
     def removeOutlier(self, data):
@@ -91,20 +124,15 @@ class Regression:
         return data
 
 
-raceCourse, classes, dist, road = None, None, None, None
 
-# raceCourse = 'HV'
-# classes = 'Class 4'
-# dist = '1200M'
-# road = 'TURF - A Course'
 
 # ========= Read CSV file =========
-data = pd.read_csv('./Processed Data/history_csv_merged.csv', header=0)
+data = pd.read_csv('./Processed Data/history_csv_merged_with_Sire_Dam.csv', header=0)
 data = data.iloc[::-1]
 logging.info('Original CSV Size, %s', str(np.shape(data)))
 
 # ======== initial Regression Class ============
-r = Regression(data, raceCourse, classes, dist, road)
+r = Regression(data, raceCourse, classes, dist, road,going)
 
 # ======== Prepare Data ==============
 data = r.groupData(data)
@@ -115,7 +143,8 @@ logging.info('After removeInvalidData Size, %s', str(np.shape(data)))
 data = r.convertData(data)
 
 data = r.selectAppropriateData(data)
-logging.info('After selectAppropriateData Size, %s', str(np.shape(data)))
+# logging.info('After selectAppropriateData Size, %s', str(np.shape(data)))
+logging.info('After selectAppropriateData data Size : %s \n %s', np.shape(data), data)
 
 data = r.removeOutlier(data)
 logging.info('After removeOutlier Size, %s', str(np.shape(data)))
@@ -124,28 +153,32 @@ logging.info('After removeOutlier Size, %s', str(np.shape(data)))
 # ========= Select column for regresion ============
 
 data_original = data.copy()
+print("','".join(map(str, data_original.columns.values)))
 
-data = data[['road', 'dist', 'class', 'draw', 'finishTime',
-             'going', 'Age', 'Win%_y', 'Win%_x', 'DamRank', 'SireRank', 'awt', 'dhw', 'raceCourse']]
+data = data[['road', 'class', 'draw', 'finishTime',
+              'Age', 'J_Win','J_2nd','J_3rd','J_4th','J_5th','Total Rides','J_Stakes Won','T_Win','T_2nd','T_3rd','T_4th','T_5th','Total Runs','T_Stakes Won', 'DamRank', 'SireRank',]]
 
 logging.info('Selected CSV Size, %s', str(np.shape(data)))
 
 
 # ========= Convert Categories to 0 1 =========
+# data = pd.get_dummies(data, columns=[
+#     'dist'], prefix=['dist'])
+
 data = pd.get_dummies(data, columns=[
-    'dist'], prefix=['dist'])
+    'draw'], prefix=['draw'])
 
 data = pd.get_dummies(data, columns=[
     'road'], prefix=['road'])
 
-data = pd.get_dummies(
-    data, columns=['going'], prefix=['going'])
+# data = pd.get_dummies(
+#     data, columns=['going'], prefix=['going'])
 
 data = pd.get_dummies(
     data, columns=['class'], prefix=['class'])
 
-data = pd.get_dummies(
-    data, columns=['raceCourse'], prefix=['raceCourse'])
+# data = pd.get_dummies(
+#     data, columns=['raceCourse'], prefix=['raceCourse'])
 
 logging.info('After converted categories Size, %s', str(np.shape(data)))
 
@@ -157,8 +190,8 @@ data.fillna(data.mean(), inplace=True)
 X = data.drop(['finishTime'], axis=1)
 headers = ','.join(map(str, X.columns.values))
 
-
 y = data[['finishTime']]
+
 
 # ========= split train and test =========
 X_train, X_test, y_train, y_test = train_test_split(
@@ -169,14 +202,8 @@ np.savetxt('./Report/predicitValue.csv', X_test.round(0),
 # ========= Standardization for data =========
 scalerX = StandardScaler().fit(X_train)
 dump(scalerX, 'scaler.sav')
-# scalery = StandardScaler().fit(y_train)
 X_train = scalerX.transform(X_train)
-# y_train = scalery.transform(y_train)
 X_test = scalerX.transform(X_test)
-# y_test = scalery.transform(y_test)
-
-# X_train = scalerX.fit_transform(X_train)
-# X_test = scalery.fit_transform(X_test)
 
 
 # ========= Regression Model =========
@@ -204,13 +231,13 @@ df_out["x_Rank"] = df_out.groupby(['date', 'raceNo'])["plc"].rank()
 df_out = df_out.sort_values(
     ['date', 'raceNo', 'plc'], ascending=[True, False, True])
 
-# df_out = df_out[(df_out['y_Rank'] <= 1)]
+df_out = df_out[(df_out['y_Rank'] <= 5)]
 
-regression_report = df_out[['Age', 'draw','Chinese Name', 'Code', 'Trainer', 'Jockey',
+regression_report = df_out[['date', 'raceNo','Age', 'draw','Chinese Name', 'Code', 'Trainer', 'Jockey',
                             'plc', 'odds', 'finishTime_x', 'y_pred', 'y_Rank', 'x_Rank']]
 
 headers = ','.join(map(str, regression_report.columns.values))
-np.savetxt('./Report/regression_report.csv', regression_report.round(0),
+np.savetxt('./Report/regression_result.csv', regression_report.round(0),
            delimiter=',', fmt='%s', header=headers, comments='')
 
 logging.info(np.shape(df_out))
@@ -218,15 +245,19 @@ df_out = df_out[df_out.plc.notnull()]
 df_out = df_out[df_out.y_Rank.notnull()]
 logging.info(np.shape(df_out))
 
-logging.info(X.columns.values)
+logging.info("','".join(map(str, X.columns.values)))
 # The coefficients
-logging.info('Coefficients: \n %s', model.coef_)
+# logging.info('Coefficients: \n %s', model.coef_)
 for idx, col_name in enumerate(X.columns):
     logging.info("The coefficient for {} is {}".format(
-        col_name, model.coef_[0][idx]))
+        col_name, float(model.coef_[0][idx])))
 # The mean squared error
 logging.info("Mean squared error: %.2f"
              % mean_squared_error(df_out['x_Rank'], df_out['y_Rank']))
+print("Mean squared error: %.2f"
+             % mean_squared_error(df_out['x_Rank'], df_out['y_Rank']))
 # Explained variance score: 1 is perfect prediction
 logging.info('Variance score: %.2f' %
+             r2_score(df_out['x_Rank'], df_out['y_Rank']))
+print('Variance score: %.2f' %
              r2_score(df_out['x_Rank'], df_out['y_Rank']))

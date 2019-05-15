@@ -16,7 +16,7 @@ import re
 
 
 # ==================== Match Value
-jockey = 1
+# jockey = 1
 
 
 pd.set_option('display.max_rows', 500)
@@ -81,40 +81,47 @@ class WebCrawling:
             logging.error('URL with %s', self.url)
             return
 
+for jockey in range(0,2):
 
-try:
-    # =============== initial webCrawling
-    logging.info('Initital Web Crawling - Launch Selenium Browser')
-    webCrawling = WebCrawling()
+    try:
+        # =============== initial webCrawling
+        logging.info('Initital Web Crawling - Launch Selenium Browser')
+        webCrawling = WebCrawling()
 
-    html_source = webCrawling.request(jockey)
-    jockeytrainerlist = webCrawling.getListDetail(html_source)
-    jockeytrainerlist['Win'] = jockeytrainerlist['Win'].str.strip('%')
-    jockeytrainerlist['2nd'] = jockeytrainerlist['2nd'].str.strip('%')
-    jockeytrainerlist['3rd'] = jockeytrainerlist['3rd'].str.strip('%')
-    jockeytrainerlist['4th'] = jockeytrainerlist['4th'].str.strip('%')
-    jockeytrainerlist['5th'] = jockeytrainerlist['5th'].str.strip('%')
-    jockeytrainerlist['Stakes Won'] = jockeytrainerlist['Stakes Won'].str.strip(
-        '$')
+        html_source = webCrawling.request(jockey)
+        jockeytrainerlist = webCrawling.getListDetail(html_source)
+        jockeytrainerlist['Win'] = jockeytrainerlist['Win'].str.strip('%')
+        jockeytrainerlist['2nd'] = jockeytrainerlist['2nd'].str.strip('%')
+        jockeytrainerlist['3rd'] = jockeytrainerlist['3rd'].str.strip('%')
+        jockeytrainerlist['4th'] = jockeytrainerlist['4th'].str.strip('%')
+        jockeytrainerlist['5th'] = jockeytrainerlist['5th'].str.strip('%')
+        jockeytrainerlist['Stakes Won'] = jockeytrainerlist['Stakes Won'].str.strip(
+            '$')
+        if jockey > 0:
+            jockeytrainerlist['Jockey'] = jockeytrainerlist['Jockey'].str.strip()
+        else:
+            jockeytrainerlist['Trainer'] = jockeytrainerlist['Trainer'].str.strip()
+        logging.info('Jockey Trainer List: \n %s', jockeytrainerlist)
+    except Exception as ex:
+        logging.exception(ex)
+    finally:
+        logging.info('Close Selenium Browser')
+        webCrawling.close()
+
+    # ================ Save as csv ==================
+    headers = ','.join(map(str, jockeytrainerlist.columns.values))
+
     if jockey > 0:
-        jockeytrainerlist['Jockey'] = jockeytrainerlist['Jockey'].str.strip()
+        jockeytrainerlist = jockeytrainerlist.rename(
+            columns={'Win': 'J_Win', '2nd': 'J_2nd', '3rd': 'J_3rd', '4th': 'J_4th', '5th': 'J_5th', 'Stakes Won': 'J_Stakes Won'})
+        headers = ','.join(map(str, jockeytrainerlist.columns.values))
+        np.savetxt('./Raw Data/jockey1819.csv', jockeytrainerlist.round(0),
+                delimiter=',', fmt='%s', header=headers, comments='')
     else:
-        jockeytrainerlist['Trainer'] = jockeytrainerlist['Trainer'].str.strip()
-    logging.info('Jockey Trainer List: \n %s', jockeytrainerlist)
-except Exception as ex:
-    logging.exception(ex)
-finally:
-    logging.info('Close Selenium Browser')
-    webCrawling.close()
+        jockeytrainerlist = jockeytrainerlist.rename(
+            columns={'Win': 'T_Win', '2nd': 'T_2nd', '3rd': 'T_3rd', '4th': 'T_4th', '5th': 'T_5th', 'Stakes Won': 'T_Stakes Won'})
+        headers = ','.join(map(str, jockeytrainerlist.columns.values)) 
+        np.savetxt('./Raw Data/trainer1819.csv', jockeytrainerlist.round(0),
+                delimiter=',', fmt='%s', header=headers, comments='')
 
-# ================ Save as csv ==================
-headers = ','.join(map(str, jockeytrainerlist.columns.values))
-
-if jockey > 0:
-    np.savetxt('./Raw Data/jockey1819.csv', jockeytrainerlist.round(0),
-               delimiter=',', fmt='%s', header=headers, comments='')
-else:
-    np.savetxt('./Raw Data/trainer1819.csv', jockeytrainerlist.round(0),
-               delimiter=',', fmt='%s', header=headers, comments='')
-
-logging.info('Finished write csv')
+    logging.info('Finished write csv')

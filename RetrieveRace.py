@@ -12,13 +12,19 @@ import numpy
 import numpy as np
 import pandas as pd
 import re
-
+import RaceParam as cfg
 
 # ==================== Match Value
-date = '20190515'
-raceCourse = 'HV'
-totalMatch = '8'
-
+# date = '20190515'
+# raceCourse = 'HV'
+# totalMatch = '8'
+totalMatch = cfg.param['totalMatch']
+date = cfg.param['date']
+dist = cfg.param['dist']
+road = cfg.param['road']
+going = cfg.param['going']
+classes = cfg.param['classes']
+raceCourse = cfg.param['raceCourse']
 
 
 
@@ -166,13 +172,7 @@ finally:
 sireRank = pd.read_csv('./Processed Data/sireRank.csv', sep=',')
 damRank = pd.read_csv('./Processed Data/damRank.csv', sep=',')
 jockey = pd.read_csv('./Raw Data/jockey1819.csv', sep=',')
-# ---------------- below 2 lines should be removed --------
-jockey['Jockey'] = jockey['Jockey'].str.strip()
-jockey['Win'] = jockey['Win']
-
 trainer = pd.read_csv('./Raw Data/trainer1819.csv', sep=',')
-# ---------------- below 1 lines should be removed --------
-trainer['Win'] = trainer['Win']
 
 
 # ============== Join required csv with allMatchToday
