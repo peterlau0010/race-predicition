@@ -1,9 +1,9 @@
 param = {
-    'raceCourse': 'HV',
+    'raceCourse': 'ST',
     'classes': 'Class 3',
-    'dist': '1650M',
+    'dist': '1800M',
     'road': 'TURF',
     'going': 'GOOD',
-    'date': '20190515',
-    'totalMatch': '8'
+    'date': '20190518',
+    'totalMatch': '10'
 }

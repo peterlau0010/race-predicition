@@ -27,11 +27,10 @@ classes = cfg.param['classes']
 raceCourse = cfg.param['raceCourse']
 
 
-
-
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
+
 
 class WebCrawling:
     logging.basicConfig(filename='./Log/RetrieveRace.log', format='%(asctime)s %(levelname)s %(message)s',
@@ -39,21 +38,21 @@ class WebCrawling:
 
     def __init__(self):
         self.browser = webdriver.Safari()
-        
 
     def close(self):
         self.browser.quit()
 
-    def reFormatText(self,text):
+    def reFormatText(self, text):
         # Trim space, remove line break, remove double space
         return re.sub(' +', ' ', text.replace('\n', ' ').replace('\r', '').replace(',', '').replace('HK$ ', '').strip())
-    
-    def getMatchInfo(self,text):
+
+    def getMatchInfo(self, text):
         matchInfo = text.find(
-        name='table', class_='font13 lineH20 tdAlignL')
+            name='table', class_='font13 lineH20 tdAlignL')
 
         matchInfo = matchInfo.find(name='td').text
-        regex = r"(All Weather Track|Turf, \"[A-C].*\" Course).*([0-9][0-9][0-9][0-9]M),.(.*)Prize.*(Class.[0-5])"
+        logging.info('Match Info: %s', matchInfo)
+        regex = r"(All Weather Track|Turf, \"[A-C].*\" Course).*([0-9][0-9][0-9][0-9]M),*Prize.*(Class.[0-5])"
         matches = re.finditer(regex, matchInfo, re.MULTILINE)
         matchInfo = []
         for matchNum, match in enumerate(matches, start=1):
@@ -66,7 +65,7 @@ class WebCrawling:
                 # print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
         return matchInfo
 
-    def getMatchDetail(self,text):
+    def getMatchDetail(self, text):
         table = text.find(name='table', class_='draggable hiddenable')
         MatchDetail = []
         for tr in table.find_all(name='tr'):
@@ -74,10 +73,9 @@ class WebCrawling:
                 MatchDetail.append(self.reFormatText(td.text))
 
         MatchDetail = numpy.reshape(MatchDetail, (-1, 25))
-        MatchDetail = pd.DataFrame(data=MatchDetail[1:,0:],
-              columns=MatchDetail[0,0:])
+        MatchDetail = pd.DataFrame(data=MatchDetail[1:, 0:],
+                                   columns=MatchDetail[0, 0:])
         return MatchDetail
-
 
     def request(self, date, raceCourse, matchNo):
         self.url = 'https://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/' + \
@@ -98,9 +96,6 @@ class WebCrawling:
             return
 
 
-
-
-
 # ============== WebCrawling (Start) ============
 allMatchToday = pd.DataFrame()
 
@@ -112,7 +107,7 @@ try:
     for matchNo in range(1, int(totalMatch) + 1):
 
         # ============== retrive full page source
-        html_source = webCrawling.request(str(date),raceCourse,str(matchNo))
+        html_source = webCrawling.request(str(date), raceCourse, str(matchNo))
 
         # ============== retrive match base information
         matchInfo = webCrawling.getMatchInfo(html_source)
@@ -125,22 +120,23 @@ try:
         # ========== drop useless data
         matchDetail = matchDetail[(matchDetail['Jockey'] != '-')]
         logging.info('Match Detail: \n %s', matchDetail)
-            
-        
+
         # ============== Split jockey awt in Match Detail
-        split_result = matchDetail['Jockey'].astype(str).str.split("(", n=1, expand=True)
+        split_result = matchDetail['Jockey'].astype(
+            str).str.split("(", n=1, expand=True)
         matchDetail['Jockey'] = split_result[0]
         logging.info('split_result shape : %s', str(np.shape(split_result)))
-        if ', 2)' in str(np.shape(split_result)) :
+        if ', 2)' in str(np.shape(split_result)):
             logging.info('In if')
             matchDetail['AWT'] = split_result[1].str.replace(')', '')
-            matchDetail['AWT'].fillna(value=0, inplace=True)   
-            matchDetail['AWT'] = matchDetail['Wt.'].astype(float) + matchDetail['AWT'].astype(float)   
+            matchDetail['AWT'].fillna(value=0, inplace=True)
+            matchDetail['AWT'] = matchDetail['Wt.'].astype(
+                float) + matchDetail['AWT'].astype(float)
         else:
             logging.info('In else')
             matchDetail['AWT'] = matchDetail['Wt.']
-        
-        matchDetail = matchDetail.drop(['Wt.'],axis=1)
+
+        matchDetail = matchDetail.drop(['Wt.'], axis=1)
 
         # ============== Merge match information to match detail
         matchDetail['road'] = matchInfo[0]
@@ -149,12 +145,14 @@ try:
         matchDetail['class'] = matchInfo[3]
         matchDetail['raceNo'] = matchNo
         matchDetail['raceCourse'] = raceCourse
-        logging.info('Match Detail: %s \n %s', np.shape(matchDetail), matchDetail)
+        logging.info('Match Detail: %s \n %s',
+                     np.shape(matchDetail), matchDetail)
 
-        # ============== Add to all match today 
+        # ============== Add to all match today
         allMatchToday = allMatchToday.append(matchDetail)
 
-    logging.info('All Match Today: %s \n %s', np.shape(allMatchToday), allMatchToday)
+    logging.info('All Match Today: %s \n %s',
+                 np.shape(allMatchToday), allMatchToday)
 
 except Exception as ex:
     logging.exception(ex)
@@ -177,23 +175,25 @@ trainer = pd.read_csv('./Processed Data/trainerRank.csv', sep=',')
 
 # ============== Join required csv with allMatchToday
 allMatchToday = pd.merge(allMatchToday, sireRank, how='left',
-                          left_on=['Sire'], right_on=['Sire'])
+                         left_on=['Sire'], right_on=['Sire'])
 
 allMatchToday = pd.merge(allMatchToday, damRank, how='left',
-                          left_on=['Dam'], right_on=['Dam'])
+                         left_on=['Dam'], right_on=['Dam'])
 
 allMatchToday = pd.merge(allMatchToday, jockey, how='left',
-                          left_on=['Jockey'], right_on=['Jockey'])
+                         left_on=['Jockey'], right_on=['Jockey'])
 
 allMatchToday = pd.merge(allMatchToday, trainer, how='left',
-                          left_on=['Trainer'], right_on=['Trainer'])
+                         left_on=['Trainer'], right_on=['Trainer'])
 
 
 # ============= Update road and going
-allMatchToday['road'] = allMatchToday['road'].str.replace(',',' -').str.replace('"','').str.upper().str.replace('COURSE','Course')
+allMatchToday['road'] = allMatchToday['road'].str.replace(
+    ',', ' -').str.replace('"', '').str.upper().str.replace('COURSE', 'Course')
 allMatchToday['going'] = allMatchToday['going'].str.upper()
 
-logging.info('All Match Today: %s \n %s', np.shape(allMatchToday), allMatchToday)
+logging.info('All Match Today: %s \n %s',
+             np.shape(allMatchToday), allMatchToday)
 
 
 # ============== Editing data for prediction  (End) =================
