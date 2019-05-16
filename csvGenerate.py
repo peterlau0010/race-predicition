@@ -43,7 +43,7 @@ def selectAppropriateData(data,raceCourse,classes,dist,road,going):
     logging.info('SelectAppropriateData going:  %s',going)
 
     data = data if dist is None else data[(data['dist'] == dist)]
-    data = data if road is None else data[(data['road'] == road)]
+    data = data if road is None else data[(data['road'].str.contains(road))]
     data = data if classes is None else data[(
         data['class'] == classes)]
     data = data if raceCourse is None else data[(
@@ -78,6 +78,27 @@ logging.info('After selectAppropriateData data Size : %s \n %s',
 
 # data = data.dropna(subset=['Sire'])
 
+# ============ Generate jockeyRank.csv for Jockey Rank ===============
+jockey_csv_1819 = pd.read_csv('./Raw Data/jockey1819.csv', sep=',')
+jockey_csv_1819['JockeyRank'] = jockey_csv_1819['J_Win'].rank()
+logging.info('jockey_csv_1819 : %s \n %s',
+             np.shape(jockey_csv_1819), jockey_csv_1819)
+
+headers = ','.join(map(str, jockey_csv_1819.columns.values))
+
+np.savetxt('./Processed Data/jockeyRank.csv', jockey_csv_1819.round(0),
+           delimiter=',', fmt='%s', header=headers, comments='')
+
+
+# ============ Generate trainerRank.csv for Trainer Rank ===============
+trainer_csv_1819 = pd.read_csv('./Raw Data/trainer1819.csv', sep=',')
+trainer_csv_1819['TrainerRank'] = trainer_csv_1819['T_Win'].rank()
+logging.info('trainer_csv_1819 : %s \n %s',
+             np.shape(trainer_csv_1819), trainer_csv_1819)
+
+headers = ','.join(map(str, trainer_csv_1819.columns.values))
+np.savetxt('./Processed Data/trainerRank.csv', trainer_csv_1819.round(0),
+           delimiter=',', fmt='%s', header=headers, comments='')
 
 # ============ Generate sireRank.csv for Sire Rank ===============
 sumOfPlc = data.groupby(['Sire'])['plc'].sum()
@@ -116,6 +137,14 @@ history_csv_merged = pd.merge(history_csv_merged, damRank, how='left',
 # ========== Merge history_csv_merged and SireRank_csv by Sire ===========
 history_csv_merged = pd.merge(history_csv_merged, sireRank, how='left',
                               left_on=['Sire'], right_on=['Sire'])
+
+# ========== Merge history_csv_merged and SireRank_csv by Sire ===========
+history_csv_merged = pd.merge(history_csv_merged, jockey_csv_1819[['JockeyRank','Jockey']], how='left',
+                              left_on=['Jockey'], right_on=['Jockey'])
+
+# ========== Merge history_csv_merged and SireRank_csv by Sire ===========
+history_csv_merged = pd.merge(history_csv_merged, trainer_csv_1819[['TrainerRank','Trainer']], how='left',
+                              left_on=['Trainer'], right_on=['Trainer'])
 
 
 logging.info('Merged history  Size : %s \n %s', np.shape(history_csv_merged), history_csv_merged)

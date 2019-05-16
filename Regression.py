@@ -1,3 +1,5 @@
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.svm import SVR
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn import datasets, linear_model
@@ -111,7 +113,7 @@ class Regression:
         logging.info('SelectAppropriateData going:  %s',self.going)
 
         data = data if self.dist is None else data[(data['dist'] == self.dist)]
-        data = data if self.road is None else data[(data['road'] == self.road)]
+        data = data if road is None else data[(data['road'].str.contains(road))]
         data = data if self.classes is None else data[(
             data['class'] == self.classes)]
         data = data if self.raceCourse is None else data[(
@@ -155,11 +157,13 @@ logging.info('After removeOutlier Size, %s', str(np.shape(data)))
 # ========= Select column for regresion ============
 
 data_original = data.copy()
-print("','".join(map(str, data_original.columns.values)))
-
+data['Age'] = data['Age'].astype(float).round(0)
 # data = data[['road', 'class', 'draw', 'finishTime','Age', 'J_Win','J_2nd','J_3rd','J_4th','J_5th','Total Rides','J_Stakes Won','T_Win','T_2nd','T_3rd','T_4th','T_5th','Total Runs','T_Stakes Won', 'DamRank', 'SireRank',]]
-data = data[[ 'draw', 'finishTime','Age','J_Win','T_Win', 'DamRank', 'SireRank','awt','dhw']]
-
+data = data[[ 'draw', 'finishTime','Age','JockeyRank','TrainerRank', 'DamRank', 'SireRank','awt','dhw']]
+data['Age'] = data['Age'].fillna(-1)
+data['Age'] = data['Age'].astype(int)
+data['Age'] = data['Age'].astype(str)
+data['Age'] = data['Age'].replace('-1', np.nan)
 logging.info('Selected CSV Size, %s', str(np.shape(data)))
 
 
@@ -169,6 +173,9 @@ logging.info('Selected CSV Size, %s', str(np.shape(data)))
 
 data = pd.get_dummies(data, columns=[
     'draw'], prefix=['draw'])
+
+data = pd.get_dummies(data, columns=[
+    'Age'], prefix=['Age'])
 
 # data = pd.get_dummies(data, columns=[
 #     'road'], prefix=['road'])
@@ -194,10 +201,10 @@ headers = ','.join(map(str, X.columns.values))
 
 y = data[['finishTime']]
 
-
+logging.info('X: %s \n %s', np.shape(X), X)
 # ========= split train and test =========
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.10, shuffle=False)
+    X, y, test_size=0.01, shuffle=False)
 
 np.savetxt('./Report/predicitValue.csv', X_test.round(0),
            delimiter=',', fmt='%s', header=headers, comments='')
@@ -207,61 +214,82 @@ dump(scalerX, 'scaler.sav')
 # logging.info('X_train, %s', str(np.shape(X_train)))
 logging.info('X_train: %s \n %s', np.shape(X_train), X_train)
 X_train = scalerX.transform(X_train)
-X_test = scalerX.transform(X_test)
+
 
 
 # ========= Regression Model =========
+# model = linear_model.LinearRegression()
+# model.fit(X_train, y_train)
 
-model = linear_model.LinearRegression()
-model.fit(X_train, y_train)
+
+poly=PolynomialFeatures(degree=3)
+poly_x=poly.fit_transform(X_train)
+
+model=LinearRegression()
+model.fit(poly_x,y_train)
+
+
+
 dump(model, 'regressioin_model.sav')
 
-# ========= Prediction =========
-y_pred = model.predict(X_test)
 
 
-X_test = scalerX.inverse_transform(X_test)
 
-# ========= Prepare output csv ==========
-y_test.loc[:, 'y_pred'] = y_pred
-# print(y_test)
-df_out = pd.merge(data_original, y_test, how='left',
-                  left_index=True, right_index=True)
 
-df_out = df_out[(df_out['y_pred'] > 0) & (df_out['y_pred'] < 200000)]
-df_out["y_Rank"] = df_out.groupby(['date', 'raceNo'])["y_pred"].rank()
-df_out["x_Rank"] = df_out.groupby(['date', 'raceNo'])["plc"].rank()
 
-df_out = df_out.sort_values(
-    ['date', 'raceNo', 'plc'], ascending=[True, False, True])
+print( "'" + "','".join(map(str,(X.columns.values))) + "'")
+np.savetxt('preditParam.csv', X.columns.values,
+           delimiter=',', fmt='%s', comments='',header='value')
 
-df_out = df_out[(df_out['y_Rank'] <= 1)]
+# # ========= Prediction =========
+X_test = scalerX.transform(X_test)
+poly_y=poly.fit_transform(X_test)
+y_pred = model.predict(poly_y)
+print(y_pred)
 
-regression_report = df_out[['date', 'raceNo','Age', 'draw','Chinese Name', 'Code', 'Trainer', 'Jockey',
-                            'plc', 'odds', 'finishTime_x', 'y_pred', 'y_Rank', 'x_Rank']]
 
-headers = ','.join(map(str, regression_report.columns.values))
-np.savetxt('./Report/regression_result.csv', regression_report.round(0),
-           delimiter=',', fmt='%s', header=headers, comments='')
+# X_test = scalerX.inverse_transform(X_test)
 
-logging.info(np.shape(df_out))
-df_out = df_out[df_out.plc.notnull()]
-df_out = df_out[df_out.y_Rank.notnull()]
-logging.info(np.shape(df_out))
+# # ========= Prepare output csv ==========
+# y_test.loc[:, 'y_pred'] = y_pred
+# # print(y_test)
+# df_out = pd.merge(data_original, y_test, how='left',
+#                   left_index=True, right_index=True)
 
-logging.info("','".join(map(str, X.columns.values)))
-# The coefficients
-# logging.info('Coefficients: \n %s', model.coef_)
+# df_out = df_out[(df_out['y_pred'] > 0) & (df_out['y_pred'] < 200000)]
+# df_out["y_Rank"] = df_out.groupby(['date', 'raceNo'])["y_pred"].rank()
+# df_out["x_Rank"] = df_out.groupby(['date', 'raceNo'])["plc"].rank()
+
+# df_out = df_out.sort_values(
+#     ['date', 'raceNo', 'plc'], ascending=[True, False, True])
+
+# df_out = df_out[(df_out['y_Rank'] <= 1)]
+
+# regression_report = df_out[['date', 'raceNo','Age', 'draw','Chinese Name', 'Code', 'Trainer', 'Jockey',
+#                             'plc', 'odds', 'finishTime_x', 'y_pred', 'y_Rank', 'x_Rank']]
+
+# headers = ','.join(map(str, regression_report.columns.values))
+# np.savetxt('./Report/regression_result.csv', regression_report.round(0),
+#            delimiter=',', fmt='%s', header=headers, comments='')
+
+# logging.info(np.shape(df_out))
+# df_out = df_out[df_out.plc.notnull()]
+# df_out = df_out[df_out.y_Rank.notnull()]
+# logging.info(np.shape(df_out))
+
+# logging.info("','".join(map(str, X.columns.values)))
+# # The coefficients
+# # logging.info('Coefficients: \n %s', model.coef_)
 for idx, col_name in enumerate(X.columns):
     logging.info("The coefficient for {} is {}".format(
         col_name, float(model.coef_[0][idx])))
-# The mean squared error
-logging.info("Mean squared error: %.2f"
-             % mean_squared_error(df_out['x_Rank'], df_out['y_Rank']))
-print("Mean squared error: %.2f"
-             % mean_squared_error(df_out['x_Rank'], df_out['y_Rank']))
-# Explained variance score: 1 is perfect prediction
-logging.info('Variance score: %.2f' %
-             r2_score(df_out['x_Rank'], df_out['y_Rank']))
-print('Variance score: %.2f' %
-             r2_score(df_out['x_Rank'], df_out['y_Rank']))
+# # The mean squared error
+# logging.info("Mean squared error: %.2f"
+#              % mean_squared_error(df_out['x_Rank'], df_out['y_Rank']))
+# print("Mean squared error: %.2f"
+#              % mean_squared_error(df_out['x_Rank'], df_out['y_Rank']))
+# # Explained variance score: 1 is perfect prediction
+# logging.info('Variance score: %.2f' %
+#              r2_score(df_out['x_Rank'], df_out['y_Rank']))
+# print('Variance score: %.2f' %
+#              r2_score(df_out['x_Rank'], df_out['y_Rank']))

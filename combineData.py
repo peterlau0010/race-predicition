@@ -55,8 +55,13 @@ history_csv["horseCode"] = split_result[1].str.replace(')', '')
 history_csv_merged = pd.merge(history_csv, horse_csv, how='left',
                               left_on=['horseCode'], right_on=['Code'])
 
-
 history_csv_merged = history_csv_merged.drop(['horseCode'],axis=1)
+
+history_csv_merged['date'] = pd.to_datetime(history_csv_merged['date'])
+history_csv_merged['Foaling Date'] = pd.to_datetime(history_csv_merged['Foaling Date'])
+history_csv_merged['Age'] = (history_csv_merged['date'] - history_csv_merged['Foaling Date']).astype('timedelta64[Y]')
+
+logging.info('horse_csv Merged history  Size : %s \n %s', np.shape(history_csv_merged), history_csv_merged)
 
 # ========== Merge history_csv_merged and jockey_csv_yyyy Jockey ===========
 # =========== 17 to 18 ========

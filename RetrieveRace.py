@@ -171,8 +171,8 @@ finally:
 # ============== Read required csv
 sireRank = pd.read_csv('./Processed Data/sireRank.csv', sep=',')
 damRank = pd.read_csv('./Processed Data/damRank.csv', sep=',')
-jockey = pd.read_csv('./Raw Data/jockey1819.csv', sep=',')
-trainer = pd.read_csv('./Raw Data/trainer1819.csv', sep=',')
+jockey = pd.read_csv('./Processed Data/jockeyRank.csv', sep=',')
+trainer = pd.read_csv('./Processed Data/trainerRank.csv', sep=',')
 
 
 # ============== Join required csv with allMatchToday

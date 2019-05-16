@@ -1,3 +1,4 @@
+from sklearn.preprocessing import PolynomialFeatures
 from joblib import dump, load
 import numpy as np
 import pandas as pd
@@ -39,7 +40,7 @@ def selectAppropriateData(data,raceCourse,classes,dist,road,going):
     logging.info('SelectAppropriateData going:  %s',going)
 
     data = data if dist is None else data[(data['dist'] == dist)]
-    data = data if road is None else data[(data['road'] == road)]
+    data = data if road is None else data[(data['road'].str.contains(road))]
     data = data if classes is None else data[(
         data['class'] == classes)]
     data = data if raceCourse is None else data[(
@@ -61,96 +62,13 @@ logging.info('X_test: %s \n %s', np.shape(X_test), X_test)
 
 
 # ========= Add missing column (Start)===================
-# X_test = pd.get_dummies(
-#     X_test, columns=['class'], prefix=['class'])
-
-# X_test = pd.get_dummies(
-#     X_test, columns=['road'], prefix=['road'])
 
 X_test = pd.get_dummies(
     X_test, columns=['Draw'], prefix=['draw'])
 
-# X_test = pd.get_dummies(
-#     X_test, columns=['dist'], prefix=['dist'])
+X_test = pd.get_dummies(
+    X_test, columns=['Age'], prefix=['Age'])
 
-# X_test = pd.get_dummies(
-#     X_test, columns=['going'], prefix=['going'])
-
-# X_test = pd.get_dummies(
-#     X_test, columns=['raceCourse'], prefix=['raceCourse'])
-
-# if 'dist_1000M' not in X_test:
-#     X_test['dist_1000M'] = np.NaN
-
-# if 'dist_1200M' not in X_test:
-#     X_test['dist_1200M'] = np.NaN
-
-# if 'dist_1000M' not in X_test:
-#     X_test['dist_1000M'] = np.NaN
-
-# if 'dist_1400M' not in X_test:
-#     X_test['dist_1400M'] = np.NaN
-
-# if 'dist_1600M' not in X_test:
-#     X_test['dist_1600M'] = np.NaN
-
-# if 'dist_1650M' not in X_test:
-#     X_test['dist_1650M'] = np.NaN
-
-# if 'dist_1800M' not in X_test:
-#     X_test['dist_1800M'] = np.NaN
-
-# if 'dist_2000M' not in X_test:
-#     X_test['dist_2000M'] = np.NaN
-
-if 'road_ALL WEATHER TRACK' not in X_test:
-    X_test['road_ALL WEATHER TRACK'] = np.NaN
-
-if 'road_TURF - A Course' not in X_test:
-    X_test['road_TURF - A Course'] = np.NaN
-
-if 'road_TURF - B Course' not in X_test:
-    X_test['road_TURF - B Course'] = np.NaN
-
-if 'road_TURF - C Course' not in X_test:
-    X_test['road_TURF - C Course'] = np.NaN
-
-# if 'going_GOOD' not in X_test:
-#     X_test['going_GOOD'] = np.NaN
-
-# if 'going_GOOD TO FIRM' not in X_test:
-#     X_test['going_GOOD TO FIRM'] = np.NaN
-
-# if 'going_GOOD TO YIELDING' not in X_test:
-#     X_test['going_GOOD TO YIELDING'] = np.NaN
-
-# if 'going_YIELDING' not in X_test:
-#     X_test['going_YIELDING'] = np.NaN
-
-# if 'going_WET SLOW' not in X_test:
-#     X_test['going_WET SLOW'] = np.NaN
-
-
-# if 'class_Class 1' not in X_test:
-#     X_test['class_Class 1'] = np.NaN
-
-# if 'class_Class 2' not in X_test:
-#     X_test['class_Class 2'] = np.NaN
-
-# if 'class_Class 3' not in X_test:
-#     X_test['class_Class 3'] = np.NaN
-
-# if 'class_Class 4' not in X_test:
-#     X_test['class_Class 4'] = np.NaN
-
-# if 'class_Class 5' not in X_test:
-#     X_test['class_Class 5'] = np.NaN
-
-# if 'raceCourse_HV' not in X_test:
-#     X_test['raceCourse_HV'] = np.NaN
-
-if 'draw_12' not in X_test:
-    X_test['draw_12'] = np.NaN
 
 logging.info('X_test: %s \n %s', np.shape(X_test), X_test)
 # ========= Add missing column (End)===================
@@ -167,8 +85,15 @@ X_test = X_test.rename(
 
 
 # ========== Select required Column ================
-# X_test = X_test[['Age','J_Win','J_2nd','J_3rd','J_4th','J_5th','Total Rides','J_Stakes Won','T_Win','T_2nd','T_3rd','T_4th','T_5th','Total Runs','T_Stakes Won','DamRank','SireRank','draw_1','draw_10','draw_11','draw_12','draw_2','draw_3','draw_4','draw_5','draw_6','draw_7','draw_8','draw_9','road_TURF - A Course','road_TURF - B Course','road_TURF - C Course','class_Class 1','class_Class 2','class_Class 3','class_Class 4','class_Class 5']]
-X_test = X_test[['Age','J_Win','T_Win','DamRank','SireRank','draw_1','draw_10','draw_11','draw_12','draw_2','draw_3','draw_4','draw_5','draw_6','draw_7','draw_8','draw_9','awt','dhw']]
+preditParam = pd.read_csv('preditParam.csv')
+# print(preditParam['value'].values.tolist())
+requirelist = preditParam['value'].values.tolist()
+
+for r in requirelist:
+    if r not in X_test:
+        X_test[r] = np.NaN
+
+X_test = X_test[requirelist]
 
 logging.info('X_test: %s \n %s', np.shape(X_test), X_test)
 
@@ -182,8 +107,12 @@ y_test = X_test.copy()
 # ========== Standardization and Prediction ======
 X_test = X_test.astype(float)
 X_test = scalerX.transform(X_test)
-y_pred = model.predict(X_test)
-X_test = scalerX.inverse_transform(X_test)
+
+poly=PolynomialFeatures(degree=3)
+poly_x=poly.fit_transform(X_test)
+
+y_pred = model.predict(poly_x)
+# X_test = scalerX.inverse_transform(X_test)
 
 
 # ========== Generat the result ==================
