@@ -33,15 +33,12 @@ raceCourse, classes, dist, road = None, None, None, None
 # going = 'GOOD'
 
 date = cfg.param['date']
-dist = cfg.param['dist']
 road = cfg.param['road']
-going = cfg.param['going']
-classes = cfg.param['classes']
-raceCourse = cfg.param['raceCourse']
 
-
-
-
+distlist = cfg.param['dist']
+goinglist = cfg.param['going']
+classeslist = cfg.param['classes']
+raceCourselist = cfg.param['raceCourse']
 
 pd.set_option('mode.chained_assignment', None)
 
@@ -49,6 +46,9 @@ pd.set_option('mode.chained_assignment', None)
 pd.set_option('display.max_rows', 50)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
+
+
+
 
 
 
@@ -77,16 +77,16 @@ class Regression:
         data.loc[data['road'].str.contains('"A+'), 'road'] = 'TURF - A Course'
         data.loc[data['road'].str.contains('"B+'), 'road'] = 'TURF - B Course'
         data.loc[data['road'].str.contains('"C+'), 'road'] = 'TURF - C Course'
-        data.loc[data['plc'].str.contains('3 DH'), 'plc'] = '3'
-        data.loc[data['plc'].str.contains('2 DH'), 'plc'] = '2'
-        data.loc[data['plc'].str.contains('1 DH'), 'plc'] = '1'
-        data.loc[data['plc'].str.contains('4 DH'), 'plc'] = '4'
-        data.loc[data['plc'].str.contains('5 DH'), 'plc'] = '5'
-        data.loc[data['plc'].str.contains('6 DH'), 'plc'] = '6'
-        data.loc[data['plc'].str.contains('7 DH'), 'plc'] = '7'
-        data.loc[data['plc'].str.contains('8 DH'), 'plc'] = '8'
-        data.loc[data['plc'].str.contains('9 DH'), 'plc'] = '9'
-        data.loc[data['plc'].str.contains('10 DH'), 'plc'] = '10'
+        data.loc[data['plc'].astype(str).str.contains('3 DH'), 'plc'] = '3'
+        data.loc[data['plc'].astype(str).str.contains('2 DH'), 'plc'] = '2'
+        data.loc[data['plc'].astype(str).str.contains('1 DH'), 'plc'] = '1'
+        data.loc[data['plc'].astype(str).str.contains('4 DH'), 'plc'] = '4'
+        data.loc[data['plc'].astype(str).str.contains('5 DH'), 'plc'] = '5'
+        data.loc[data['plc'].astype(str).str.contains('6 DH'), 'plc'] = '6'
+        data.loc[data['plc'].astype(str).str.contains('7 DH'), 'plc'] = '7'
+        data.loc[data['plc'].astype(str).str.contains('8 DH'), 'plc'] = '8'
+        data.loc[data['plc'].astype(str).str.contains('9 DH'), 'plc'] = '9'
+        data.loc[data['plc'].astype(str).str.contains('10 DH'), 'plc'] = '10'
 
         return data
 
@@ -130,166 +130,116 @@ class Regression:
 
 
 
-# ========= Read CSV file =========
-data = pd.read_csv('./Processed Data/history_csv_merged_with_Sire_Dam.csv', header=0)
-data = data.iloc[::-1]
-logging.info('Original CSV Size, %s', str(np.shape(data)))
 
-# ======== initial Regression Class ============
-r = Regression(data, raceCourse, classes, dist, road,going)
-
-# ======== Prepare Data ==============
-data = r.groupData(data)
-
-data = r.removeInvalidData(data)
-logging.info('After removeInvalidData Size, %s', str(np.shape(data)))
-
-data = r.convertData(data)
-
-data = r.selectAppropriateData(data)
-# logging.info('After selectAppropriateData Size, %s', str(np.shape(data)))
-logging.info('After selectAppropriateData data Size : %s \n %s', np.shape(data), data)
-
-data = r.removeOutlier(data)
-logging.info('After removeOutlier Size, %s', str(np.shape(data)))
+for i,v in enumerate(distlist):
+    # print(date, goinglist[i] , distlist[i], road, classeslist[i],raceCourselist[i])
+    going = goinglist[i]
+    dist = distlist[i]
+    classes = classeslist[i]
+    raceCourse = raceCourselist[i]
 
 
-# ========= Select column for regresion ============
+    # ========= Read CSV file =========
+    filename = './Processed Data/history_csv_merged_with_Sire_Dam_' + date + going + raceCourse + dist + classes + '.csv'
+    data = pd.read_csv(filename, header=0)
+    data = data.iloc[::-1]
+    logging.info('Original CSV Size, %s', str(np.shape(data)))
 
-data_original = data.copy()
-data['Age'] = data['Age'].astype(float).round(0)
-# data = data[['road', 'class', 'draw', 'finishTime','Age', 'J_Win','J_2nd','J_3rd','J_4th','J_5th','Total Rides','J_Stakes Won','T_Win','T_2nd','T_3rd','T_4th','T_5th','Total Runs','T_Stakes Won', 'DamRank', 'SireRank',]]
-data = data[[ 'draw', 'finishTime','Age','JockeyRank','TrainerRank', 'DamRank', 'SireRank','awt','dhw']]
-data['Age'] = data['Age'].fillna(-1)
-data['Age'] = data['Age'].astype(int)
-data['Age'] = data['Age'].astype(str)
-data['Age'] = data['Age'].replace('-1', np.nan)
-logging.info('Selected CSV Size, %s', str(np.shape(data)))
+    # ======== initial Regression Class ============
+    r = Regression(data, raceCourse, classes, dist, road,going)
 
+    # ======== Prepare Data ==============
+    data = r.groupData(data)
 
-# ========= Convert Categories to 0 1 =========
-# data = pd.get_dummies(data, columns=[
-#     'dist'], prefix=['dist'])
+    data = r.removeInvalidData(data)
+    logging.info('After removeInvalidData Size, %s', str(np.shape(data)))
 
-data = pd.get_dummies(data, columns=[
-    'draw'], prefix=['draw'])
+    data = r.convertData(data)
 
-data = pd.get_dummies(data, columns=[
-    'Age'], prefix=['Age'])
+    data = r.selectAppropriateData(data)
+    # logging.info('After selectAppropriateData Size, %s', str(np.shape(data)))
+    logging.info('After selectAppropriateData data Size : %s \n %s', np.shape(data), data)
 
-# data = pd.get_dummies(data, columns=[
-#     'road'], prefix=['road'])
-
-# data = pd.get_dummies(
-#     data, columns=['going'], prefix=['going'])
-
-# data = pd.get_dummies(
-#     data, columns=['class'], prefix=['class'])
-
-# data = pd.get_dummies(
-#     data, columns=['raceCourse'], prefix=['raceCourse'])
-
-logging.info('After converted categories Size, %s', str(np.shape(data)))
-
-data = data.astype(float)
-data.fillna(data.mean(), inplace=True)
+    data = r.removeOutlier(data)
+    logging.info('After removeOutlier Size, %s', str(np.shape(data)))
 
 
-# ========= Prepare X Y =========
-X = data.drop(['finishTime'], axis=1)
-headers = ','.join(map(str, X.columns.values))
+    # ========= Select column for regresion ============
 
-y = data[['finishTime']]
+    data_original = data.copy()
+    data['Age'] = data['Age'].astype(float).round(0)
+    data = data[[ 'draw', 'finishTime','Age','Jockey','Trainer', 'DamRank', 'SireRank','awt','dhw']]
+    data['Age'] = data['Age'].fillna(-1)
+    data['Age'] = data['Age'].astype(int)
+    data['Age'] = data['Age'].astype(str)
+    data['Age'] = data['Age'].replace('-1', np.nan)
+    logging.info('Selected CSV Size, %s', str(np.shape(data)))
 
-logging.info('X: %s \n %s', np.shape(X), X)
-# ========= split train and test =========
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.01, shuffle=False)
 
-np.savetxt('./Report/predicitValue.csv', X_test.round(0),
-           delimiter=',', fmt='%s', header=headers, comments='')
-# ========= Standardization for data =========
-scalerX = StandardScaler().fit(X_train)
-dump(scalerX, 'scaler.sav')
-# logging.info('X_train, %s', str(np.shape(X_train)))
-logging.info('X_train: %s \n %s', np.shape(X_train), X_train)
-X_train = scalerX.transform(X_train)
+    # ========= Convert Categories to 0 1 =========
+    # data = pd.get_dummies(data, columns=[
+    #     'dist'], prefix=['dist'])
+
+    data = pd.get_dummies(data, columns=[
+        'draw'], prefix=['draw'])
+
+    data = pd.get_dummies(data, columns=[
+        'Age'], prefix=['Age'])
+
+    data = pd.get_dummies(data, columns=[
+        'Jockey'], prefix=['Jockey'])
+
+    data = pd.get_dummies(data, columns=[
+        'Trainer'], prefix=['Trainer'])
 
 
 
-# ========= Regression Model =========
-# model = linear_model.LinearRegression()
-# model.fit(X_train, y_train)
+    logging.info('After converted categories Size, %s', str(np.shape(data)))
+
+    data = data.astype(float)
+    data.fillna(data.mean(), inplace=True)
 
 
-poly=PolynomialFeatures(degree=3)
-poly_x=poly.fit_transform(X_train)
+    # ========= Prepare X Y =========
+    X = data.drop(['finishTime'], axis=1)
+    headers = ','.join(map(str, X.columns.values))
 
-model=LinearRegression()
-model.fit(poly_x,y_train)
+    y = data[['finishTime']]
 
+    logging.info('X: %s \n %s', np.shape(X), X)
+    # ========= split train and test =========
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.01, shuffle=False)
 
+    np.savetxt('./Report/predicitValue.csv', X_test.round(0),
+            delimiter=',', fmt='%s', header=headers, comments='')
+    # ========= Standardization for data =========
+    scalerX = StandardScaler().fit(X_train)
+    filename = 'scaler_' + date + going + raceCourse + dist + classes + '.sav'
+    dump(scalerX, filename)
+    # logging.info('X_train, %s', str(np.shape(X_train)))
+    logging.info('X_train: %s \n %s', np.shape(X_train), X_train)
+    X_train = scalerX.transform(X_train)
 
-dump(model, 'regressioin_model.sav')
+    poly=PolynomialFeatures(degree=2)
+    poly_x=poly.fit_transform(X_train)
+    model=LinearRegression()
+    model.fit(poly_x,y_train)
 
+    # modelname = 'regressioin_model_' + date + going + raceCourse + dist +'.sav'
+    filename = 'regressioin_model_' + date + going + raceCourse + dist + classes + '.sav'
+    dump(model, filename)
 
+    filename = 'preditParam' + date + going + raceCourse + dist + classes + '.csv'
+    np.savetxt(filename, X.columns.values,
+            delimiter=',', fmt='%s', comments='',header='value')
 
+    # # ========= Prediction =========
+    X_test = scalerX.transform(X_test)
+    poly_y=poly.fit_transform(X_test)
+    y_pred = model.predict(poly_y)
+    print(y_pred)
 
-
-
-print( "'" + "','".join(map(str,(X.columns.values))) + "'")
-np.savetxt('preditParam.csv', X.columns.values,
-           delimiter=',', fmt='%s', comments='',header='value')
-
-# # ========= Prediction =========
-X_test = scalerX.transform(X_test)
-poly_y=poly.fit_transform(X_test)
-y_pred = model.predict(poly_y)
-print(y_pred)
-
-
-# X_test = scalerX.inverse_transform(X_test)
-
-# # ========= Prepare output csv ==========
-# y_test.loc[:, 'y_pred'] = y_pred
-# # print(y_test)
-# df_out = pd.merge(data_original, y_test, how='left',
-#                   left_index=True, right_index=True)
-
-# df_out = df_out[(df_out['y_pred'] > 0) & (df_out['y_pred'] < 200000)]
-# df_out["y_Rank"] = df_out.groupby(['date', 'raceNo'])["y_pred"].rank()
-# df_out["x_Rank"] = df_out.groupby(['date', 'raceNo'])["plc"].rank()
-
-# df_out = df_out.sort_values(
-#     ['date', 'raceNo', 'plc'], ascending=[True, False, True])
-
-# df_out = df_out[(df_out['y_Rank'] <= 1)]
-
-# regression_report = df_out[['date', 'raceNo','Age', 'draw','Chinese Name', 'Code', 'Trainer', 'Jockey',
-#                             'plc', 'odds', 'finishTime_x', 'y_pred', 'y_Rank', 'x_Rank']]
-
-# headers = ','.join(map(str, regression_report.columns.values))
-# np.savetxt('./Report/regression_result.csv', regression_report.round(0),
-#            delimiter=',', fmt='%s', header=headers, comments='')
-
-# logging.info(np.shape(df_out))
-# df_out = df_out[df_out.plc.notnull()]
-# df_out = df_out[df_out.y_Rank.notnull()]
-# logging.info(np.shape(df_out))
-
-# logging.info("','".join(map(str, X.columns.values)))
-# # The coefficients
-# # logging.info('Coefficients: \n %s', model.coef_)
-for idx, col_name in enumerate(X.columns):
-    logging.info("The coefficient for {} is {}".format(
-        col_name, float(model.coef_[0][idx])))
-# # The mean squared error
-# logging.info("Mean squared error: %.2f"
-#              % mean_squared_error(df_out['x_Rank'], df_out['y_Rank']))
-# print("Mean squared error: %.2f"
-#              % mean_squared_error(df_out['x_Rank'], df_out['y_Rank']))
-# # Explained variance score: 1 is perfect prediction
-# logging.info('Variance score: %.2f' %
-#              r2_score(df_out['x_Rank'], df_out['y_Rank']))
-# print('Variance score: %.2f' %
-#              r2_score(df_out['x_Rank'], df_out['y_Rank']))
+    for idx, col_name in enumerate(X.columns):
+        logging.info("The coefficient for {} is {}".format(
+            col_name, float(model.coef_[0][idx])))

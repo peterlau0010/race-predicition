@@ -1,9 +1,25 @@
+import pandas as pd
+
+date = '20190515'
+totalMatch = '8'
+todayRaceCourse ='HV'
+
+
+
+data = pd.read_csv('./Processed Data/match_data_'+date+'.csv', header=0)
+data = data[['raceCourse','class','dist','road','going','raceNo']]
+data = data.drop_duplicates()
+# print(data)
+
 param = {
-    'raceCourse': 'ST',
-    'classes': 'Class 3',
-    'dist': '1800M',
+    'raceCourse': data['raceCourse'].tolist(),
+    'classes': data['class'].tolist(),
+    'dist': data['dist'].tolist(),
     'road': 'TURF',
-    'going': 'GOOD',
-    'date': '20190518',
-    'totalMatch': '10'
+    'going': data['going'].tolist(),
+    'date': date,
+    'totalMatch': totalMatch,
+    'todayRaceCourse':todayRaceCourse
 }
+
+# print(param)

@@ -24,7 +24,7 @@ dist = cfg.param['dist']
 road = cfg.param['road']
 going = cfg.param['going']
 classes = cfg.param['classes']
-raceCourse = cfg.param['raceCourse']
+raceCourse = cfg.param['todayRaceCourse']
 
 
 pd.set_option('display.max_rows', 500)
@@ -52,7 +52,7 @@ class WebCrawling:
 
         matchInfo = matchInfo.find(name='td').text
         logging.info('Match Info: %s', matchInfo)
-        regex = r"(All Weather Track|Turf, \"[A-C].*\" Course).*([0-9][0-9][0-9][0-9]M),*Prize.*(Class.[0-5])"
+        regex = r"(All Weather Track|Turf, \"[A-C].*\" Course).*([0-9][0-9][0-9][0-9]M),.(.*)Prize.*(Class.[0-5])"
         matches = re.finditer(regex, matchInfo, re.MULTILINE)
         matchInfo = []
         for matchNum, match in enumerate(matches, start=1):
