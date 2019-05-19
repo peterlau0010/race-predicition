@@ -90,8 +90,8 @@ for i,v in enumerate(distlist):
     # X_test = pd.get_dummies(
     #     X_test, columns=['Jockey'], prefix=['Jockey'])
 
-    X_test = pd.get_dummies(
-        X_test, columns=['Trainer'], prefix=['Trainer'])
+    # X_test = pd.get_dummies(
+    #     X_test, columns=['Trainer'], prefix=['Trainer'])
 
     logging.info('X_test: %s \n %s', np.shape(X_test), X_test)
     # ========= Add missing column (End)===================
@@ -132,7 +132,7 @@ for i,v in enumerate(distlist):
     X_test = X_test.astype(float)
     X_test = scalerX.transform(X_test)
 
-    poly=PolynomialFeatures(degree=2)
+    poly=PolynomialFeatures(degree=3)
     poly_x=poly.fit_transform(X_test)
 
     y_pred = model.predict(poly_x)

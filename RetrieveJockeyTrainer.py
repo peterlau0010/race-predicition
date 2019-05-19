@@ -45,16 +45,22 @@ class WebCrawling:
             for td in tr.find_all(name='td'):
                 listDetail.append(self.reFormatText(td.text))
 
-        listDetail.remove('Others')
+        # listDetail.remove('Others')
+        if "Others" in str(listDetail):
+            listDetail.remove('Others')
+
         if self.jockey > 0:
             listDetail.remove("Jockeys' Ranking")
-            listDetail.remove('Jockeys in Service')
+            if "Jockeys in Service" in str(listDetail):
+                listDetail.remove('Jockeys in Service')
         else:
             listDetail.remove("Trainers' Ranking")
-            listDetail.remove('Trainers in Service')
+            if "Trainers in Service" in str(listDetail):
+                listDetail.remove('Trainers in Service')
 
         listDetail.remove('View in Numbers')
-        listDetail.remove('')
+        # listDetail.remove('')
+
         listDetail = numpy.reshape(listDetail, (-1, 8))
         listDetail = pd.DataFrame(data=listDetail[1:, 0:],
                                   columns=listDetail[0, 0:])
@@ -63,9 +69,9 @@ class WebCrawling:
     def request(self, jockey):
         self.jockey = jockey
         if jockey > 0:
-            self.url = 'https://racing.hkjc.com/racing/information/english/Jockey/JockeyRanking.aspx?Season=Current&View=Percentage&Racecourse=ALL'
+            self.url = 'https://racing.hkjc.com/racing/information/english/Jockey/JockeyRanking.aspx?Season=Previous&View=Percentage&Racecourse=ALL'
         else:
-            self.url = 'https://racing.hkjc.com/racing/information/English/Trainers/TrainerRanking.aspx?Season=Current&View=Percentage&Racecourse=ALL'
+            self.url = 'https://racing.hkjc.com/racing/information/English/Trainers/TrainerRanking.aspx?Season=Previous&View=Percentage&Racecourse=ALL'
         self.browser.get(self.url)
         try:
 
@@ -81,7 +87,8 @@ class WebCrawling:
             logging.error('URL with %s', self.url)
             return
 
-for jockey in range(0,2):
+
+for jockey in range(0, 2):
 
     try:
         # =============== initial webCrawling
@@ -116,12 +123,12 @@ for jockey in range(0,2):
             columns={'Win': 'J_Win', '2nd': 'J_2nd', '3rd': 'J_3rd', '4th': 'J_4th', '5th': 'J_5th', 'Stakes Won': 'J_Stakes Won'})
         headers = ','.join(map(str, jockeytrainerlist.columns.values))
         np.savetxt('./Raw Data/jockey1819.csv', jockeytrainerlist.round(0),
-                delimiter=',', fmt='%s', header=headers, comments='')
+                   delimiter=',', fmt='%s', header=headers, comments='')
     else:
         jockeytrainerlist = jockeytrainerlist.rename(
             columns={'Win': 'T_Win', '2nd': 'T_2nd', '3rd': 'T_3rd', '4th': 'T_4th', '5th': 'T_5th', 'Stakes Won': 'T_Stakes Won'})
-        headers = ','.join(map(str, jockeytrainerlist.columns.values)) 
+        headers = ','.join(map(str, jockeytrainerlist.columns.values))
         np.savetxt('./Raw Data/trainer1819.csv', jockeytrainerlist.round(0),
-                delimiter=',', fmt='%s', header=headers, comments='')
+                   delimiter=',', fmt='%s', header=headers, comments='')
 
     logging.info('Finished write csv')

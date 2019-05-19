@@ -1,13 +1,12 @@
 import pandas as pd
 
-date = '20190515'
-totalMatch = '8'
-todayRaceCourse ='HV'
-
+date = '20190518'
+totalMatch = '10'
+todayRaceCourse = 'ST'
 
 
 data = pd.read_csv('./Processed Data/match_data_'+date+'.csv', header=0)
-data = data[['raceCourse','class','dist','road','going','raceNo']]
+data = data[['raceCourse', 'class', 'dist', 'road', 'going', 'raceNo']]
 data = data.drop_duplicates()
 # print(data)
 
@@ -19,7 +18,7 @@ param = {
     'going': data['going'].tolist(),
     'date': date,
     'totalMatch': totalMatch,
-    'todayRaceCourse':todayRaceCourse
+    'todayRaceCourse': todayRaceCourse
 }
 
 # print(param)

@@ -7,7 +7,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
-
+from sklearn.neural_network import MLPRegressor
 from sklearn.linear_model import LinearRegression
 from datetime import datetime, timedelta
 from sklearn.model_selection import train_test_split
@@ -168,7 +168,7 @@ for i,v in enumerate(distlist):
 
     data_original = data.copy()
     data['Age'] = data['Age'].astype(float).round(0)
-    data = data[[ 'draw', 'finishTime','Age','Jockey','Trainer', 'DamRank', 'SireRank','awt','dhw']]
+    data = data[[ 'draw', 'finishTime','Age','JockeyRank','TrainerRank', 'DamRank', 'SireRank','awt','dhw','dist']]
     data['Age'] = data['Age'].fillna(-1)
     data['Age'] = data['Age'].astype(int)
     data['Age'] = data['Age'].astype(str)
@@ -177,20 +177,20 @@ for i,v in enumerate(distlist):
 
 
     # ========= Convert Categories to 0 1 =========
+    data = pd.get_dummies(data, columns=[
+        'dist'], prefix=['dist'])
+
     # data = pd.get_dummies(data, columns=[
-    #     'dist'], prefix=['dist'])
+    #     'draw'], prefix=['draw'])
 
-    data = pd.get_dummies(data, columns=[
-        'draw'], prefix=['draw'])
+    # data = pd.get_dummies(data, columns=[
+    #     'Age'], prefix=['Age'])
 
-    data = pd.get_dummies(data, columns=[
-        'Age'], prefix=['Age'])
+    # data = pd.get_dummies(data, columns=[
+    #     'Jockey'], prefix=['Jockey'])
 
-    data = pd.get_dummies(data, columns=[
-        'Jockey'], prefix=['Jockey'])
-
-    data = pd.get_dummies(data, columns=[
-        'Trainer'], prefix=['Trainer'])
+    # data = pd.get_dummies(data, columns=[
+    #     'Trainer'], prefix=['Trainer'])
 
 
 
@@ -209,7 +209,7 @@ for i,v in enumerate(distlist):
     logging.info('X: %s \n %s', np.shape(X), X)
     # ========= split train and test =========
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.01, shuffle=False)
+        X, y, test_size=0.10, shuffle=False)
 
     np.savetxt('./Report/predicitValue.csv', X_test.round(0),
             delimiter=',', fmt='%s', header=headers, comments='')
@@ -221,10 +221,20 @@ for i,v in enumerate(distlist):
     logging.info('X_train: %s \n %s', np.shape(X_train), X_train)
     X_train = scalerX.transform(X_train)
 
-    poly=PolynomialFeatures(degree=2)
+    poly=PolynomialFeatures(degree=3)
     poly_x=poly.fit_transform(X_train)
-    model=LinearRegression()
-    model.fit(poly_x,y_train)
+
+
+    # model=LinearRegression()
+    # model.fit(poly_x,y_train)
+
+    model = MLPRegressor(
+        hidden_layer_sizes=(10,),  activation='relu', solver='adam', alpha=0.001, batch_size='auto',
+        learning_rate='constant', learning_rate_init=0.01, power_t=0.5, max_iter=1000, shuffle=True,
+        random_state=9, tol=0.0001, verbose=False, warm_start=False, momentum=0.9, nesterovs_momentum=True,
+        early_stopping=False, validation_fraction=0.1, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
+
+    model.fit(poly_x, y_train.values.ravel())
 
     # modelname = 'regressioin_model_' + date + going + raceCourse + dist +'.sav'
     filename = 'regressioin_model_' + date + going + raceCourse + dist + classes + '.sav'
@@ -238,8 +248,21 @@ for i,v in enumerate(distlist):
     X_test = scalerX.transform(X_test)
     poly_y=poly.fit_transform(X_test)
     y_pred = model.predict(poly_y)
-    print(y_pred)
 
-    for idx, col_name in enumerate(X.columns):
-        logging.info("The coefficient for {} is {}".format(
-            col_name, float(model.coef_[0][idx])))
+    # for idx, col_name in enumerate(X.columns):
+    #     logging.info("The coefficient for {} is {}".format(
+    #         col_name, float(model.coef_[0][idx])))
+
+    y_test.loc[:, 'y_pred'] = y_pred
+
+    df_out = pd.merge(data_original, y_test, how='left',
+                      left_index=True, right_index=True)
+
+    # df_out = df_out[(df_out['y_pred'] > 0) & (df_out['y_pred'] < 200000)]
+    df_out["y_Rank"] = df_out.groupby(['date', 'raceNo'])["y_pred"].rank()
+    df_out["x_Rank"] = df_out.groupby(['date', 'raceNo'])["plc"].rank()
+
+    df_out = df_out[['date', 'raceNo','plc','finishTime_x', 'y_pred', 'y_Rank', 'x_Rank']]
+    df_out = df_out[(df_out['y_Rank'] <= 1)]
+
+    logging.info('df_out: %s \n %s', np.shape(df_out), df_out)
