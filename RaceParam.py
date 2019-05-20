@@ -1,8 +1,8 @@
 import pandas as pd
 
-date = '20190518'
-totalMatch = '10'
-todayRaceCourse = 'ST'
+date = '20190515'
+totalMatch = '8'
+todayRaceCourse = 'HV'
 
 
 data = pd.read_csv('./Processed Data/match_data_'+date+'.csv', header=0)

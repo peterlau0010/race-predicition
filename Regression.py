@@ -168,7 +168,7 @@ for i,v in enumerate(distlist):
 
     data_original = data.copy()
     data['Age'] = data['Age'].astype(float).round(0)
-    data = data[[ 'draw', 'finishTime','Age','JockeyRank','TrainerRank', 'DamRank', 'SireRank','awt','dhw','dist']]
+    data = data[[ 'draw', 'finishTime','Age','JockeyRank','TrainerRank', 'DamRank', 'SireRank','awt','dhw',]]
     data['Age'] = data['Age'].fillna(-1)
     data['Age'] = data['Age'].astype(int)
     data['Age'] = data['Age'].astype(str)
@@ -177,8 +177,8 @@ for i,v in enumerate(distlist):
 
 
     # ========= Convert Categories to 0 1 =========
-    data = pd.get_dummies(data, columns=[
-        'dist'], prefix=['dist'])
+    # data = pd.get_dummies(data, columns=[
+    #     'dist'], prefix=['dist'])
 
     # data = pd.get_dummies(data, columns=[
     #     'draw'], prefix=['draw'])
@@ -214,27 +214,29 @@ for i,v in enumerate(distlist):
     np.savetxt('./Report/predicitValue.csv', X_test.round(0),
             delimiter=',', fmt='%s', header=headers, comments='')
     # ========= Standardization for data =========
-    scalerX = StandardScaler().fit(X_train)
-    filename = 'scaler_' + date + going + raceCourse + dist + classes + '.sav'
-    dump(scalerX, filename)
-    # logging.info('X_train, %s', str(np.shape(X_train)))
-    logging.info('X_train: %s \n %s', np.shape(X_train), X_train)
-    X_train = scalerX.transform(X_train)
+    scaler = StandardScaler()  
+    scaler.fit(X_train) 
 
-    poly=PolynomialFeatures(degree=3)
-    poly_x=poly.fit_transform(X_train)
+    filename = 'scaler_' + date + going + raceCourse + dist + classes + '.sav'
+    dump(scaler, filename)
+
+    logging.info('X_train: %s \n %s', np.shape(X_train), X_train)
+    X_train = scaler.transform(X_train)
+
+    # poly=PolynomialFeatures(degree=3)
+    # poly_x=poly.fit_transform(X_train)
 
 
     # model=LinearRegression()
     # model.fit(poly_x,y_train)
 
     model = MLPRegressor(
-        hidden_layer_sizes=(10,),  activation='relu', solver='adam', alpha=0.001, batch_size='auto',
+        hidden_layer_sizes=(10,),  activation='relu', solver='lbfgs', alpha=0.001, batch_size='auto',
         learning_rate='constant', learning_rate_init=0.01, power_t=0.5, max_iter=1000, shuffle=True,
         random_state=9, tol=0.0001, verbose=False, warm_start=False, momentum=0.9, nesterovs_momentum=True,
         early_stopping=False, validation_fraction=0.1, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
 
-    model.fit(poly_x, y_train.values.ravel())
+    model.fit(X_train, y_train.values.ravel())
 
     # modelname = 'regressioin_model_' + date + going + raceCourse + dist +'.sav'
     filename = 'regressioin_model_' + date + going + raceCourse + dist + classes + '.sav'
@@ -245,9 +247,10 @@ for i,v in enumerate(distlist):
             delimiter=',', fmt='%s', comments='',header='value')
 
     # # ========= Prediction =========
-    X_test = scalerX.transform(X_test)
-    poly_y=poly.fit_transform(X_test)
-    y_pred = model.predict(poly_y)
+    X_test = scaler.transform(X_test)  
+    # X_test = scalerX.transform(X_test)
+    # poly_y=poly.fit_transform(X_test)
+    y_pred = model.predict(X_test)
 
     # for idx, col_name in enumerate(X.columns):
     #     logging.info("The coefficient for {} is {}".format(

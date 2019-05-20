@@ -1,3 +1,4 @@
+from sklearn.model_selection import train_test_split
 import pandas as pd
 import numpy as np
 import logging
@@ -62,7 +63,11 @@ for i,v in enumerate(distlist):
     raceCourse = raceCourselist[i]
 
     data = pd.read_csv('Processed Data/history_csv_merged.csv', header=0)
+
     history_csv_merged = data.copy()
+#     y = history_csv_merged['plc']
+#     history_csv_merged, X_test, y_train, y_test = train_test_split(
+#         history_csv_merged, y, test_size=0.10, shuffle=False)
     
     data = data[data.finishTime != '---']
     data = data[data.plc != 'DISQ']

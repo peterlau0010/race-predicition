@@ -81,11 +81,14 @@ for i,v in enumerate(distlist):
 
     # ========= Add missing column (Start)===================
 
-    X_test = pd.get_dummies(
-        X_test, columns=['Draw'], prefix=['draw'])
+    # X_test = pd.get_dummies(X_test, columns=[
+    #     'dist'], prefix=['dist'])
 
-    X_test = pd.get_dummies(
-        X_test, columns=['Age'], prefix=['Age'])
+    # X_test = pd.get_dummies(
+    #     X_test, columns=['Draw'], prefix=['draw'])
+
+    # X_test = pd.get_dummies(
+    #     X_test, columns=['Age'], prefix=['Age'])
 
     # X_test = pd.get_dummies(
     #     X_test, columns=['Jockey'], prefix=['Jockey'])
@@ -106,6 +109,7 @@ for i,v in enumerate(distlist):
                 'Horse Wt. (Declaration)': 'dhw',
                 })
 
+    logging.info('X_test columns: %s ', X_test.columns.values)
 
     # ========== Select required Column ================
     filename = 'preditParam' + date + going + raceCourse + dist + classes + '.csv'
@@ -132,10 +136,10 @@ for i,v in enumerate(distlist):
     X_test = X_test.astype(float)
     X_test = scalerX.transform(X_test)
 
-    poly=PolynomialFeatures(degree=3)
-    poly_x=poly.fit_transform(X_test)
+    # poly=PolynomialFeatures(degree=3)
+    # poly_x=poly.fit_transform(X_test)
 
-    y_pred = model.predict(poly_x)
+    y_pred = model.predict(X_test)
     # X_test = scalerX.inverse_transform(X_test)
 
 
