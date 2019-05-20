@@ -19,6 +19,7 @@ pd.set_option('display.width', 1000)
 
 # --------- Read CSV
 data = pd.read_csv('Processed Data/history_csv_merged.csv', header=0)
+data = data.iloc[::-1]
 data = data[data.finishTime != '---']
 data = data[data.plc != 'DISQ']
 data['plc'] = data['plc'].str.replace('.DH', '', regex=True)
@@ -52,7 +53,7 @@ X = X[[ 'draw','Age','awt','dhw','J_Win','T_Win','Sire','Dam','plc']]
 #     'draw'], prefix=['draw'])
 
 X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.30, shuffle=False)
+        X, y, test_size=0.10, shuffle=False)
 
 sumOfPlc = data.groupby(['Sire'])['plc'].sum()
 noOfMatch = data.groupby(['Sire'])['finishTime'].count()
@@ -106,7 +107,7 @@ X_test.fillna(X_train.mean(), inplace=True)
 scaler = StandardScaler()  
 scaler.fit(X_train)
 X_train = scaler.transform(X_train)
-logging.info('Scaled data %s \n %s', np.shape(X_train), X_train)
+# logging.info('Scaled data %s \n %s', np.shape(X_train), X_train)
 
 # ---------- Regression model
 model = MLPRegressor(
@@ -145,6 +146,11 @@ logging.info('mean_squared_error: %s ', mean_squared_error(df_out['real_plc'], d
 
 
 
+# ------------ Temp ----------
+jockey = pd.read_csv('Raw Data/jockey1819.csv', header=0)
+trainer = pd.read_csv('Raw Data/trainer1819.csv', header=0)
+
+
 
 
 # ------------ Prediction
@@ -159,35 +165,51 @@ pred_data = pred_data.rename(
             })
 
 pred_data_original = pred_data.copy()
-logging.info('pred_data_original: %s \n %s', np.shape(pred_data_original), pred_data_original)
+# logging.info('pred_data_original: %s \n %s', np.shape(pred_data_original), pred_data_original)
 
 
-pred_data = pred_data[[ 'draw','Age','awt','dhw','J_Win','T_Win','Sire','Dam']]
+pred_data = pred_data[['draw', 'Age', 'awt',
+                       'dhw', 'Jockey', 'Trainer', 'Sire', 'Dam']]
+
+# logging.info('pred_data: %s \n %s', np.shape(
+#     pred_data), pred_data)
 
 pred_data = pd.merge(pred_data, sireRank, how='left',
     left_on=['Sire'], right_on=['Sire'])
+# logging.info('pred_data 1: %s \n %s', np.shape(pred_data), pred_data)
+
 pred_data = pd.merge(pred_data, damRank, how='left',
     left_on=['Dam'], right_on=['Dam'])
-logging.info('pred_data 1: %s \n %s', np.shape(pred_data), pred_data)
+# logging.info('pred_data 2: %s \n %s', np.shape(pred_data), pred_data)
+
+pred_data = pd.merge(pred_data, jockey[['J_Win','Jockey']], how='left',
+                     left_on=['Jockey'], right_on=['Jockey'])
+
+pred_data = pd.merge(pred_data, trainer[['T_Win','Trainer']], how='left',
+                     left_on=['Trainer'], right_on=['Trainer'])
 
 pred_data.fillna(X_train.mean(), inplace=True)
-pred_data = pred_data.drop(['Sire','Dam'],axis=1)
+pred_data = pred_data.drop(['Sire','Dam','Trainer','Jockey'],axis=1)
 
-logging.info('pred_data: %s \n %s', np.shape(pred_data), pred_data)
+# logging.info('pred_data: 3%s \n %s', np.shape(pred_data), pred_data)
 pred_data = pred_data.astype(float)
 
 pred_data = scaler.transform(pred_data) 
 pred_result = model.predict(pred_data)
 
+pred_data_original['pred_finishTime'] = pred_result
 
-df_out = pd.merge(pred_data_original, pd.Series(pred_result).rename('pred_finishTime'), how='right',
-                      left_index=True, right_index=True)
+# logging.info('pred_data_original: %s \n %s', np.shape(
+#     pred_data_original), pred_data_original)
 
-logging.info('df_out: %s \n %s', np.shape(df_out), df_out)
+pred_data_original.loc[:, 'pred_plc'] = pred_data_original.groupby(['raceNo'])[
+        "pred_finishTime"].rank()
+pred_data_original = pred_data_original[[
+        'raceNo', 'Horse No.', 'Horse', 'draw', 'pred_finishTime', 'pred_plc']]
+# logging.info('Prediction result: %s \n %s',
+#              np.shape(pred_data_original), pred_data_original)
 
-# df_out.loc[:, 'pred_plc'] = df_out.groupby(['raceNo'])[
-#         "pred_finishTime"].rank()
-# df_out = df_out[[
-#         'raceNo', 'Horse No.', 'Horse', 'draw', 'pred_finishTime', 'pred_plc']]
-# logging.info('df_out: %s \n %s', np.shape(df_out), df_out)
-# df_out["real_plc"] = df_out.groupby(['date', 'raceNo'])["plc"].rank()
+
+pred_data_original = pred_data_original[(pred_data_original['pred_plc'] <= 1)]
+
+print(pred_data_original)

@@ -167,24 +167,24 @@ finally:
 # ============== Editing data for prediction  (Start) =================
 
 # ============== Read required csv
-sireRank = pd.read_csv('./Processed Data/sireRank.csv', sep=',')
-damRank = pd.read_csv('./Processed Data/damRank.csv', sep=',')
-jockey = pd.read_csv('./Processed Data/jockeyRank.csv', sep=',')
-trainer = pd.read_csv('./Processed Data/trainerRank.csv', sep=',')
+# sireRank = pd.read_csv('./Processed Data/sireRank.csv', sep=',')
+# damRank = pd.read_csv('./Processed Data/damRank.csv', sep=',')
+# jockey = pd.read_csv('./Processed Data/jockeyRank.csv', sep=',')
+# trainer = pd.read_csv('./Processed Data/trainerRank.csv', sep=',')
 
 
 # ============== Join required csv with allMatchToday
-allMatchToday = pd.merge(allMatchToday, sireRank, how='left',
-                         left_on=['Sire'], right_on=['Sire'])
+# allMatchToday = pd.merge(allMatchToday, sireRank, how='left',
+#                          left_on=['Sire'], right_on=['Sire'])
 
-allMatchToday = pd.merge(allMatchToday, damRank, how='left',
-                         left_on=['Dam'], right_on=['Dam'])
+# allMatchToday = pd.merge(allMatchToday, damRank, how='left',
+#                          left_on=['Dam'], right_on=['Dam'])
 
-allMatchToday = pd.merge(allMatchToday, jockey, how='left',
-                         left_on=['Jockey'], right_on=['Jockey'])
+# allMatchToday = pd.merge(allMatchToday, jockey, how='left',
+#                          left_on=['Jockey'], right_on=['Jockey'])
 
-allMatchToday = pd.merge(allMatchToday, trainer, how='left',
-                         left_on=['Trainer'], right_on=['Trainer'])
+# allMatchToday = pd.merge(allMatchToday, trainer, how='left',
+#                          left_on=['Trainer'], right_on=['Trainer'])
 
 
 # ============= Update road and going
