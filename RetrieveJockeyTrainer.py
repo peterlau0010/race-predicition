@@ -58,7 +58,11 @@ class WebCrawling:
             if "Trainers in Service" in str(listDetail):
                 listDetail.remove('Trainers in Service')
 
-        listDetail.remove('View in Numbers')
+        if "View in Numbers" in str(listDetail):
+            listDetail.remove('View in Numbers')
+        if "View in Percentage" in str(listDetail):    
+            listDetail.remove('View in Percentage')
+        
         # listDetail.remove('')
 
         listDetail = numpy.reshape(listDetail, (-1, 8))

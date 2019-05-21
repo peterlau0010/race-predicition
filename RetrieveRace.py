@@ -145,6 +145,7 @@ try:
         matchDetail['class'] = matchInfo[3]
         matchDetail['raceNo'] = matchNo
         matchDetail['raceCourse'] = raceCourse
+        matchDetail['date'] = date
         logging.info('Match Detail: %s \n %s',
                      np.shape(matchDetail), matchDetail)
 
