@@ -10,7 +10,7 @@ from sklearn.metrics import mean_squared_error,accuracy_score
 # ---------- Parameter
 date = '20190522'
 raceCourse = 'HV'
-test_size = 0.05
+test_size = 0.20
 dist = '1200M'
 
 
@@ -79,7 +79,7 @@ X_copy = X.copy()
 y = data[['finishTime']]
 
 
-X = X[[ 'draw','Age','awt','dhw','J_Win','T_Win','Sire','Dam','plc','T_2nd','J_2nd','J_3rd','Total Rides','T_3rd','Total Runs','class','going']]
+X = X[[ 'draw','Age','awt','dhw','J_Win','T_Win','Sire','Dam','plc','T_2nd','J_2nd','J_3rd','J_4th','Total Rides','T_3rd','T_4th','Total Runs','class','going']]
 
 X['class'] = X['class'].str.replace('Class ','')
 
@@ -114,8 +114,8 @@ damRank.columns = ['Dam','DamRank']
 X_train = pd.merge(X_train, damRank, how='left',
     left_on=['Dam'], right_on=['Dam'])
 
-X_train['JockeyRank'] = (X_train['J_Win']*3 + X_train['J_2nd']*2 + X_train['J_3rd']*1)
-X_train['TrainerRank'] = (X_train['T_Win']*3 + X_train['T_2nd']*2 + X_train['T_3rd']*1) 
+X_train['JockeyRank'] = (X_train['J_Win']*5 + X_train['J_2nd']*4 + X_train['J_3rd']*3 + X_train['J_4th']*2)
+X_train['TrainerRank'] = (X_train['T_Win']*5 + X_train['T_2nd']*4 + X_train['T_3rd']*3 + X_train['T_4th']*2) 
 
 X_train = X_train.drop(['finishTime','Sire','Dam' ,'plc','J_Win','J_2nd','J_3rd','Total Rides','T_Win','T_2nd','T_3rd','Total Runs'],axis=1)
 
@@ -131,8 +131,8 @@ X_test = pd.merge(X_test, sireRank, how='left',
 X_test = pd.merge(X_test, damRank, how='left',
     left_on=['Dam'], right_on=['Dam'])
 
-X_test['JockeyRank'] = (X_test['J_Win']*3 + X_test['J_2nd']*2 + X_test['J_3rd']*1)
-X_test['TrainerRank'] = (X_test['T_Win']*3 + X_test['T_2nd']*2 + X_test['T_3rd']*1)
+X_test['JockeyRank'] = (X_test['J_Win']*5 + X_test['J_2nd']*4 + X_test['J_3rd']*3 + X_test['J_4th']*2) 
+X_test['TrainerRank'] = (X_test['T_Win']*5 + X_test['T_2nd']*4 + X_test['T_3rd']*3 + X_test['T_4th']*2)
 
 X_test = X_test.drop(['Sire','Dam' ,'plc','J_Win','J_2nd','J_3rd','Total Rides','T_Win','T_2nd','T_3rd','Total Runs'],axis=1)
 
@@ -306,8 +306,8 @@ pred_data = pd.merge(pred_data, horse[['Code','Foaling Date']], how='left',
                      left_on=['Brand No.'], right_on=['Code'])
 
 pred_data['Age'] = (pd.to_datetime(pred_data['date'],format='%Y%m%d', errors='ignore') - pd.to_datetime(pred_data['Foaling Date'],format='%d/%m/%Y', errors='ignore'))/np.timedelta64(1,'Y')
-pred_data['JockeyRank'] = (pred_data['J_Win']*3 + pred_data['J_2nd']*2 + pred_data['J_3rd']*1)
-pred_data['TrainerRank'] = (pred_data['T_Win']*3 + pred_data['T_2nd']*2 + pred_data['T_3rd']*1)
+pred_data['JockeyRank'] = (pred_data['J_Win']*5 + pred_data['J_2nd']*4 + pred_data['J_3rd']*3 + pred_data['J_4th']*2)
+pred_data['TrainerRank'] = (pred_data['T_Win']*5 + pred_data['T_2nd']*4 + pred_data['T_3rd']*3 + pred_data['T_4th']*2)
 
 pred_data = pred_data.drop(['Sire','Dam','Trainer','Jockey','Brand No.','date','Code','Foaling Date'],axis=1)
 pred_data['JockeyRank'].fillna(X_train_backup['JockeyRank'].quantile(0.25), inplace=True)
