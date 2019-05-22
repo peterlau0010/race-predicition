@@ -20,10 +20,10 @@ import RaceParam as cfg
 # totalMatch = '8'
 totalMatch = cfg.param['totalMatch']
 date = cfg.param['date']
-dist = cfg.param['dist']
-road = cfg.param['road']
-going = cfg.param['going']
-classes = cfg.param['classes']
+# dist = cfg.param['dist']
+# road = cfg.param['road']
+# going = cfg.param['going']
+# classes = cfg.param['classes']
 raceCourse = cfg.param['todayRaceCourse']
 
 
