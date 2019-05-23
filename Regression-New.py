@@ -10,7 +10,13 @@ from sklearn.metrics import mean_squared_error,accuracy_score
 # ---------- Parameter
 date = '20190522'
 raceCourse = 'HV'
-test_size = 0.20
+# test_size = 0.01 # For real prediction
+# test_size = 0.07 # For backtest prediction
+# test_size = 0.50 # For training
+# test_size = 0.40 # For training
+# test_size = 0.30 # For training
+test_size = 0.20 # For training
+# test_size = 0.10 # For training
 dist = '1200M'
 
 
@@ -38,6 +44,7 @@ data['plc'] = data['plc'].str.replace('.DH', '', regex=True)
 data['finishTime'] = (pd.to_datetime(
     data['finishTime'], format="%M:%S.%f") - datetime(1900, 1, 1))/timedelta(milliseconds=1)
 data['plc'] = data['plc'].astype(float)
+
 
 logging.info('Original data %s \n %s', np.shape(data), data.head())
 
@@ -79,7 +86,7 @@ X_copy = X.copy()
 y = data[['finishTime']]
 
 
-X = X[[ 'draw','Age','awt','dhw','J_Win','T_Win','Sire','Dam','plc','T_2nd','J_2nd','J_3rd','J_4th','Total Rides','T_3rd','T_4th','Total Runs','class','going']]
+X = X[[ 'draw','Age','awt','dhw','Sire','Dam','plc','J_Win','J_2nd','J_3rd','J_4th','Total Rides','T_Win','T_2nd','T_3rd','T_4th','Total Runs','class','going','jockey','trainer','horseCode']]
 
 X['class'] = X['class'].str.replace('Class ','')
 
@@ -95,29 +102,70 @@ X = pd.get_dummies(X, columns=[
 X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=test_size, shuffle=False)
 
+# X_train = X_train.tail(int(len(X_train)*((test_size*100 +60)/100)))
+# y_train = y_train.tail(int(len(y_train)*((test_size*100 +60)/100)))
+
+
 X_train['finishTime'] = y_train
-sumOfPlc = X_train.groupby(['Sire'])['plc'].sum()
-noOfMatch = X_train.groupby(['Sire'])['finishTime'].count()
-sireRank = sumOfPlc/noOfMatch
+# sumOfPlc = X_train.groupby(['Sire'])['plc'].sum()
+# noOfMatch = X_train.groupby(['Sire'])['finishTime'].count()
+# sireRank = sumOfPlc/noOfMatch
+sireRank = X_train.groupby(['Sire'])['plc'].apply(lambda x: (x<=3).sum())
 sireRank = sireRank.reset_index()
 sireRank.columns = ['Sire','SireRank']
-
 X_train = pd.merge(X_train, sireRank, how='left',
     left_on=['Sire'], right_on=['Sire'])
 
-sumOfPlc = X_train.groupby(['Dam'])['plc'].sum()
-noOfMatch = X_train.groupby(['Dam'])['finishTime'].count()
-damRank = sumOfPlc/noOfMatch
+# sumOfPlc = X_train.groupby(['Dam'])['plc'].sum()
+# noOfMatch = X_train.groupby(['Dam'])['finishTime'].count()
+# damRank = sumOfPlc/noOfMatch
+damRank = X_train.groupby(['Dam'])['plc'].apply(lambda x: (x<=3).sum())
 damRank = damRank.reset_index()
+# print(damRank)
 damRank.columns = ['Dam','DamRank']
 
 X_train = pd.merge(X_train, damRank, how='left',
     left_on=['Dam'], right_on=['Dam'])
 
-X_train['JockeyRank'] = (X_train['J_Win']*5 + X_train['J_2nd']*4 + X_train['J_3rd']*3 + X_train['J_4th']*2)
-X_train['TrainerRank'] = (X_train['T_Win']*5 + X_train['T_2nd']*4 + X_train['T_3rd']*3 + X_train['T_4th']*2) 
 
-X_train = X_train.drop(['finishTime','Sire','Dam' ,'plc','J_Win','J_2nd','J_3rd','Total Rides','T_Win','T_2nd','T_3rd','Total Runs'],axis=1)
+# ---- Horse Rank
+horseRank = X_train.groupby(['horseCode'])['plc'].apply(lambda x: (x<=3).sum())/ X_train.groupby(['horseCode'])['plc'].count()
+horseRank = horseRank.reset_index()
+horseRank.columns = ['horseCode','horseRank']
+
+X_train = pd.merge(X_train, horseRank[['horseRank','horseCode']], how='left',
+    left_on=['horseCode'], right_on=['horseCode'])
+
+
+# ---- Jockey Rank
+jockeyRank = X_train.groupby(['jockey'])['plc'].apply(lambda x: (x<=3).sum())/ X_train.groupby(['jockey'])['plc'].count()
+# print (jockeyRank)
+jockeyRank = jockeyRank.reset_index()
+jockeyRank.columns = ['jockey','JockeyRank']
+
+X_train = pd.merge(X_train, jockeyRank[['JockeyRank','jockey']], how='left',
+    left_on=['jockey'], right_on=['jockey'])
+
+
+# ---- Trainer Rank
+trainerRank = X_train.groupby(['trainer'])['plc'].apply(lambda x: (x<=3).sum()) / X_train.groupby(['trainer'])['plc'].count()
+# print (trainerRank)
+# exit()
+trainerRank = trainerRank.reset_index()
+trainerRank.columns = ['trainer','TrainerRank']
+
+X_train = pd.merge(X_train, trainerRank[['TrainerRank','trainer']], how='left',
+    left_on=['trainer'], right_on=['trainer'])
+
+
+
+# ---- Trainer Jockey Fail Rank
+X_train['JockeyFail'] = 100 - X_train['J_Win']- X_train['J_2nd']- X_train['J_3rd']
+X_train['TrainerFail'] = 100 - X_train['T_Win']- X_train['T_2nd']- X_train['T_3rd']
+
+# X_train['TrainerFail'] = 100 - X_train['T_Win']- X_train['T_2nd']- X_train['T_3rd']
+
+X_train = X_train.drop(['finishTime','Sire','Dam' ,'plc','J_Win','J_2nd','J_3rd','J_4th','Total Rides','T_Win','T_2nd','T_3rd','T_4th','Total Runs','jockey','trainer','horseCode'],axis=1)
 
 
 # logging.info('Train data: %s \n %s', np.shape(X_train), X_train.head())
@@ -125,23 +173,29 @@ X_train = X_train.drop(['finishTime','Sire','Dam' ,'plc','J_Win','J_2nd','J_3rd'
 
 
 
-
+X_test = pd.merge(X_test, horseRank[['horseRank','horseCode']], how='left',
+    left_on=['horseCode'], right_on=['horseCode'])
 X_test = pd.merge(X_test, sireRank, how='left',
     left_on=['Sire'], right_on=['Sire'])
 X_test = pd.merge(X_test, damRank, how='left',
     left_on=['Dam'], right_on=['Dam'])
+X_test = pd.merge(X_test, jockeyRank[['JockeyRank','jockey']], how='left',
+    left_on=['jockey'], right_on=['jockey'])
+X_test = pd.merge(X_test, trainerRank[['TrainerRank','trainer']], how='left',
+    left_on=['trainer'], right_on=['trainer'])
 
-X_test['JockeyRank'] = (X_test['J_Win']*5 + X_test['J_2nd']*4 + X_test['J_3rd']*3 + X_test['J_4th']*2) 
-X_test['TrainerRank'] = (X_test['T_Win']*5 + X_test['T_2nd']*4 + X_test['T_3rd']*3 + X_test['T_4th']*2)
+X_test['JockeyFail'] = 100 - X_test['J_Win']- X_test['J_2nd']- X_test['J_3rd']
+X_test['TrainerFail'] = 100 - X_test['T_Win']- X_test['T_2nd']- X_test['T_3rd']
+# X_test['JockeyRank'] = (X_test['J_Win']*1 + X_test['J_2nd']*1 + X_test['J_3rd']*1) /(X_test['Total Rides'])
+# X_test['TrainerRank'] = (X_test['T_Win']*1 + X_test['T_2nd']*1 + X_test['T_3rd']*1)/(X_test['Total Runs'])
 
-X_test = X_test.drop(['Sire','Dam' ,'plc','J_Win','J_2nd','J_3rd','Total Rides','T_Win','T_2nd','T_3rd','Total Runs'],axis=1)
+X_test = X_test.drop(['Sire','Dam' ,'plc','J_Win','J_2nd','J_3rd','J_4th','Total Rides','T_Win','T_2nd','T_3rd','T_4th','Total Runs','jockey','trainer','horseCode'],axis=1)
 
 logging.info('Train data before filled NaN:  %s \n %s', np.shape(X_train), X_train.head())
 logging.info('Test data before filled NaN:  %s \n %s', np.shape(X_test), X_test.head())
 
 
 # ------------ select columns for prediction
-# Train_Columns = [ 'draw','Age','awt','dhw','J_Win','T_Win']
 
 
 
@@ -153,16 +207,29 @@ predictionColumns = X_train.columns.values
 
 # --------- Fill NaN
 X_train_backup = X_train
-# print(X_train['JockeyRank'].describe())
-# print(X_train['TrainerRank'].describe())
+# print(X_train['J_Win'].describe())
+# print(X_train['T_Win'].describe())
 # print(X_train['TrainerRank'].quantile(0.25))
+
+# X_train['J_Win'].fillna(X_train['J_Win'].quantile(0.1), inplace=True)
+# X_test['J_Win'].fillna(X_train['J_Win'].quantile(0.1), inplace=True)
+# X_train['J_2nd'].fillna(X_train['J_2nd'].quantile(0.2), inplace=True)
+# X_test['J_2nd'].fillna(X_train['J_2nd'].quantile(0.2), inplace=True)
+# X_train['J_3rd'].fillna(X_train['J_3rd'].quantile(0.3), inplace=True)
+# X_test['J_3rd'].fillna(X_train['J_3rd'].quantile(0.3), inplace=True)
+# X_train['J_4th'].fillna(X_train['J_4th'].quantile(0.4), inplace=True)
+# X_test['J_4th'].fillna(X_train['J_4th'].quantile(0.4), inplace=True)
+X_train['TrainerRank'].fillna(X_train['TrainerRank'].quantile(0.5), inplace=True)
+X_test['TrainerRank'].fillna(X_train['TrainerRank'].quantile(0.5), inplace=True)
+X_train['TrainerFail'].fillna(X_train['TrainerFail'].quantile(0.5), inplace=True)
+X_test['TrainerFail'].fillna(X_train['TrainerFail'].quantile(0.5), inplace=True)
 
 X_train['JockeyRank'].fillna(X_train['JockeyRank'].quantile(0.25), inplace=True)
 X_test['JockeyRank'].fillna(X_train['JockeyRank'].quantile(0.25), inplace=True)
-X_train['TrainerRank'].fillna(X_train['TrainerRank'].quantile(0.25), inplace=True)
-X_test['TrainerRank'].fillna(X_train['TrainerRank'].quantile(0.25), inplace=True)
-# X_test['DamRank'].fillna(X_train['DamRank'].quantile(0.75), inplace=True)
-# X_test['SireRank'].fillna(X_train['SireRank'].quantile(0.75), inplace=True)
+X_train['JockeyFail'].fillna(X_train['JockeyFail'].quantile(0.7), inplace=True)
+X_test['JockeyFail'].fillna(X_train['JockeyFail'].quantile(0.7), inplace=True)
+X_test['horseRank'].fillna(X_train['horseRank'].quantile(0.25), inplace=True)
+X_test['horseRank'].fillna(X_train['horseRank'].quantile(0.25), inplace=True)
 
 # print(X_test.isnull().values.any())
 X_train.fillna(X_train.mean(), inplace=True)
@@ -178,7 +245,7 @@ X_train = scaler.transform(X_train)
 # logging.info('Scaled data %s \n %s', np.shape(X_train), X_train)
 
 # ---------- Regression model
-model = MLPRegressor(hidden_layer_sizes=(5,5,5,),activation='relu', solver='lbfgs', alpha=0.0001, shuffle=True, random_state=10,learning_rate='constant'
+model = MLPRegressor(hidden_layer_sizes=(5,5,5,5,),activation='relu', solver='lbfgs', alpha=0.0001, shuffle=True, random_state=10,learning_rate='constant'
     )
 
 model.fit(X_train, y_train.values.ravel())
@@ -212,14 +279,16 @@ y_test.loc[:, 'pred_finishTime'] = y_pred
 # X_test = scaler.inverse_transform(X_test) 
 df_out = pd.merge(X_copy, y_test, how='right',
                       left_index=True, right_index=True)
-# logging.info('Original df_out  %s \n %s', np.shape(df_out), df_out.head())
+logging.info('Original df_out  %s \n %s', np.shape(df_out), df_out.head())
 
 df_out["pred_plc"] = df_out.groupby(['date', 'raceNo'])["pred_finishTime"].rank()
 df_out["real_plc"] = df_out.groupby(['date', 'raceNo'])["plc"].rank()
 
-df_out = df_out[['date', 'raceNo','horseNo', 'plc','finishTime', 'pred_finishTime','real_plc', 'pred_plc']]
+df_out = df_out[['date', 'raceNo','horseNo', 'plc','odds','finishTime', 'pred_finishTime','real_plc', 'pred_plc',]]
 df_out_original = df_out.copy()
-df_out = df_out[(df_out['pred_plc'] <= 1)]
+logging.info('Original df_out  %s \n %s', np.shape(df_out), df_out.head())
+df_out = df_out[(df_out['pred_plc'] <= 1) & (df_out['odds'].astype(float) <= 15)]
+
 df_out.loc[df_out['real_plc'] <=3, 'real_first_3'] = 1
 df_out.fillna(0,inplace=True)
 # q = df_out["plc"].quantile(0.99)
@@ -253,6 +322,12 @@ np.savetxt('./Report/test_result_'+date+'.csv', df_out_original.round(0),
 
 
 
+
+
+
+
+
+exit()
 
 
 # ------------ Prediction
@@ -310,8 +385,8 @@ pred_data['JockeyRank'] = (pred_data['J_Win']*5 + pred_data['J_2nd']*4 + pred_da
 pred_data['TrainerRank'] = (pred_data['T_Win']*5 + pred_data['T_2nd']*4 + pred_data['T_3rd']*3 + pred_data['T_4th']*2)
 
 pred_data = pred_data.drop(['Sire','Dam','Trainer','Jockey','Brand No.','date','Code','Foaling Date'],axis=1)
-pred_data['JockeyRank'].fillna(X_train_backup['JockeyRank'].quantile(0.25), inplace=True)
-pred_data['TrainerRank'].fillna(X_train_backup['TrainerRank'].quantile(0.25), inplace=True)
+# pred_data['JockeyRank'].fillna(X_train_backup['JockeyRank'].quantile(0.25), inplace=True)
+# pred_data['TrainerRank'].fillna(X_train_backup['TrainerRank'].quantile(0.25), inplace=True)
 
 pred_data.fillna(X_train_backup.mean(), inplace=True)
 
