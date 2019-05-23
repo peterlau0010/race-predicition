@@ -14,8 +14,8 @@ raceCourse = 'HV'
 # test_size = 0.07 # For backtest prediction
 # test_size = 0.50 # For training
 # test_size = 0.40 # For training
-# test_size = 0.30 # For training
-test_size = 0.20 # For training
+test_size = 0.30 # For training
+# test_size = 0.20 # For training
 # test_size = 0.10 # For training
 dist = '1200M'
 
@@ -160,8 +160,8 @@ X_train = pd.merge(X_train, trainerRank[['TrainerRank','trainer']], how='left',
 
 
 # ---- Trainer Jockey Fail Rank
-X_train['JockeyFail'] = 100 - X_train['J_Win']- X_train['J_2nd']- X_train['J_3rd']
-X_train['TrainerFail'] = 100 - X_train['T_Win']- X_train['T_2nd']- X_train['T_3rd']
+# X_train['JockeyFail'] = 100 - X_train['J_Win']- X_train['J_2nd']- X_train['J_3rd']
+# X_train['TrainerFail'] = 100 - X_train['T_Win']- X_train['T_2nd']- X_train['T_3rd']
 
 # X_train['TrainerFail'] = 100 - X_train['T_Win']- X_train['T_2nd']- X_train['T_3rd']
 
@@ -184,8 +184,8 @@ X_test = pd.merge(X_test, jockeyRank[['JockeyRank','jockey']], how='left',
 X_test = pd.merge(X_test, trainerRank[['TrainerRank','trainer']], how='left',
     left_on=['trainer'], right_on=['trainer'])
 
-X_test['JockeyFail'] = 100 - X_test['J_Win']- X_test['J_2nd']- X_test['J_3rd']
-X_test['TrainerFail'] = 100 - X_test['T_Win']- X_test['T_2nd']- X_test['T_3rd']
+# X_test['JockeyFail'] = 100 - X_test['J_Win']- X_test['J_2nd']- X_test['J_3rd']
+# X_test['TrainerFail'] = 100 - X_test['T_Win']- X_test['T_2nd']- X_test['T_3rd']
 # X_test['JockeyRank'] = (X_test['J_Win']*1 + X_test['J_2nd']*1 + X_test['J_3rd']*1) /(X_test['Total Rides'])
 # X_test['TrainerRank'] = (X_test['T_Win']*1 + X_test['T_2nd']*1 + X_test['T_3rd']*1)/(X_test['Total Runs'])
 
@@ -207,7 +207,7 @@ predictionColumns = X_train.columns.values
 
 # --------- Fill NaN
 X_train_backup = X_train
-# print(X_train['J_Win'].describe())
+# print(X_train['horseRank'].describe())
 # print(X_train['T_Win'].describe())
 # print(X_train['TrainerRank'].quantile(0.25))
 
@@ -221,13 +221,13 @@ X_train_backup = X_train
 # X_test['J_4th'].fillna(X_train['J_4th'].quantile(0.4), inplace=True)
 X_train['TrainerRank'].fillna(X_train['TrainerRank'].quantile(0.5), inplace=True)
 X_test['TrainerRank'].fillna(X_train['TrainerRank'].quantile(0.5), inplace=True)
-X_train['TrainerFail'].fillna(X_train['TrainerFail'].quantile(0.5), inplace=True)
-X_test['TrainerFail'].fillna(X_train['TrainerFail'].quantile(0.5), inplace=True)
+# X_train['TrainerFail'].fillna(X_train['TrainerFail'].quantile(0.5), inplace=True)
+# X_test['TrainerFail'].fillna(X_train['TrainerFail'].quantile(0.5), inplace=True)
 
 X_train['JockeyRank'].fillna(X_train['JockeyRank'].quantile(0.25), inplace=True)
 X_test['JockeyRank'].fillna(X_train['JockeyRank'].quantile(0.25), inplace=True)
-X_train['JockeyFail'].fillna(X_train['JockeyFail'].quantile(0.7), inplace=True)
-X_test['JockeyFail'].fillna(X_train['JockeyFail'].quantile(0.7), inplace=True)
+# X_train['JockeyFail'].fillna(X_train['JockeyFail'].quantile(0.7), inplace=True)
+# X_test['JockeyFail'].fillna(X_train['JockeyFail'].quantile(0.7), inplace=True)
 X_test['horseRank'].fillna(X_train['horseRank'].quantile(0.25), inplace=True)
 X_test['horseRank'].fillna(X_train['horseRank'].quantile(0.25), inplace=True)
 
