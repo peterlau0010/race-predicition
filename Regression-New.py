@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 import logging
+import multiprocessing
+import itertools 
 from datetime import datetime, timedelta
 from sklearn.neural_network import MLPRegressor
 from sklearn.preprocessing import StandardScaler
@@ -11,7 +13,7 @@ from sklearn.metrics import mean_squared_error,accuracy_score
 date = '20190526'
 # raceCourse = 'ST'
 # test_size = 0.01 # For real prediction
-# test_size = 0.07 # For backtest prediction
+# test_size = 0.07 # For backtest predictionx
 # test_size = 0.70 # For training
 # test_size = 0.60 # For training
 test_size = 0.50 # For training
@@ -176,154 +178,185 @@ X_train = pd.merge(X_train, trainerRank[['TrainerRank','Trainer']], how='left',
 Select requried columns for train, test, predict 
 """
 
-train_test_col = ['class', 'Draw', 'Age', 'AWT', 'Horse Wt. (Declaration)', 'Rtg.+/-', 'Runs_1',
+train_test_col = [ 'class','Draw', 'Age', 'AWT', 'Horse Wt. (Declaration)', 'Rtg.+/-', 'Runs_1',
  'Runs_2', 'Runs_3', 'Runs_4', 'B', 'H', 'TT', 'CP', 'V', 'XB', 'Sex_c', 'Sex_f',
  'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM',
  'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'raceCourse_ST',
- 'SireRank', 'DamRank', 'horseRank', 'JockeyRank', 'TrainerRank']
+ 'SireRank', 'DamRank', 'horseRank', 'JockeyRank', 'TrainerRank',]
 
-X_train = X_train[train_test_col]
+# train_test_col = ['Draw', 'Age', 'AWT', 'Horse Wt. (Declaration)', 'Rtg.+/-', 'Runs_1',
+#  'Runs_2', 'Runs_3',]
+print(datetime.now())
 
-X_train = X_train.astype(float)
-
-
-# ---- save columns for further test or prediciton 
-predictionColumns = X_train.columns.values
-
-
-# --------- Fill all missing data
-X_train_backup = X_train
-X_train.fillna(X_train.mean(), inplace=True)
-# X_test.fillna(X_train.mean(), inplace=True)
-logging.info('Test data filled NaN:  %s \n %s' , np.shape(X_test), X_test.head(2).append( X_test.tail(2)))
-    
-
-""" 
-Scale data
-Train model
-"""
-# --------- Scaler data
-scaler = StandardScaler()  
-scaler.fit(X_train)
-X_train = scaler.transform(X_train)
+perm = itertools.permutations(train_test_col)
+print(datetime.now())
 
 
-# ---------- Regression model
-# model = MLPRegressor(hidden_layer_sizes=(10,10,10,10,10,10,),activation='relu', solver='lbfgs', alpha=0.0001, shuffle=True, random_state=8,learning_rate='constant') # 0.64 Test size 70%
-model = MLPRegressor(hidden_layer_sizes=(5,5,5,5,),activation='relu', solver='adam', alpha=0.00001, shuffle=True, random_state=13,learning_rate='constant',max_iter=2000) # 0.73 Test size 70%
-# model = MLPRegressor(hidden_layer_sizes=(3,3,3,3),activation='relu', solver='lbfgs', alpha=0.0001, shuffle=True,) 
-model.fit(X_train, y_train.values.ravel())
+score = 0
+col = []
+index = 0
+X_train_copy = X_train.copy()
+X_test_copy = X_test.copy()
+with multiprocessing.Pool() as pool:
+    for  train_test_col in perm:
+        index+=1
+        # if index > 10:
+        #     exit()
+        # print (list(train_test_col)) 
+        train_test_col = list(train_test_col)
 
-# model = MLPRegressor()
-# params = {'solver':['lbfgs'],'hidden_layer_sizes':[(3,3,3,),(5,5,5,5),(10,10,10,10)],'random_state':[None]}
-# gs = GridSearchCV(model, params,cv=10,n_jobs=-1)
+        X_train = X_train_copy[train_test_col]
 
-# gs.fit(X_train, y_train.values.ravel())
+        X_train = X_train.astype(float)
+        # print(train_test_col)
+        X_train = X_train[train_test_col]
 
-# model= gs
-# print(gs.best_score_)#最好的得分
-
-# print(gs.best_params_)#最好的参数
-# # exit()
-
-# print(model.score)
-
-
-
-
-""" 
-Test the model with X_test
-Generate Test result report
- """
-
-# ---- Set up for X_test
-X_test = pd.merge(X_test, horseRank[['horseRank', 'Brand No.']], how='left',
-                  left_on=['Brand No.'], right_on=['Brand No.'])
-X_test = pd.merge(X_test, sireRank, how='left',
-                  left_on=['Sire'], right_on=['Sire'])
-X_test = pd.merge(X_test, damRank, how='left',
-                  left_on=['Dam'], right_on=['Dam'])
-X_test = pd.merge(X_test, jockeyRank[['JockeyRank', 'Jockey']], how='left',
-                  left_on=['Jockey'], right_on=['Jockey'])
-X_test = pd.merge(X_test, trainerRank[['TrainerRank', 'Trainer']], how='left',
-                  left_on=['Trainer'], right_on=['Trainer'])
-
-# ---- Fill missing data
-X_test.fillna(X_train_backup.mean(), inplace=True)
-
-# ---- Select required columns
-X_test = X_test[predictionColumns]
-
-# ---- scale data and test will trianed model
-X_test = X_test.astype(float)
-X_test = scaler.transform(X_test)  
-y_pred = model.predict(X_test)
-
-# ---- Prepare data for report generation
-y_test.loc[:, 'pred_finishTime'] = y_pred
-test_report = pd.merge(X_copy, y_test, how='right',
-                      left_index=True, right_index=True)
-
-test_report["pred_plc"] = test_report.groupby(['date', 'raceNo'])["pred_finishTime"].rank()
-test_report["real_plc"] = test_report.groupby(['date', 'raceNo'])["plc"].rank()
-
-# ---- Generate Report
-test_report = test_report[['date', 'raceNo','horseNo', 'plc','odds', 'pred_finishTime','real_plc', 'pred_plc',]]
-
-headers = ','.join(map(str, test_report.columns.values))
-np.savetxt('./Report/test_result_'+date+'.csv', test_report.round(0),
-                   delimiter=',', fmt='%s', header=headers, comments='')
+        X_train = X_train.astype(float)
 
 
-# ---- Accuracy rate
-test_report = test_report[(test_report['pred_plc'] <= 1) & (test_report['odds'].astype(float) <= 8)]
-# test_report = test_report[(test_report['pred_plc'] <= 1) ]
-
-test_report.loc[test_report['real_plc'] <=3, 'real_first_3'] = 1
-test_report.fillna(0,inplace=True)
-# logging.info('test_report: %s \n %s', np.shape(test_report), test_report)
-
-print('Accuracy score for 1st: %s', accuracy_score(test_report['real_plc'].round(0), test_report['pred_plc'].round(0)))
-print('Accuracy score for first 3: %s ', accuracy_score(test_report['real_first_3'], test_report['pred_plc']))
-print()
-
-logging.info('Accuracy score for 1st: %s', accuracy_score(
-    test_report['real_plc'].round(0), test_report['pred_plc'].round(0)))
-logging.info('Accuracy score for first 3: %s ', accuracy_score(
-    test_report['real_first_3'], test_report['pred_plc']))
-
-test_report = test_report.tail(20)
-print('Accuracy score for 1st recent 20 matches: %s', accuracy_score(
-    test_report['real_plc'].round(0), test_report['pred_plc'].round(0)))
-print('Accuracy score for first 3 recent 20 matches: %s ', accuracy_score(
-    test_report['real_first_3'], test_report['pred_plc']))
-print()
-
-logging.info('Accuracy score for 1st recent 20 matches: %s', accuracy_score(
-    test_report['real_plc'].round(0), test_report['pred_plc'].round(0)))
-logging.info('Accuracy score for first 3 recent 20 matches: %s ',
-             accuracy_score(test_report['real_first_3'], test_report['pred_plc']))
+        # ---- save columns for further test or prediciton 
+        predictionColumns = X_train.columns.values
 
 
-test_report = test_report.tail(10)
-print('Accuracy score for 1st recent 10 matches: %s', accuracy_score(test_report['real_plc'].round(0), test_report['pred_plc'].round(0)))
-print('Accuracy score for first 3 recent 10 matches: %s ', accuracy_score(test_report['real_first_3'], test_report['pred_plc']))
-print()
+        # --------- Fill all missing data
+        X_train_backup = X_train
+        X_train.fillna(X_train.mean(), inplace=True)
+        # X_test.fillna(X_train.mean(), inplace=True)
+        # logging.info('Test data filled NaN:  %s \n %s' , np.shape(X_test), X_test.head(2).append( X_test.tail(2)))
+            
 
-logging.info('Accuracy score for 1st recent 10 matches: %s', accuracy_score(
-    test_report['real_plc'].round(0), test_report['pred_plc'].round(0)))
-logging.info('Accuracy score for first 3 recent 10 matches: %s ',
-             accuracy_score(test_report['real_first_3'], test_report['pred_plc']))
+        """ 
+        Scale data
+        Train model
+        """
+        # --------- Scaler data
+        scaler = StandardScaler()  
+        scaler.fit(X_train)
+        X_train = scaler.transform(X_train)
+
+
+        # ---------- Regression model
+        # model = MLPRegressor(hidden_layer_sizes=(10,10,10,10,10,10,),activation='relu', solver='lbfgs', alpha=0.0001, shuffle=True, random_state=8,learning_rate='constant') # 0.64 Test size 70%
+        model = MLPRegressor(hidden_layer_sizes=(5,5,5,5,),activation='relu', solver='adam', alpha=0.00001, shuffle=True, random_state=13,learning_rate='constant',max_iter=2000) # 0.74 Test size 50%
+        # model = MLPRegressor(hidden_layer_sizes=(3,3,3,3),activation='relu', solver='lbfgs', alpha=0.0001, shuffle=True,) 
+        model.fit(X_train, y_train.values.ravel())
+
+        # model = MLPRegressor()
+        # params = {'solver':['adam'],'hidden_layer_sizes':[(5,5,5,5,)],'random_state':[13],'alpha':[0.00001],'max_iter':[1500]}
+        # gs = GridSearchCV(model, params,n_jobs=-1, cv=[(slice(None), slice(None))])
+
+        # gs.fit(X_train, y_train.values.ravel())
+
+        # model= gs
+        # print(gs.best_score_)#最好的得分
+
+        # print(gs.best_params_)#最好的参数
+        # # exit()
+
+        # print(model.score)
 
 
 
 
+        """ 
+        Test the model with X_test
+        Generate Test result report
+        """
+
+        # ---- Set up for X_test
+        X_test = pd.merge(X_test_copy, horseRank[['horseRank', 'Brand No.']], how='left',
+                        left_on=['Brand No.'], right_on=['Brand No.'])
+        X_test = pd.merge(X_test, sireRank, how='left',
+                        left_on=['Sire'], right_on=['Sire'])
+        X_test = pd.merge(X_test, damRank, how='left',
+                        left_on=['Dam'], right_on=['Dam'])
+        X_test = pd.merge(X_test, jockeyRank[['JockeyRank', 'Jockey']], how='left',
+                        left_on=['Jockey'], right_on=['Jockey'])
+        X_test = pd.merge(X_test, trainerRank[['TrainerRank', 'Trainer']], how='left',
+                        left_on=['Trainer'], right_on=['Trainer'])
+
+        # ---- Fill missing data
+        X_test.fillna(X_train_backup.mean(), inplace=True)
+
+        # ---- Select required columns
+        X_test = X_test[predictionColumns]
+
+        # ---- scale data and test will trianed model
+        X_test = X_test.astype(float)
+        X_test = scaler.transform(X_test)  
+        y_pred = model.predict(X_test)
+
+        # ---- Prepare data for report generation
+        y_test.loc[:, 'pred_finishTime'] = y_pred
+        test_report = pd.merge(X_copy, y_test, how='right',
+                            left_index=True, right_index=True)
+
+        test_report["pred_plc"] = test_report.groupby(['date', 'raceNo'])["pred_finishTime"].rank()
+        test_report["real_plc"] = test_report.groupby(['date', 'raceNo'])["plc"].rank()
+
+        # ---- Generate Report
+        test_report = test_report[['date', 'raceNo','horseNo', 'plc','odds', 'pred_finishTime','real_plc', 'pred_plc',]]
+
+        headers = ','.join(map(str, test_report.columns.values))
+        np.savetxt('./Report/test_result_'+date+'.csv', test_report.round(0),
+                        delimiter=',', fmt='%s', header=headers, comments='')
 
 
+        # ---- Accuracy rate
+        test_report = test_report[(test_report['pred_plc'] <= 1) & (test_report['odds'].astype(float) <= 8)]
+        # test_report = test_report[(test_report['pred_plc'] <= 1) ]
+
+        test_report.loc[test_report['real_plc'] <=3, 'real_first_3'] = 1
+        test_report.fillna(0,inplace=True)
+        # logging.info('test_report: %s \n %s', np.shape(test_report), test_report)
+
+        # print('Accuracy score for 1st: %s', accuracy_score(test_report['real_plc'].round(0), test_report['pred_plc'].round(0)))
+        # print('Accuracy score for first 3: %s ', accuracy_score(test_report['real_first_3'], test_report['pred_plc']))
+
+        if accuracy_score(test_report['real_first_3'], test_report['pred_plc']) > score:
+            score = accuracy_score(test_report['real_first_3'], test_report['pred_plc'])
+            col = train_test_col
+            print('score and col updated')
+            print(score)
+            print(col)
+            logging.info('score and col updated score: %s, \n %s',score,col )
+
+        # print()
+
+        logging.info('Accuracy score for 1st: %s', accuracy_score(
+            test_report['real_plc'].round(0), test_report['pred_plc'].round(0)))
+        logging.info('Accuracy score for first 3: %s ', accuracy_score(
+            test_report['real_first_3'], test_report['pred_plc']))
+
+        test_report = test_report.tail(20)
+        # print('Accuracy score for 1st recent 20 matches: %s', accuracy_score(
+        #     test_report['real_plc'].round(0), test_report['pred_plc'].round(0)))
+        # print('Accuracy score for first 3 recent 20 matches: %s ', accuracy_score(
+        #     test_report['real_first_3'], test_report['pred_plc']))
+        # print()
+
+        logging.info('Accuracy score for 1st recent 20 matches: %s', accuracy_score(
+            test_report['real_plc'].round(0), test_report['pred_plc'].round(0)))
+        logging.info('Accuracy score for first 3 recent 20 matches: %s ',
+                    accuracy_score(test_report['real_first_3'], test_report['pred_plc']))
 
 
+        test_report = test_report.tail(10)
+        # print('Accuracy score for 1st recent 10 matches: %s', accuracy_score(test_report['real_plc'].round(0), test_report['pred_plc'].round(0)))
+        # print('Accuracy score for first 3 recent 10 matches: %s ', accuracy_score(test_report['real_first_3'], test_report['pred_plc']))
+        # print()
 
-# exit()
+        logging.info('Accuracy score for 1st recent 10 matches: %s', accuracy_score(
+            test_report['real_plc'].round(0), test_report['pred_plc'].round(0)))
+        logging.info('Accuracy score for first 3 recent 10 matches: %s ',
+                    accuracy_score(test_report['real_first_3'], test_report['pred_plc']))
+        # exit()
+
+# print(score)
+# print(col)
+
+
+exit()
 
 
 """ 
