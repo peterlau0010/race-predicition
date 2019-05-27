@@ -40,8 +40,8 @@ Convert columns to required format
 Combine required csv files into 'data'
 """
 
-data = pd.read_csv('Raw Data/history_bak.csv', header=0)
-raceCard = pd.read_csv('Raw Data/match_data_race_card_bak.csv', header=0)
+data = pd.read_csv('Raw Data/history_bak.csv', header=0,low_memory=False)
+raceCard = pd.read_csv('Raw Data/match_data_race_card_bak.csv', header=0,low_memory=False)
 # horse = pd.read_csv('Raw Data/horse_bak.csv', header=0)
 # jockey = pd.read_csv('Raw Data/jockey1819.csv', header=0)
 # trainer = pd.read_csv('Raw Data/trainer1819.csv', header=0)
@@ -178,21 +178,19 @@ X_train = pd.merge(X_train, trainerRank[['TrainerRank','Trainer']], how='left',
 Select requried columns for train, test, predict 
 """
 
-train_test_col = [ 'class','Draw', 'Age', 'AWT', 'Horse Wt. (Declaration)', 'Rtg.+/-', 'Runs_1',
- 'Runs_2', 'Runs_3', 'Runs_4', 'B', 'H', 'TT', 'CP', 'V', 'XB', 'Sex_c', 'Sex_f',
- 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM',
- 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'raceCourse_ST',
- 'SireRank', 'DamRank', 'horseRank', 'JockeyRank', 'TrainerRank',]
+train_test_col = ['class', 'Draw', 'Age', 'AWT', 'Horse Wt. (Declaration)', 'Rtg.+/-', 'Runs_1', 'Runs_2', 'Runs_3', 'Runs_4', 'B', 'H', 'TT', 'CP', 'V', 'XB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'raceCourse_ST', 'DamRank', 'SireRank', 'horseRank', 'TrainerRank', 'JockeyRank']
 
-# train_test_col = ['Draw', 'Age', 'AWT', 'Horse Wt. (Declaration)', 'Rtg.+/-', 'Runs_1',
-#  'Runs_2', 'Runs_3',]
-print(datetime.now())
+#0.755
+# train_test_col = ['class', 'Draw', 'Age', 'AWT', 'Horse Wt. (Declaration)', 'Rtg.+/-', 'Runs_1', 'Runs_2', 'Runs_3', 'Runs_4', 'B', 'H', 'TT', 'CP', 'V', 'XB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'raceCourse_ST', 'DamRank', 'SireRank', 'horseRank', 'TrainerRank', 'JockeyRank']
+
+# 0.75 / 0.380
+#['class', 'Draw', 'Age', 'AWT', 'Horse Wt. (Declaration)', 'Rtg.+/-', 'Runs_1', 'Runs_2', 'Runs_3', 'Runs_4', 'B', 'H', 'TT', 'CP', 'V', 'XB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'raceCourse_ST', 'TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'DamRank']
 
 perm = itertools.permutations(train_test_col)
-print(datetime.now())
 
 
-score = 0
+score_first_3 = 0
+score_first_1 = 0
 col = []
 index = 0
 X_train_copy = X_train.copy()
@@ -313,13 +311,16 @@ with multiprocessing.Pool() as pool:
         # print('Accuracy score for 1st: %s', accuracy_score(test_report['real_plc'].round(0), test_report['pred_plc'].round(0)))
         # print('Accuracy score for first 3: %s ', accuracy_score(test_report['real_first_3'], test_report['pred_plc']))
 
-        if accuracy_score(test_report['real_first_3'], test_report['pred_plc']) > score:
-            score = accuracy_score(test_report['real_first_3'], test_report['pred_plc'])
+        if (accuracy_score(test_report['real_first_3'], test_report['pred_plc']) > score_first_3) | (accuracy_score(test_report['real_plc'].round(0), test_report['pred_plc'].round(0)) > score_first_1):
+            score_first_3 = accuracy_score(test_report['real_first_3'], test_report['pred_plc'])
+            score_first_1 = accuracy_score(test_report['real_plc'].round(0), test_report['pred_plc'].round(0))
             col = train_test_col
+
             print('score and col updated')
-            print(score)
+            print(score_first_3)
+            print(score_first_1)
             print(col)
-            logging.info('score and col updated score: %s, \n %s',score,col )
+            logging.info('score and col updated score_first_1: %s,  score_first_3: %s \n %s',score_first_1,score_first_3,col )
 
         # print()
 
