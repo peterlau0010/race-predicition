@@ -23,7 +23,7 @@ date = '20190529'
 # test_size = 0.20 # For training
 # test_size = 0.10 # For training
 dist = '1200M'
-dist = '1650M'
+# dist = '1650M'
 split_date = 20180831
 
 # --------- Setting
@@ -67,6 +67,8 @@ raceCard['date'] = raceCard['date'].astype(float)
 raceCard['raceNo'] = raceCard['raceNo'].astype(float)
 raceCard['Rtg.+/-'] = raceCard['Rtg.+/-'].replace({'-': np.nan})
 raceCard['Rtg.+/-'].fillna(0, inplace=True)
+raceCard['Wt.+/- (vs Declaration)'] = raceCard['Wt.+/- (vs Declaration)'].replace({'-': np.nan})
+raceCard['Wt.+/- (vs Declaration)'].fillna(0, inplace=True)
 raceCard['class'] = raceCard['class'].str.replace('Class ', '', regex=True)
 
 data = pd.merge(data[['finishTime','date','raceNo','horseNo','odds','plc']], raceCard, how='left',
@@ -190,11 +192,13 @@ X_train = pd.merge(X_train, trainerRank[['TrainerRank','Trainer']], how='left',
 Select requried columns for train, test, predict 
 """
 
-# 0.794 /0.384 test split_date=20180831  data=20190526 odds=2-6 andom_state=1, solver='lbfgs' 1200M
-train_test_col = ['Runs_1', 'Runs_2', 'Runs_3', 'Runs_4', 'Runs_5', 'Runs_6', 'B', 'H', 'TT', 'CP', 'V', 'XB', 'SR', 'P', 'PC', 'E', 'BO', 'PS', 'SB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'raceCourse_ST', 'Draw', 'Rtg.+/-', 'AWT', 'Horse Wt. (Declaration)', 'class', 'DamRank', 'Age']
+# 0.8 /0.375 test split_date=20180831  data=20190529 odds=2-6 andom_state=1, solver='lbfgs' 1200M
+# train_test_col = ['Runs_1', 'Runs_2', 'Runs_3', 'Runs_4', 'Runs_5', 'Runs_6', 'B', 'H', 'TT', 'CP', 'V', 'XB', 'SR', 'P', 'PC', 'E', 'BO', 'PS', 'SB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'raceCourse_ST', 'Draw', 'Rtg.+/-', 'AWT', 'Horse Wt. (Declaration)', 'class', 'DamRank', 'Age']
 
+# train_test_col = ['Runs_1', 'PS', 'Rtg.+/-']
+train_test_col =  ['Wt.+/- (vs Declaration)', 'Age', 'class', 'Rtg.+/-', 'SB']
 # 0.7894 /0.4211 test split_date=20180831  data=20190526 odds=2-6 andom_state=1, solver='lbfgs' 1650M
-train_test_col = ['B', 'H', 'TT', 'CP', 'V', 'XB', 'SR', 'P', 'PC', 'E', 'BO', 'PS', 'SB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'Runs_1', 'Runs_2', 'Runs_3', 'Runs_4', 'Runs_5', 'Runs_6', 'raceCourse_ST', 'Draw', 'Age', 'AWT', 'Rtg.+/-', 'DamRank', 'Horse Wt. (Declaration)', 'class']
+# train_test_col = ['B', 'H', 'TT', 'CP', 'V', 'XB', 'SR', 'P', 'PC', 'E', 'BO', 'PS', 'SB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'Runs_1', 'Runs_2', 'Runs_3', 'Runs_4', 'Runs_5', 'Runs_6', 'raceCourse_ST', 'Draw', 'Age', 'AWT', 'Rtg.+/-', 'DamRank', 'Horse Wt. (Declaration)', 'class']
 
 X_train_copy = X_train.copy()
 X_test_copy = X_test.copy()
@@ -287,7 +291,8 @@ np.savetxt('./Report/test_result_'+date+'.csv', test_report.round(0),
 
 
 # ---- Accuracy rate
-test_report = test_report[(test_report['pred_plc'] <= 1) & (test_report['odds'].astype(float) <= 6) & (test_report['odds'].astype(float) >= 2)]
+# test_report = test_report[(test_report['pred_plc'] <= 1) & (test_report['odds'].astype(float) <= 6) & (test_report['odds'].astype(float) >= 2)]
+test_report = test_report[(test_report['pred_plc'] <= 1) & (test_report['odds'].astype(float) <= 15) & (test_report['odds'].astype(float) >= 5)]
 # test_report = test_report[(test_report['pred_plc'] <= 1) ]
 
 test_report.loc[test_report['real_plc'] <=3, 'real_first_3'] = 1
@@ -359,6 +364,8 @@ pred_data = pred_data[pred_data['class'].str.contains(
 pred_data['date'] = pred_data['date'].astype(float)
 pred_data['Rtg.+/-'] = pred_data['Rtg.+/-'].replace({'-': np.nan})
 pred_data['Rtg.+/-'].fillna(0, inplace=True)
+pred_data['Wt.+/- (vs Declaration)'] = pred_data['Wt.+/- (vs Declaration)'].replace({'-': np.nan})
+pred_data['Wt.+/- (vs Declaration)'].fillna(0, inplace=True)
 pred_data['Age'] = pred_data['Age'] + 0.0
 
 # ---- Adding new columns to data for further train, test, predict

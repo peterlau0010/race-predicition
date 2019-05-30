@@ -22,8 +22,8 @@ date = '20190529'
 # test_size = 0.30 # For training
 # test_size = 0.20 # For training
 # test_size = 0.10 # For training
-# dist = '1200M'
-dist = '1650M'
+dist = '1200M'
+# dist = '1650M'
 split_date = 20180831
 
 # --------- Setting
@@ -67,6 +67,9 @@ raceCard['date'] = raceCard['date'].astype(float)
 raceCard['raceNo'] = raceCard['raceNo'].astype(float)
 raceCard['Rtg.+/-'] = raceCard['Rtg.+/-'].replace({'-': np.nan})
 raceCard['Rtg.+/-'].fillna(0, inplace=True)
+raceCard['Wt.+/- (vs Declaration)'] = raceCard['Wt.+/- (vs Declaration)'].replace({'-': np.nan})
+raceCard['Wt.+/- (vs Declaration)'].fillna(0, inplace=True)
+
 raceCard['class'] = raceCard['class'].str.replace('Class ', '', regex=True)
 
 data = pd.merge(data[['finishTime','date','raceNo','horseNo','odds','plc']], raceCard, how='left',
@@ -190,7 +193,7 @@ Select requried columns for train, test, predict
 """
 
 
-train_test_col = ['B', 'H', 'TT', 'CP', 'V', 'XB', 'SR', 'P', 'PC', 'E', 'BO', 'PS', 'SB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'TrainerRank', 'SireRank', 'horseRank', 'JockeyRank','Runs_1', 'Runs_2', 'Runs_3', 'Runs_4', 'Runs_5', 'Runs_6', 'raceCourse_ST', 'Draw', 'Rtg.+/-', 'Age', 'AWT', 'class', 'DamRank', 'Horse Wt. (Declaration)']
+train_test_col = ['Runs_1', 'Runs_2', 'Runs_3', 'Runs_4', 'Runs_5', 'Runs_6', 'B', 'H', 'TT', 'CP', 'V', 'XB', 'SR', 'P', 'PC', 'E', 'BO', 'PS', 'SB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'raceCourse_ST', 'Draw', 'Rtg.+/-', 'AWT', 'Horse Wt. (Declaration)', 'class', 'DamRank', 'Age','Wt.+/- (vs Declaration)']
 
 
 
@@ -296,7 +299,8 @@ def train(train_test_col):
 
 
     # ---- Accuracy rate
-    test_report = test_report[(test_report['pred_plc'] <= 1) & (test_report['odds'].astype(float) <= 6) & (test_report['odds'].astype(float) >= 2)]
+    # test_report = test_report[(test_report['pred_plc'] <= 1) & (test_report['odds'].astype(float) <= 6) & (test_report['odds'].astype(float) >= 2)]
+    test_report = test_report[(test_report['pred_plc'] <= 1) & (test_report['odds'].astype(float) <= 15) & (test_report['odds'].astype(float) >= 5)]
     # test_report = test_report[(test_report['pred_plc'] <= 1) ]
 
     test_report.loc[test_report['real_plc'] <=3, 'real_first_3'] = 1
@@ -322,8 +326,11 @@ def train(train_test_col):
             logging.info('score and col updated score_first_1: %s,  score_first_3: %s \n %s',score_first_1.value,score_first_3.value,train_test_col )
 
 
-
-perm = itertools.permutations(train_test_col)
+train_test_col = ['Runs_1', 'Runs_2', 'Runs_3', 'Runs_4', 'Runs_5', 'Runs_6', 'B', 'H', 'TT', 'CP', 'V', 'XB', 'SR', 'P', 'PC', 'E', 'BO', 'PS', 'SB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'raceCourse_ST', 'Draw', 'Rtg.+/-', 'AWT', 'Horse Wt. (Declaration)', 'class', 'DamRank', 'Age','Wt.+/- (vs Declaration)']
+# train_test_col = [['Wt.+/- (vs Declaration)', 'Age', 'class', 'Rtg.+/-', 'SB']
+train_test_col = train_test_col[::-1]
+# perm = itertools.permutations(train_test_col)
+perm = itertools.combinations(train_test_col,5)
 if __name__ == "__main__":
     names = perm
     procs = []
