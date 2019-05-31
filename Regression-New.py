@@ -170,6 +170,8 @@ horseRank = horseRank.reset_index()
 horseRank.columns = ['Brand No.','horseRank']
 X_train = pd.merge(X_train, horseRank[['horseRank','Brand No.']], how='left',
     left_on=['Brand No.'], right_on=['Brand No.'])
+X_train['HorseMatchRank'] = X_train.groupby(['date', 'raceNo'])[
+    "horseRank"].rank()
 
 
 # ---- Jockey Rank
@@ -270,6 +272,8 @@ def train(train_test_col):
                     left_on=['Jockey'], right_on=['Jockey'])
     X_test = pd.merge(X_test, trainerRank[['TrainerRank', 'Trainer']], how='left',
                     left_on=['Trainer'], right_on=['Trainer'])
+    X_test['HorseMatchRank'] = X_test.groupby(['date', 'raceNo'])[
+    "horseRank"].rank()
 
     # ---- Fill missing data
     X_test.fillna(X_train_backup.mean(), inplace=True)
@@ -326,11 +330,13 @@ def train(train_test_col):
             logging.info('score and col updated score_first_1: %s,  score_first_3: %s \n %s',score_first_1.value,score_first_3.value,train_test_col )
 
 
-train_test_col = ['Runs_1', 'Runs_2', 'Runs_3', 'Runs_4', 'Runs_5', 'Runs_6', 'B', 'H', 'TT', 'CP', 'V', 'XB', 'SR', 'P', 'PC', 'E', 'BO', 'PS', 'SB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'raceCourse_ST', 'Draw', 'Rtg.+/-', 'AWT', 'Horse Wt. (Declaration)', 'class', 'DamRank', 'Age','Wt.+/- (vs Declaration)']
-# train_test_col = [['Wt.+/- (vs Declaration)', 'Age', 'class', 'Rtg.+/-', 'SB']
-train_test_col = train_test_col[::-1]
-# perm = itertools.permutations(train_test_col)
-perm = itertools.combinations(train_test_col,5)
+train_test_col = ['B', 'H', 'TT', 'CP', 'V', 'XB', 'SR', 'P', 'PC', 'E', 'BO', 'PS', 'SB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'raceCourse_ST', 'Runs_6', 'Runs_5', 'Runs_4', 'Runs_3', 'Runs_2', 'Runs_1','B', 'H', 'TT', 'TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'Draw', 'Rtg.+/-', 'AWT', 'Horse Wt. (Declaration)', 'class', 'DamRank', 'Age','Wt.+/- (vs Declaration)','HorseMatchRank']
+# train_test_col = ['Wt.+/- (vs Declaration)', 'Runs_2', 'class', 'Draw', 'Rtg.+/-']
+# train_test_col = ['Wt.+/- (vs Declaration)', 'Age', 'class', 'Rtg.+/-', 'Draw','Runs_1','Runs_2','HorseMatchRank']
+
+# train_test_col = train_test_col[::-1]
+perm = itertools.permutations(train_test_col)
+# perm = itertools.combinations(train_test_col,5)
 if __name__ == "__main__":
     names = perm
     procs = []

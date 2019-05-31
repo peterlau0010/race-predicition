@@ -170,7 +170,8 @@ horseRank = horseRank.reset_index()
 horseRank.columns = ['Brand No.','horseRank']
 X_train = pd.merge(X_train, horseRank[['horseRank','Brand No.']], how='left',
     left_on=['Brand No.'], right_on=['Brand No.'])
-
+X_train['HorseMatchRank'] = X_train.groupby(['date', 'raceNo'])[
+    "horseRank"].rank()
 
 # ---- Jockey Rank
 jockeyRank = X_train.groupby(['Jockey'])['plc'].apply(lambda x: (x<=3).sum())/ X_train.groupby(['Jockey'])['plc'].count()
@@ -188,15 +189,20 @@ X_train = pd.merge(X_train, trainerRank[['TrainerRank','Trainer']], how='left',
     left_on=['Trainer'], right_on=['Trainer'])
 
 
+logging.info('X_train data %s \n %s', np.shape(X_train), X_train.head(2).append(X_train.tail(2)))
+
+
 """ 
 Select requried columns for train, test, predict 
 """
 
 # 0.8 /0.375 test split_date=20180831  data=20190529 odds=2-6 andom_state=1, solver='lbfgs' 1200M
 # train_test_col = ['Runs_1', 'Runs_2', 'Runs_3', 'Runs_4', 'Runs_5', 'Runs_6', 'B', 'H', 'TT', 'CP', 'V', 'XB', 'SR', 'P', 'PC', 'E', 'BO', 'PS', 'SB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'raceCourse_ST', 'Draw', 'Rtg.+/-', 'AWT', 'Horse Wt. (Declaration)', 'class', 'DamRank', 'Age']
+train_test_col = ['B', 'H', 'TT', 'CP', 'V', 'XB', 'SR', 'P', 'PC', 'E', 'BO', 'PS', 'SB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'raceCourse_ST', 'Runs_6', 'Runs_5', 'Runs_4', 'Runs_3', 'Runs_2', 'Runs_1','TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'Draw', 'Rtg.+/-', 'AWT', 'class', 'DamRank', 'HorseMatchRank', 'Age', 'Horse Wt. (Declaration)', 'Wt.+/- (vs Declaration)']
+
 
 # train_test_col = ['Runs_1', 'PS', 'Rtg.+/-']
-train_test_col =  ['Wt.+/- (vs Declaration)', 'Age', 'class', 'Rtg.+/-', 'SB']
+# train_test_col =  ['Wt.+/- (vs Declaration)', 'Age', 'class', 'Rtg.+/-', 'SB',]
 # 0.7894 /0.4211 test split_date=20180831  data=20190526 odds=2-6 andom_state=1, solver='lbfgs' 1650M
 # train_test_col = ['B', 'H', 'TT', 'CP', 'V', 'XB', 'SR', 'P', 'PC', 'E', 'BO', 'PS', 'SB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'Runs_1', 'Runs_2', 'Runs_3', 'Runs_4', 'Runs_5', 'Runs_6', 'raceCourse_ST', 'Draw', 'Age', 'AWT', 'Rtg.+/-', 'DamRank', 'Horse Wt. (Declaration)', 'class']
 
@@ -222,12 +228,19 @@ predictionColumns = X_train.columns.values
 
 
 # --------- Fill all missing data
-X_train_backup = X_train
+print(X_train.head())
+print(X_train.mean())
 X_train.fillna(X_train.mean(), inplace=True)
+print(X_train.head())
+X_train_backup = X_train
+
+headers = ','.join(map(str, X_train.columns.values))
+np.savetxt('./Processed Data/trainX_'+date+'.csv', X_train,
+                   delimiter=',', fmt='%s', header=headers, comments='')
 # X_test.fillna(X_train.mean(), inplace=True)
 # logging.info('Test data filled NaN:  %s \n %s' , np.shape(X_test), X_test.head(2).append( X_test.tail(2)))
     
-
+# print(X_train.head())
 """ 
 Scale data
 Train model
@@ -262,10 +275,24 @@ X_test = pd.merge(X_test, jockeyRank[['JockeyRank', 'Jockey']], how='left',
                 left_on=['Jockey'], right_on=['Jockey'])
 X_test = pd.merge(X_test, trainerRank[['TrainerRank', 'Trainer']], how='left',
                 left_on=['Trainer'], right_on=['Trainer'])
+X_test['HorseMatchRank'] = X_test.groupby(['date', 'raceNo'])[
+    "horseRank"].rank()
 
 # ---- Fill missing data
 X_test.fillna(X_train_backup.mean(), inplace=True)
 
+# print(X_test)
+headers = ','.join(map(str, X_test.columns.values))
+np.savetxt('./Processed Data/testX_'+date+'.csv', X_test,
+                   delimiter=',', fmt='%s', header=headers, comments='')
+
+headers = ','.join(map(str, y_test.columns.values))
+np.savetxt('./Processed Data/testY_'+date+'.csv', y_test,
+                   delimiter=',', fmt='%s', header=headers, comments='')
+
+headers = ','.join(map(str, y_train.columns.values))
+np.savetxt('./Processed Data/trainY_'+date+'.csv', y_train,
+                   delimiter=',', fmt='%s', header=headers, comments='')
 # ---- Select required columns
 X_test = X_test[predictionColumns]
 
