@@ -198,8 +198,12 @@ Select requried columns for train, test, predict
 
 # 0.8 /0.375 test split_date=20180831  data=20190529 odds=2-6 andom_state=1, solver='lbfgs' 1200M
 # train_test_col = ['Runs_1', 'Runs_2', 'Runs_3', 'Runs_4', 'Runs_5', 'Runs_6', 'B', 'H', 'TT', 'CP', 'V', 'XB', 'SR', 'P', 'PC', 'E', 'BO', 'PS', 'SB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'raceCourse_ST', 'Draw', 'Rtg.+/-', 'AWT', 'Horse Wt. (Declaration)', 'class', 'DamRank', 'Age']
+
+#Origial
 train_test_col = ['B', 'H', 'TT', 'CP', 'V', 'XB', 'SR', 'P', 'PC', 'E', 'BO', 'PS', 'SB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'raceCourse_ST', 'Runs_6', 'Runs_5', 'Runs_4', 'Runs_3', 'Runs_2', 'Runs_1','TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'Draw', 'Rtg.+/-', 'AWT', 'class', 'DamRank', 'HorseMatchRank', 'Age', 'Horse Wt. (Declaration)', 'Wt.+/- (vs Declaration)']
 
+
+train_test_col = ['H', 'Sex_f', 'Rtg.+/-', 'Wt.+/- (vs Declaration)']
 
 # train_test_col = ['Runs_1', 'PS', 'Rtg.+/-']
 # train_test_col =  ['Wt.+/- (vs Declaration)', 'Age', 'class', 'Rtg.+/-', 'SB',]
