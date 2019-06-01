@@ -202,8 +202,9 @@ Select requried columns for train, test, predict
 #Origial
 train_test_col = ['B', 'H', 'TT', 'CP', 'V', 'XB', 'SR', 'P', 'PC', 'E', 'BO', 'PS', 'SB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'raceCourse_ST', 'Runs_6', 'Runs_5', 'Runs_4', 'Runs_3', 'Runs_2', 'Runs_1','TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'Draw', 'Rtg.+/-', 'AWT', 'class', 'DamRank', 'HorseMatchRank', 'Age', 'Horse Wt. (Declaration)', 'Wt.+/- (vs Declaration)']
 
-
-# train_test_col = ['H', 'Sex_f', 'Rtg.+/-', 'Wt.+/- (vs Declaration)']
+# 2019-06-01 08:21:26  INFO Accuracy (All) first_1: 0.4762, first_3: 0.7143, col: ['Wt.+/- (vs Declaration)', 'Horse Wt. (Declaration)', 'class', 'Rtg.+/-', 'Runs_6']
+# 2019-06-01 05:42:26  INFO Accuracy (All) first_1: 0.5082, first_3: 0.7049, col: ['CP', 'Sex_f', 'Rtg.+/-', 'class']
+# train_test_col = ['Wt.+/- (vs Declaration)', 'Horse Wt. (Declaration)', 'class', 'Rtg.+/-', 'Runs_6']
 
 # train_test_col = ['Runs_1', 'PS', 'Rtg.+/-']
 # train_test_col =  ['Wt.+/- (vs Declaration)', 'Age', 'class', 'Rtg.+/-', 'SB',]
