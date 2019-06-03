@@ -99,9 +99,9 @@ def test(train_test_col, odds_max=99, odds_min=1):
 
 if __name__ == "__main__":
 
-    train_test_col = ['Rtg.+/-', 'Wt.+/- (vs Declaration)', 'horseRank', 'going_GOOD TO FIRM', 'BO']
+    train_test_col = ['Rtg.+/-', 'Age', 'raceCourse_HV', 'going_GOOD', 'E']
 
-    result = test(train_test_col, 15,5)
+    result = test(train_test_col, 15, 5)
     # result = test(train_test_col)
 
     result = result[['date', 'raceNo', 'horseNo', 'plc',
@@ -110,8 +110,16 @@ if __name__ == "__main__":
     logging.info('Test Result \n %s', result.tail(5))
 
 
-
-
+# 1000M
+# 2019-06-03 21:49:44  INFO Accuracy (All) first_1: 0.4839, first_3: 0.7097, No. of rows: 31, col: ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'Age', 'AWT']
+# 2019-06-03 21: 49: 50  INFO Accuracy(All) first_1: 0.4545, first_3: 0.7273, No. of rows: 33, col: ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'Age', 'going_GOOD']
+# 2019-06-03 21: 53: 06  INFO Accuracy(All) first_1: 0.3846, first_3: 0.7308, No. of rows: 26, col: ['Rtg.+/-', 'class', 'Age', 'Horse Wt. (Declaration)', 'raceCourse_ST']
+# 2019-06-03 21: 53: 11  INFO Accuracy(All) first_1: 0.4815, first_3: 0.7407, No. of rows: 27, col: ['Rtg.+/-', 'class', 'Age', 'Horse Wt. (Declaration)', 'CP']
+# 2019-06-03 21: 53: 39  INFO Accuracy(All) first_1: 0.4688, first_3: 0.8125, No. of rows: 32, col: ['Rtg.+/-', 'class', 'Age', 'Draw', 'raceCourse_ST']
+# 2019-06-03 21: 59: 14  INFO Accuracy(All) first_1: 0.4348, first_3: 0.8261, No. of rows: 23, col: ['Rtg.+/-', 'class', 'HorseMatchRank', 'horseRank', 'P']
+# 2019-06-03 23: 37: 32  INFO Accuracy(All) first_1: 0.6364, first_3: 0.8636, No. of rows: 22, col: ['Rtg.+/-', 'Age', 'raceCourse_HV', 'going_GOOD', 'E']
+#
+#
 # 1200M
 # 2019-06-03 10:53:15  INFO Accuracy (All) first_1: 0.4800, first_3: 0.7067, col: ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'Sex_h', 'SB']
 # 2019-06-03 10:53:31  INFO Accuracy (All) first_1: 0.4730, first_3: 0.7162, col: ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'SB', 'B']
