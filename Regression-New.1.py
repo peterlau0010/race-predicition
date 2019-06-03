@@ -22,10 +22,12 @@ date = '20190529'
 # test_size = 0.30 # For training
 # test_size = 0.20 # For training
 # test_size = 0.10 # For training
+dist = '1000M'
 # dist = '1200M'
 # dist = '1400M'
+# dist = '1600M'
 # dist = '1650M'
-dist = '1600M'
+# dist = '1800M'
 split_date = 20180831
 
 # --------- Setting
@@ -209,43 +211,40 @@ logging.info('X_train data %s \n %s', np.shape(X_train),
 Select requried columns for train, test, predict 
 """
 
-# 0.8 /0.375 test split_date=20180831  data=20190529 odds=2-6 andom_state=1, solver='lbfgs' 1200M
-# train_test_col = ['Runs_1', 'Runs_2', 'Runs_3', 'Runs_4', 'Runs_5', 'Runs_6', 'B', 'H', 'TT', 'CP', 'V', 'XB', 'SR', 'P', 'PC', 'E', 'BO', 'PS', 'SB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'raceCourse_ST', 'Draw', 'Rtg.+/-', 'AWT', 'Horse Wt. (Declaration)', 'class', 'DamRank', 'Age']
-
 # Origial
-train_test_col = ['B', 'H', 'TT', 'CP', 'V', 'XB', 'SR', 'P', 'PC', 'E', 'BO', 'PS', 'SB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'raceCourse_ST',
-                  'Runs_6', 'Runs_5', 'Runs_4', 'Runs_3', 'Runs_2', 'Runs_1', 'TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'Draw', 'Rtg.+/-', 'AWT', 'class', 'DamRank', 'HorseMatchRank', 'Age', 'Horse Wt. (Declaration)', 'Wt.+/- (vs Declaration)']
+train_test_col = ['B', 'H', 'TT', 'CP', 'V', 'XB', 'SR', 'P', 'PC', 'E', 'BO', 'PS', 'SB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'raceCourse_ST','Runs_6', 'Runs_5', 'Runs_4', 'Runs_3', 'Runs_2', 'Runs_1', 'TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'Draw', 'Rtg.+/-', 'AWT', 'class', 'DamRank', 'HorseMatchRank', 'Age', 'Horse Wt. (Declaration)', 'Wt.+/- (vs Declaration)']
 
 # 1200M
-# 2019-06-01 08:21:26  INFO Accuracy (All) first_1: 0.4762, first_3: 0.7143, col: ['Wt.+/- (vs Declaration)', 'Horse Wt. (Declaration)', 'class', 'Rtg.+/-', 'Runs_6']
-# 2019-06-01 05:42:26  INFO Accuracy (All) first_1: 0.5082, first_3: 0.7049, col: ['CP', 'Sex_f', 'Rtg.+/-', 'class']
-# 2019-06-01 14: 49: 56  INFO Accuracy(All) first_1: 0.4267, first_3: 0.7067, col: ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'Horse Wt. (Declaration)', 'Draw', 'TrainerRank']
-# 2019-06-01 14: 50: 04  INFO Accuracy(All) first_1: 0.4545, first_3: 0.7013, col: ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'Horse Wt. (Declaration)', 'Draw', 'going_GOOD TO YIELDING']
-# 2019-06-01 14: 53: 20  INFO Accuracy(All) first_1: 0.4756, first_3: 0.7317, col: ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'Horse Wt. (Declaration)', 'Runs_6', 'Sex_r']
-# 2019-06-01 14: 53: 24  INFO Accuracy(All) first_1: 0.4815, first_3: 0.7284, col: ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'Horse Wt. (Declaration)', 'Runs_6', 'PS']
-# 2019-06-01 16: 24: 38  INFO Accuracy(All) first_1: 0.4857, first_3: 0.7286, col: ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'Sex_r', 'Sex_g', 'B']
+# 2019-06-03 10:53:15  INFO Accuracy (All) first_1: 0.4800, first_3: 0.7067, col: ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'Sex_h', 'SB']
+# 2019-06-03 10:53:31  INFO Accuracy (All) first_1: 0.4730, first_3: 0.7162, col: ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'SB', 'B']
+# 2019-06-03 11:08:26  INFO Accuracy (All) first_1: 0.4795, first_3: 0.7123, col: ['Rtg.+/-', 'class', 'Draw', 'raceCourse_ST', 'SB']
+# 2019-06-03 11:08:40  INFO Accuracy (All) first_1: 0.4583, first_3: 0.7361, col: ['Rtg.+/-', 'class', 'Draw', 'going_GOOD TO YIELDING', 'Sex_g']
+# 2019-06-03 11:24:24  INFO Accuracy (All) first_1: 0.4861, first_3: 0.7222, col: ['Rtg.+/-', 'class', 'Runs_6', 'raceCourse_ST', 'CP']
+# 2019-06-03 11:24:45  INFO Accuracy (All) first_1: 0.4868, first_3: 0.7237, col: ['Rtg.+/-', 'class', 'Runs_6', 'going_GOOD TO FIRM', 'CP']
+# 2019-06-03 11:24:45  INFO Accuracy (All) first_1: 0.4861, first_3: 0.7361, col: ['Rtg.+/-', 'class', 'Runs_6', 'going_GOOD TO FIRM', 'TT']
+# 2019-06-03 11:25:03  INFO Accuracy (All) first_1: 0.5000, first_3: 0.7297, col: ['Rtg.+/-', 'class', 'Runs_6', 'Sex_g', 'CP']
+# 2019-06-03 12:06:13  INFO Accuracy (All) first_1: 0.4000, first_3: 0.7375, col: ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'Runs_5', 'E']
+
 
 # 1400M
-# 2019-06-02 07:59:35  INFO Accuracy (All) first_1: 0.4667, first_3: 0.7333, col: ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'Runs_6', 'raceCourse_ST']
-# 2019-06-02 07:59:37  INFO Accuracy (All) first_1: 0.4516, first_3: 0.7742, col: ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'Runs_6', 'going_GOOD TO YIELDING']
-# 2019-06-02 07:59:39  INFO Accuracy (All) first_1: 0.5000, first_3: 0.7500, col: ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'Runs_6', 'Sex_h']
-# 2019-06-02 07:59:40  INFO Accuracy (All) first_1: 0.4800, first_3: 0.8000, col: ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'Runs_6', 'E']
-# 2019-06-02 08:00:07  INFO Accuracy (All) first_1: 0.5385, first_3: 0.8077, col: ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'going_YIELDING', 'Sex_c']
-# 2019-06-02 08:34:46  INFO Accuracy (All) first_1: 0.5333, first_3: 0.7333, col: ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'Age', 'Horse Wt. (Declaration)', 'going_YIELDING', 'H']
+# 2019-06-03 14:23:56  INFO Accuracy (All) first_1: 0.5385, first_3: 0.8077, No. of rows: 26, col: ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'going_YIELDING', 'Sex_c']
+# 2019-06-03 14:26:36  INFO Accuracy (All) first_1: 0.3793, first_3: 0.8276, No. of rows: 29, col: ['Rtg.+/-', 'class', 'Horse Wt. (Declaration)', 'AWT', 'Runs_3']
+# 2019-06-03 14:27:36  INFO Accuracy (All) first_1: 0.5600, first_3: 0.8400, No. of rows: 25, col: ['Rtg.+/-', 'class', 'Horse Wt. (Declaration)', 'going_YIELDING', 'going_GOOD TO FIRM']
+# 2019-06-03 14:32:51  INFO Accuracy (All) first_1: 0.4400, first_3: 0.8400, No. of rows: 25, col: ['Rtg.+/-', 'class', 'AWT', 'SR', 'H']
+# 2019-06-03 14:42:53  INFO Accuracy (All) first_1: 0.6296, first_3: 0.8519, No. of rows: 27, col: ['Rtg.+/-', 'class', 'Runs_5', 'raceCourse_ST', 'H']
+# 2019-06-03 14:44:19  INFO Accuracy (All) first_1: 0.5833, first_3: 0.8750, No. of rows: 24, col: ['Rtg.+/-', 'class', 'raceCourse_ST', 'going_YIELDING', 'H']
+# 2019-06-03 14:45:54  INFO Accuracy (All) first_1: 0.6364, first_3: 0.9091, No. of rows: 22, col: ['Rtg.+/-', 'class', 'going_YIELDING', 'P', 'H']
+# 2019-06-03 14:46:24  INFO Accuracy (All) first_1: 0.6522, first_3: 0.9130, No. of rows: 23, col: ['Rtg.+/-', 'class', 'going_GOOD TO YIELDING', 'P', 'H']
 
 # 1600M
-# 2019-06-02 12:03:02  INFO Accuracy (All) first_1: 0.5200, first_3: 0.7200, col: ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'Age', 'Runs_4', 'going_GOOD']
-# 2019-06-02 12:22:21  INFO Accuracy (All) first_1: 0.5625, first_3: 0.6875, col: ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'Horse Wt. (Declaration)', 'Runs_6', 'SR']
-# 2019-06-02 13:33:23  INFO Accuracy (All) first_1: 0.5500, first_3: 0.7500, col: ['Rtg.+/-', 'class', 'Horse Wt. (Declaration)', 'Runs_3', 'going_YIELDING', 'TT']
-# 2019-06-02 13:38:03  INFO Accuracy(All) first_1: 0.6667, first_3: 0.6667, col: ['Rtg.+/-', 'class', 'Horse Wt. (Declaration)', 'raceCourse_ST', 'Sex_h', 'Sex_c']
-# train_test_col = ['Rtg.+/-', 'class',
-                #   'Horse Wt. (Declaration)', 'raceCourse_ST', 'Sex_h', 'Sex_c']
+# 2019-06-03 15:00:05  INFO Accuracy (All) first_1: 0.4348, first_3: 0.7391, No. of rows: 23, col: ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'going_YIELDING', 'TT']
+# 2019-06-03 15:01:28  INFO Accuracy (All) first_1: 0.3684, first_3: 0.7895, No. of rows: 19, col: ['Rtg.+/-', 'class', 'Horse Wt. (Declaration)', 'going_GOOD TO YIELDING', 'Sex_r']
+# 2019-06-03 15:03:40  INFO Accuracy (All) first_1: 0.5000, first_3: 0.8125, No. of rows: 16, col: ['Rtg.+/-', 'class', 'Draw', 'going_GOOD TO FIRM', 'H']
+# 2019-06-03 15:05:06  INFO Accuracy (All) first_1: 0.5294, first_3: 0.8235, No. of rows: 17, col: ['Rtg.+/-', 'class', 'SireRank', 'SR', 'CP']
 
 
-# train_test_col = ['Runs_1', 'PS', 'Rtg.+/-']
-# train_test_col =  ['Wt.+/- (vs Declaration)', 'Age', 'class', 'Rtg.+/-', 'SB',]
-# 0.7894 /0.4211 test split_date=20180831  data=20190526 odds=2-6 andom_state=1, solver='lbfgs' 1650M
-# train_test_col = ['B', 'H', 'TT', 'CP', 'V', 'XB', 'SR', 'P', 'PC', 'E', 'BO', 'PS', 'SB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'Runs_1', 'Runs_2', 'Runs_3', 'Runs_4', 'Runs_5', 'Runs_6', 'raceCourse_ST', 'Draw', 'Age', 'AWT', 'Rtg.+/-', 'DamRank', 'Horse Wt. (Declaration)', 'class']
+# train_test_col = ['Rtg.+/-', 'class', 'Horse Wt. (Declaration)', 'going_GOOD TO FIRM', 'Sex_r']
+
 
 X_train_copy = X_train.copy()
 X_test_copy = X_test.copy()
@@ -256,7 +255,6 @@ train_test_col = list(train_test_col)
 X_train = X_train_copy[train_test_col]
 
 X_train = X_train.astype(float)
-# print(train_test_col)
 X_train = X_train[train_test_col]
 
 X_train = X_train.astype(float)
@@ -267,19 +265,13 @@ predictionColumns = X_train.columns.values
 
 
 # --------- Fill all missing data
-# print(X_train.head())
-# print(X_train.mean())
 X_train.fillna(X_train.mean(), inplace=True)
-# print(X_train.head())
 X_train_backup = X_train
 
 headers = ','.join(map(str, X_train.columns.values))
 np.savetxt('./Processed Data/trainX_'+date+'.csv', X_train,
            delimiter=',', fmt='%s', header=headers, comments='')
-# X_test.fillna(X_train.mean(), inplace=True)
-# logging.info('Test data filled NaN:  %s \n %s' , np.shape(X_test), X_test.head(2).append( X_test.tail(2)))
 
-# print(X_train.head())
 """ 
 Scale data
 Train model
@@ -359,8 +351,8 @@ np.savetxt('./Report/test_result_'+date+'.csv', test_report.round(0),
 
 
 # ---- Accuracy rate
-test_report = test_report[(test_report['pred_plc'] <= 1) & (test_report['odds'].astype(float) <= 6) & (test_report['odds'].astype(float) >= 2)]
-# test_report = test_report[(test_report['pred_plc'] <= 1) & (test_report['odds'].astype(float) <= 15) & (test_report['odds'].astype(float) >= 5)]
+# test_report = test_report[(test_report['pred_plc'] <= 1) & (test_report['odds'].astype(float) <= 6) & (test_report['odds'].astype(float) >= 2)]
+test_report = test_report[(test_report['pred_plc'] <= 1) & (test_report['odds'].astype(float) <= 15) & (test_report['odds'].astype(float) >= 5)]
 # test_report = test_report[(test_report['pred_plc'] <= 1) ]
 
 test_report.loc[test_report['real_plc'] <= 3, 'real_first_3'] = 1
@@ -405,7 +397,7 @@ logging.info('Accuracy score for first 3 recent 10 matches: %s ',
              accuracy_score(test_report['real_first_3'], test_report['pred_plc']))
 
 
-# exit()
+exit()
 
 
 """ 

@@ -2,28 +2,26 @@
 from multiprocessing import Process, Value, Lock, Pool, Manager
 import itertools
 import time
+import pandas as pd
 
-def f(name):
-    # counter.value +=1
-    time.sleep(1)
-    print('F called:',name)
-    # return counter.value
-    
-if __name__ == "__main__":
-    train_test_col = ['B', 'H', 'TT', 'CP', 'V', 'XB', 'SR', 'P', 'PC', 'E', 'BO', 'PS', 'SB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'Runs_1', 'Runs_2', 'Runs_3', 'Runs_4', 'Runs_5', 'Runs_6', 'raceCourse_ST', 'Draw', 'Age', 'AWT', 'Rtg.+/-', 'DamRank', 'Horse Wt. (Declaration)', 'class']
-    # train_test_col = ['B', 'H', 'TT','SS']
-    perm = itertools.permutations(train_test_col)
-    names = perm
+match_data_race_card_bak = pd.read_csv('Raw Data/match_data_race_card_bak.csv', header=0)
 
-    # manager = Manager()
-    # counter = manager.Value('i',0)
+match_data_race_card_bak = match_data_race_card_bak[match_data_race_card_bak['date']> 20180831]
+print(match_data_race_card_bak.groupby(['dist'])['date'].nunique())
 
-    
-    pool = Pool(processes=2)
-    for name in names:
-        # print('start')
-        result = pool.apply_async(f, (name,))
-        # print(result.get())
-    pool.close()
-    pool.join()
-# print(counter.value)
+dist = ['1000M','1200M','1400M','1600M','1650M','1800M','2000M','2200M','2400M']
+data = pd.DataFrame()
+for d in dist:
+    data = data.append(match_data_race_card_bak[match_data_race_card_bak['dist']==d][['dist','date']].head(1))
+    # print(match_data_race_card_bak[match_data_race_card_bak['dist']==d][['dist','date']].head(1))
+
+print(data)
+# 1000M    60
+# 1200M    76
+# 1400M    39
+# 1600M    31
+# 1650M    48
+# 1800M    52
+# 2000M    13
+# 2200M     8
+# 2400M     3

@@ -17,20 +17,7 @@ pd.set_option('display.max_rows', 50)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 
-# Declare varaible
-testX = pd.read_csv('Processed Data/testX_20190529.csv',
-                    header=0, low_memory=False)
-testY = pd.read_csv('Processed Data/testY_20190529.csv',
-                    header=0, low_memory=False)
-trainX = pd.read_csv('Processed Data/trainX_20190529.csv',
-                     header=0, low_memory=False)
-trainY = pd.read_csv('Processed Data/trainY_20190529.csv',
-                     header=0, low_memory=False)
-testX_bak = testX.copy()
-first_1_max = Value('f', 0)
-first_3_max = Value('f', 0)
 
-print(','.join(map(str, trainX.columns.values)))
 
 
 def train(train_test_col):
@@ -91,26 +78,57 @@ def train(train_test_col):
 
     with first_1_max.get_lock(), first_3_max.get_lock():
         # print('Compare global variable')
-        if (first_1 + first_3) > (first_1_max.value + first_3_max.value):
-            print('updated')
-            logging.info('Accuracy (All) first_1: %.4f, first_3: %.4f, col: %s',
-                         first_1, first_3, train_test_col)
-            first_1_max.value = first_1
-            first_3_max.value = first_3
-        else:
+        # if (first_1 + first_3) > (first_1_max.value + first_3_max.value):
+        if first_3 > first_3_max.value:
             print('perious:', first_1_max.value,
                   first_3_max.value, 'current: ', first_1, first_3)
+            logging.info('Accuracy (All) first_1: %.4f, first_3: %.4f, No. of rows: %s, col: %s',
+                         first_1, first_3,overall['real_plc'].count(), train_test_col)
+            first_1_max.value = first_1
+            first_3_max.value = first_3
+        # else:
+            # print('perious:', first_1_max.value,
+            #       first_3_max.value, 'current: ', first_1, first_3)
 
     return overall
 
+testX = pd.read_csv('Processed Data/testX_20190529.csv',
+                    header=0, low_memory=False)
+testY = pd.read_csv('Processed Data/testY_20190529.csv',
+                    header=0, low_memory=False)
+trainX = pd.read_csv('Processed Data/trainX_20190529.csv',
+                    header=0, low_memory=False)
+trainY = pd.read_csv('Processed Data/trainY_20190529.csv',
+                    header=0, low_memory=False)
+testX_bak = testX.copy()
+
+first_1_max = None
+first_3_max = None
+
+def init(arg1,arg2,):
+    ''' store the counter for later use '''
+    global first_1_max
+    global first_3_max
+    first_1_max = arg1
+    first_3_max = arg2
 
 if __name__ == "__main__":
+    # Declare varaible
+    # global first_1_max
+    # global first_3_max
+
+    first_1_max = Value('f', 0)
+    first_3_max = Value('f', 0)
+
+    print(','.join(map(str, trainX.columns.values)))
+
     # train_test_col = ['TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'Draw', 'Rtg.+/-', 'AWT','class', 'DamRank', 'HorseMatchRank', 'Age', 'Horse Wt. (Declaration)', 'Wt.+/- (vs Declaration)']
     train_test_col = ['B','H','TT','CP','V','XB','SR','P','PC','E','BO','PS','SB','Sex_c','Sex_f','Sex_g','Sex_h','Sex_r','going_GOOD','going_GOOD TO FIRM','going_GOOD TO YIELDING','going_YIELDING','raceCourse_HV','raceCourse_ST','Runs_6','Runs_5','Runs_4','Runs_3','Runs_2','Runs_1','TrainerRank','SireRank','horseRank','JockeyRank','Draw','AWT','DamRank','HorseMatchRank','Horse Wt. (Declaration)','Age','Wt.+/- (vs Declaration)','class','Rtg.+/-']
     train_test_col = train_test_col[::-1]
+    # train_test_col = ['Rtg.+/-', 'DamRank', 'TrainerRank', 'Sex_h', 'B']
     # perm = itertools.permutations(train_test_col)
-    perm = itertools.combinations(train_test_col,6)
-    pool = Pool()
+    perm = itertools.combinations(train_test_col,5)
+    pool = Pool(initializer = init, initargs = (first_1_max,first_3_max, ))
 
     for i in perm:
         # result = pool.apply(train, (i,))
