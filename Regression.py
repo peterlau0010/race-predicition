@@ -136,8 +136,8 @@ def test(result,train_test_col,odds_min=1,odds_max=999):
 
     overall.fillna(0, inplace=True)
 
-    if overall['real_plc'].count() < 10:
-        print('Number of rows < 10')
+    if overall['real_plc'].count() < 15:
+        print('Number of rows < 15')
         return
 
     first_1 = accuracy_score(overall['real_plc'].round(
@@ -146,7 +146,7 @@ def test(result,train_test_col,odds_min=1,odds_max=999):
 
     with first_1_max.get_lock(), first_3_max.get_lock():
         # print('Compare global variable')
-        # if (first_1 + first_3) > (first_1_max.value + first_3_max.value):
+#         if (first_1 + first_3) > (first_1_max.value + first_3_max.value):
         if first_3 > first_3_max.value:
             # print('perious:', first_1_max.value,
             #       first_3_max.value, 'current: ', first_1, first_3)
@@ -212,7 +212,7 @@ if __name__ == "__main__":
 
     
     train_test_col = train_test_col[::-1]
-    # train_test_col = ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'SB', 'B']
+#     train_test_col = ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'SB', 'B']
     perm = itertools.combinations(train_test_col,4)
     pool = Pool(initializer = init, initargs = (first_1_max,first_3_max, ))
     
@@ -227,48 +227,48 @@ if __name__ == "__main__":
     pool.close()
     pool.join()
 
-    exit()
+#     exit()
 
 
 
-    # train_test_col = ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'raceCourse_HV', 'going_YIELDING']
+#     # train_test_col = ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'raceCourse_HV', 'going_YIELDING']
 
-    model,scaler = train(train_test_col,5,15)
+#     model,scaler = train(train_test_col,5,15)
 
-    test_result = test(model,scaler,train_test_col,5,15)
+#     test_result = test(model,scaler,train_test_col,5,15)
 
-    first_1 = accuracy_score(test_result['real_plc'].round(
-        0), test_result['pred_plc'].round(0))
-    first_3 = accuracy_score(test_result['real_first_3'], test_result['pred_plc'])
-    logging.info('%s, Accuracy (All) first_1: %.4f, first_3: %.4f, No. of rows: %s, col: %s', testX['dist'].values[0],
-                 first_1, first_3, test_result['real_plc'].count(), train_test_col)
+#     first_1 = accuracy_score(test_result['real_plc'].round(
+#         0), test_result['pred_plc'].round(0))
+#     first_3 = accuracy_score(test_result['real_first_3'], test_result['pred_plc'])
+#     logging.info('%s, Accuracy (All) first_1: %.4f, first_3: %.4f, No. of rows: %s, col: %s', testX['dist'].values[0],
+#                  first_1, first_3, test_result['real_plc'].count(), train_test_col)
 
-    # test_result = test_result.tail(20)
-    # first_1_recent_20 = accuracy_score(
-    #     test_result['real_plc'].round(0), test_result['pred_plc'].round(0))
-    # first_3_recent_20 = accuracy_score(
-    #     test_result['real_first_3'], test_result['pred_plc'])
-    # logging.info('%s, Accuracy (Recent 20) first_1: %.4f, first_3: %.4f, No. of rows: %s, col: %s', testX['dist'].values[0],
-    #              first_1_recent_20, first_3_recent_20, test_result['real_plc'].count(), train_test_col)
+#     # test_result = test_result.tail(20)
+#     # first_1_recent_20 = accuracy_score(
+#     #     test_result['real_plc'].round(0), test_result['pred_plc'].round(0))
+#     # first_3_recent_20 = accuracy_score(
+#     #     test_result['real_first_3'], test_result['pred_plc'])
+#     # logging.info('%s, Accuracy (Recent 20) first_1: %.4f, first_3: %.4f, No. of rows: %s, col: %s', testX['dist'].values[0],
+#     #              first_1_recent_20, first_3_recent_20, test_result['real_plc'].count(), train_test_col)
 
-    # test_result = test_result.tail(10)
-    # first_1_recent_10 = accuracy_score(
-    #     test_result['real_plc'].round(0), test_result['pred_plc'].round(0))
-    # first_3_recent_10 = accuracy_score(
-    #     test_result['real_first_3'], test_result['pred_plc'])
-    # logging.info('%s, Accuracy (Recent 10) first_1: %.4f, first_3: %.4f, No. of rows: %s, col: %s', testX['dist'].values[0],
-    #              first_1_recent_10, first_3_recent_10, test_result['real_plc'].count(), train_test_col)
+#     # test_result = test_result.tail(10)
+#     # first_1_recent_10 = accuracy_score(
+#     #     test_result['real_plc'].round(0), test_result['pred_plc'].round(0))
+#     # first_3_recent_10 = accuracy_score(
+#     #     test_result['real_first_3'], test_result['pred_plc'])
+#     # logging.info('%s, Accuracy (Recent 10) first_1: %.4f, first_3: %.4f, No. of rows: %s, col: %s', testX['dist'].values[0],
+#     #              first_1_recent_10, first_3_recent_10, test_result['real_plc'].count(), train_test_col)
 
-    test_result = test_result[['date', 'raceNo', 'horseNo', 'plc',
-                     'odds', 'pred_finishTime', 'real_plc', 'pred_plc', ]]
+#     test_result = test_result[['date', 'raceNo', 'horseNo', 'plc',
+#                      'odds', 'pred_finishTime', 'real_plc', 'pred_plc', ]]
 
-    logging.info('Test Result \n %s', test_result.sort_values(by=['date', 'raceNo'], ascending=[False,False]).head())
+#     logging.info('Test Result \n %s', test_result.sort_values(by=['date', 'raceNo'], ascending=[False,False]).head())
 
-    # ----------- Predict
+#     # ----------- Predict
 
-    pred_result = predict(model,scaler,train_test_col)
-    pred_result = pred_result[['date', 'raceNo', 'Horse No.','Horse',
-                    'pred_finishTime', 'pred_plc', ]]
-    logging.info('Predict Result \n %s', pred_result[pred_result['pred_plc']==1])
+#     pred_result = predict(model,scaler,train_test_col)
+#     pred_result = pred_result[['date', 'raceNo', 'Horse No.','Horse',
+#                     'pred_finishTime', 'pred_plc', ]]
+#     logging.info('Predict Result \n %s', pred_result[pred_result['pred_plc']==1])
 
     
