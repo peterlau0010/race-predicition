@@ -10,8 +10,15 @@ import time
 
 
 date = '20190602'
-odds_max = 999
+odds_max = 15
 odds_min = 5
+nCr_r = 4
+
+test_col = None
+test_col = ['Runs_6','Runs_5','Runs_4','Runs_3','Runs_2','Runs_1','Draw','AWT','Horse Wt. (Declaration)','Age','Wt.+/- (vs Declaration)','class','Rtg.+/-']
+
+nPr_r = None
+nPr_r = 5
 
 # Config
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',datefmt='%Y-%m-%d %H:%M:%S ', level=logging.INFO, handlers=[logging.StreamHandler(), logging.FileHandler("{0}/{1}.log".format('./Log/', 'Regression'))])
@@ -212,8 +219,16 @@ if __name__ == "__main__":
 
     
     train_test_col = train_test_col[::-1]
-#     train_test_col = ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'SB', 'B']
-    perm = itertools.combinations(train_test_col,4)
+    perm = itertools.combinations(train_test_col, nCr_r)
+
+    # ----- Test 1 time
+    if not test_col == None:
+        train_test_col = test_col
+        if not nPr_r == None:
+            perm = itertools.permutations(train_test_col, nPr_r)
+        else:
+            perm = itertools.permutations(train_test_col, len(train_test_col))
+
     pool = Pool(initializer = init, initargs = (first_1_max,first_3_max, ))
     
 

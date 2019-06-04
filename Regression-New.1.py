@@ -23,10 +23,10 @@ date = '20190602'
 # test_size = 0.20 # For training
 # test_size = 0.10 # For training
 # dist = '1000M'
-# dist = '1200M'
+dist = '1200M'
 # dist = '1400M'
 # dist = '1600M'
-dist = '1650M'
+# dist = '1650M'
 # dist = '1800M'
 split_date = 20180831
 
