@@ -287,3 +287,59 @@ if __name__ == "__main__":
 #     logging.info('Predict Result \n %s', pred_result[pred_result['pred_plc']==1])
 
     
+# 2019-06-04 22: 19: 15  INFO 1200M, Accuracy(All) first_1: 0.4250, first_3: 0.7125, No. of rows: 80, col: ['Runs_6', 'Runs_5', 'Draw', 'Rtg.+/-', 'AWT']
+# 2019-06-04 22: 19: 15  INFO Predict Result
+# Accuracy(All) first_1: 0.4250, first_3: 0.7125
+# Accuracy(Recent 20) first_1: 0.3500, first_3: 0.6500
+# Accuracy(Recent 10) first_1: 0.4000, first_3: 0.5000
+# date  raceNo  Horse No.           Horse  pred_finishTime  pred_plc
+# 0   20190605.0       4          1  ORIENTAL ELITE     70298.405130       1.0
+# 21  20190605.0       7         10     STRATHALLAN     70239.515788       1.0
+# 2019-06-04 22: 21: 16  INFO 1200M, Accuracy(All) first_1: 0.4304, first_3: 0.7215, No. of rows: 79, col: ['Runs_6', 'Runs_5', 'Horse Wt. (Declaration)', 'Rtg.+/-', 'class']
+# 2019-06-04 22: 21: 16  INFO Predict Result
+# Accuracy(All) first_1: 0.4304, first_3: 0.7215
+# Accuracy(Recent 20) first_1: 0.4000, first_3: 0.6000
+# Accuracy(Recent 10) first_1: 0.5000, first_3: 0.5000
+# date  raceNo  Horse No.           Horse  pred_finishTime  pred_plc
+# 7   20190605.0       4          8  BLISSFUL EIGHT     70605.051624       1.0
+# 19  20190605.0       7          8     ELITE PATCH     70181.709987       1.0
+# 2019-06-04 22: 23: 53  INFO 1200M, Accuracy(All) first_1: 0.4211, first_3: 0.7237, No. of rows: 76, col: ['Runs_6', 'Runs_5', 'class', 'Horse Wt. (Declaration)', 'Rtg.+/-']
+# 2019-06-04 22: 23: 53  INFO Predict Result
+# Accuracy(All) first_1: 0.4211, first_3: 0.7237
+# Accuracy(Recent 20) first_1: 0.4500, first_3: 0.6500
+# Accuracy(Recent 10) first_1: 0.5000, first_3: 0.6000
+# date  raceNo  Horse No.           Horse  pred_finishTime  pred_plc
+# 7   20190605.0       4          8  BLISSFUL EIGHT     70603.150022       1.0
+# 19  20190605.0       7          8     ELITE PATCH     70180.726205       1.0
+# 2019-06-04 22: 45: 44  INFO 1200M, Accuracy(All) first_1: 0.4146, first_3: 0.7317, No. of rows: 82, col: ['Runs_6', 'Runs_3', 'class', 'Rtg.+/-', 'Draw']
+# 2019-06-04 22: 45: 44  INFO Predict Result
+# Accuracy(All) first_1: 0.4146, first_3: 0.7317
+# Accuracy(Recent 20) first_1: 0.4000, first_3: 0.6000
+# Accuracy(Recent 10) first_1: 0.4000, first_3: 0.5000
+# date  raceNo  Horse No.           Horse  pred_finishTime  pred_plc
+# 7   20190605.0       4          8  BLISSFUL EIGHT     70509.188993       1.0
+# 19  20190605.0       7          8     ELITE PATCH     70146.877357       1.0
+# 2019-06-05 00: 00: 15  INFO 1200M, Accuracy(All) first_1: 0.4762, first_3: 0.7381, No. of rows: 84, col: ['Runs_6', 'Wt.+/- (vs Declaration)', 'class', 'Horse Wt. (Declaration)', 'Rtg.+/-']
+# 2019-06-05 00: 00: 15  INFO Predict Result
+# Accuracy(All) first_1: 0.4762, first_3: 0.7381
+# Accuracy(Recent 20) first_1: 0.5000, first_3: 0.6500
+# Accuracy(Recent 10) first_1: 0.5000, first_3: 0.6000
+# date  raceNo  Horse No.           Horse  pred_finishTime  pred_plc
+# 7   20190605.0       4          8  BLISSFUL EIGHT     70573.619623       1.0
+# 17  20190605.0       7          6  BALLISTIC KING     70188.902946       1.0
+# 2019-06-05 00: 11: 55  INFO 1200M, Accuracy(All) first_1: 0.4268, first_3: 0.7439, No. of rows: 82, col: ['Runs_6', 'class', 'Rtg.+/-', 'Wt.+/- (vs Declaration)', 'Draw']
+# 2019-06-05 00: 11: 55  INFO Predict Result
+# Accuracy(All) first_1: 0.4268, first_3: 0.7439
+# Accuracy(Recent 20) first_1: 0.3500, first_3: 0.7000
+# Accuracy(Recent 10) first_1: 0.3000, first_3: 0.6000
+# date  raceNo  Horse No.         Horse  pred_finishTime  pred_plc
+# 10  20190605.0       4         11  CHARITYDREAM     70495.497348       1.0
+# 19  20190605.0       7          8   ELITE PATCH     70170.971807       1.0
+# 2019-06-05 02: 16: 03  INFO 1200M, Accuracy(All) first_1: 0.4557, first_3: 0.7595, No. of rows: 79, col: ['Runs_5', 'class', 'Horse Wt. (Declaration)', 'Rtg.+/-', 'Wt.+/- (vs Declaration)']
+# 2019-06-05 02: 16: 03  INFO Predict Result
+# Accuracy(All) first_1: 0.4557, first_3: 0.7595
+# Accuracy(Recent 20) first_1: 0.3500, first_3: 0.6000
+# Accuracy(Recent 10) first_1: 0.5000, first_3: 0.6000
+# date  raceNo  Horse No.           Horse  pred_finishTime  pred_plc
+# 7   20190605.0       4          8  BLISSFUL EIGHT     70549.798993       1.0
+# 17  20190605.0       7          6  BALLISTIC KING     70194.682608       1.0
