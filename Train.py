@@ -78,12 +78,12 @@ def train(train_test_col):
 
     with first_1_max.get_lock(), first_3_max.get_lock():
         # print('Compare global variable')
-        # if (first_1 + first_3) > (first_1_max.value + first_3_max.value):
-        if first_3 > first_3_max.value:
+        if (first_1 + first_3) > (first_1_max.value + first_3_max.value):
+        # if first_3 > first_3_max.value:
             print('perious:', first_1_max.value,
                   first_3_max.value, 'current: ', first_1, first_3)
-            logging.info('Accuracy (All) first_1: %.4f, first_3: %.4f, No. of rows: %s, col: %s',
-                         first_1, first_3,overall['real_plc'].count(), train_test_col)
+            logging.info('%s, Accuracy (All) first_1: %.4f, first_3: %.4f, No. of rows: %s, col: %s', testX['dist'].values[0],
+                 first_1, first_3, overall['real_plc'].count(), train_test_col)
             first_1_max.value = first_1
             first_3_max.value = first_3
         # else:
@@ -125,7 +125,7 @@ if __name__ == "__main__":
     # train_test_col = ['TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'Draw', 'Rtg.+/-', 'AWT','class', 'DamRank', 'HorseMatchRank', 'Age', 'Horse Wt. (Declaration)', 'Wt.+/- (vs Declaration)']
     train_test_col = ['B','H','TT','CP','V','XB','SR','P','PC','E','BO','PS','SB','Sex_c','Sex_f','Sex_g','Sex_h','Sex_r','going_GOOD','going_GOOD TO FIRM','going_GOOD TO YIELDING','going_YIELDING','raceCourse_HV','raceCourse_ST','Runs_6','Runs_5','Runs_4','Runs_3','Runs_2','Runs_1','TrainerRank','SireRank','horseRank','JockeyRank','Draw','AWT','DamRank','HorseMatchRank','Horse Wt. (Declaration)','Age','Wt.+/- (vs Declaration)','class','Rtg.+/-']
     train_test_col = train_test_col[::-1]
-    # train_test_col = ['Rtg.+/-', 'DamRank', 'TrainerRank', 'Sex_h', 'B']
+    train_test_col = ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'SB', 'B']
     # perm = itertools.permutations(train_test_col)
     perm = itertools.combinations(train_test_col,5)
     pool = Pool(initializer = init, initargs = (first_1_max,first_3_max, ))
@@ -139,27 +139,3 @@ if __name__ == "__main__":
     pool.close()
     pool.join()
 
-
-# logging.info('test_report: %s \n %s', np.shape(test_report), test_report)
-
-# print('Accuracy score for 1st: %s', accuracy_score(test_report['real_plc'].round(0), test_report['pred_plc'].round(0)))
-# print('Accuracy score for first 3: %s ', accuracy_score(test_report['real_first_3'], test_report['pred_plc']))
-
-# print()
-
-# logging.info('Accuracy score for 1st: %s', accuracy_score(
-#     test_report['real_plc'].round(0), test_report['pred_plc'].round(0)))
-# logging.info('Accuracy score for first 3: %s ', accuracy_score(
-#     test_report['real_first_3'], test_report['pred_plc']))
-
-# test_report = test_report.tail(20)
-# print('Accuracy score for 1st recent 20 matches: %s', accuracy_score(
-#     test_report['real_plc'].round(0), test_report['pred_plc'].round(0)))
-# print('Accuracy score for first 3 recent 20 matches: %s ', accuracy_score(
-#     test_report['real_first_3'], test_report['pred_plc']))
-# print()
-
-# logging.info('Accuracy score for 1st recent 20 matches: %s', accuracy_score(
-#     test_report['real_plc'].round(0), test_report['pred_plc'].round(0)))
-# logging.info('Accuracy score for first 3 recent 20 matches: %s ',
-#             accuracy_score(test_report['real_first_3'], test_report['pred_plc']))

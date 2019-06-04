@@ -11,27 +11,17 @@ from sklearn.metrics import mean_squared_error, accuracy_score
 
 # ---------- Parameter
 date = '20190602'
-# raceCourse = 'ST'
-# test_size = 0.01 # For real prediction
-# test_size = 0.07 # For backtest predictionx
-# test_size = 0.70 # For training
-# test_size = 0.60 # For training
-# test_size = 0.50 # For training
-# test_size = 0.42 # For training
-# test_size = 0.40 # For training
-# test_size = 0.30 # For training
-# test_size = 0.20 # For training
-# test_size = 0.10 # For training
 # dist = '1000M'
 # dist = '1200M'
 # dist = '1400M'
 # dist = '1600M'
 dist = '1650M'
 # dist = '1800M'
+
 split_date = 20180831
 
 # --------- Setting
-logging.basicConfig(filename='./Log/Regression-New.log', format='%(asctime)s %(levelname)s %(message)s',
+logging.basicConfig(filename='./Log/csv_generator.log', format='%(asctime)s %(levelname)s %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S ', level=logging.INFO)
 
 pd.set_option('mode.chained_assignment', None)
@@ -325,10 +315,10 @@ headers = ','.join(map(str, y_train.columns.values))
 np.savetxt('./Processed Data/trainY_'+date+'.csv', y_train,
            delimiter=',', fmt='%s', header=headers, comments='')
 # ---- Select required columns
-X_test = X_test[predictionColumns]
+# X_test = X_test[predictionColumns]
 
 # ---- scale data and test will trianed model
-X_test = X_test.astype(float)
+# X_test = X_test.astype(float)
 # X_test = scaler.transform(X_test)
 # y_pred = model.predict(X_test)
 

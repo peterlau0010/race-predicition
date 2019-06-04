@@ -1,271 +1,274 @@
-from sklearn.preprocessing import PolynomialFeatures
-from sklearn.svm import SVR
-import matplotlib.pyplot as plt
 import numpy as np
-from sklearn import datasets, linear_model
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder
-from sklearn.neural_network import MLPRegressor
-from sklearn.linear_model import LinearRegression
-from datetime import datetime, timedelta
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
 import pandas as pd
-import numpy as np
-from sklearn import preprocessing
-import matplotlib.pyplot as plt
-import time
+from sklearn.neural_network import MLPRegressor
+from sklearn.preprocessing import StandardScaler
 import logging
-from sklearn.preprocessing import MinMaxScaler
-import seaborn as sns
-import RaceParam as cfg
-from joblib import dump, load
+import itertools
+from sklearn.metrics import mean_squared_error, accuracy_score
+from multiprocessing import Process, Value, Lock, Pool, Manager
+import time
 
-raceCourse, classes, dist, road = None, None, None, None
 
-# raceCourse = 'HV'
-# classes = 'Class 4'
-# dist = '1200M'
-# road = 'TURF - A Course'
-# going = 'GOOD'
+date = '20190602'
+odds_max = 999
+odds_min = 5
 
-date = cfg.param['date']
-road = cfg.param['road']
-
-distlist = cfg.param['dist']
-goinglist = cfg.param['going']
-classeslist = cfg.param['classes']
-raceCourselist = cfg.param['raceCourse']
+# Config
+logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',datefmt='%Y-%m-%d %H:%M:%S ', level=logging.INFO, handlers=[logging.StreamHandler(), logging.FileHandler("{0}/{1}.log".format('./Log/', 'Regression'))])
 
 pd.set_option('mode.chained_assignment', None)
-
-
 pd.set_option('display.max_rows', 50)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 
 
 
+testX = pd.read_csv('Processed Data/testX_'+date+'.csv',
+                    header=0, low_memory=False)
+testY = pd.read_csv('Processed Data/testY_'+date+'.csv',
+                    header=0, low_memory=False)
+trainX = pd.read_csv('Processed Data/trainX_'+date+'.csv',
+                     header=0, low_memory=False)
+trainY = pd.read_csv('Processed Data/trainY_'+date+'.csv',
+                     header=0, low_memory=False)
+pred = pd.read_csv('Processed Data/pred_'+date+'.csv',
+                     header=0, low_memory=False)
+
+testX_bak = testX.copy()
+pred_bak = pred.copy()
+
+first_1_max = None
+first_3_max = None
+
+def init(arg1,arg2,):
+    ''' store the counter for later use '''
+    global first_1_max
+    global first_3_max
+    first_1_max = arg1
+    first_3_max = arg2
+
+def train(train_test_col, odds_max=999, odds_min=1):
+    # print('method init')
+    # global testX
+    # global testY
+    # global testX_bak
+    global trainX
+    global trainY
+    train_test_col = list(train_test_col)
+
+    trainX_copy = trainX.copy()
+    # testX_copy = testX.copy()
+    # testY_copy = testY.copy()
+
+    trainX_copy = trainX_copy[train_test_col]
+    trainX_copy = trainX_copy.astype(float)
+    scaler = StandardScaler()
+    scaler.fit(trainX_copy)
+    trainX_copy = scaler.transform(trainX_copy)
+    model = MLPRegressor(random_state=1, solver='lbfgs')
+    model.fit(trainX_copy, trainY.values.ravel())
+
+    return model, scaler
+
+def test(model,scaler,train_test_col,odds_min=1,odds_max=999):
+    global testX
+    global testY
+    global testX_bak
+    testX_copy = testX.copy()
+    testY_copy = testY.copy()
+    # logging.info('testX_copy \n %s', testX_copy[(testX_copy['date']==20190529) & (testX_copy['raceNo']==1) & (testX_copy['horseNo']==3)])
+    testX_copy = testX_copy[train_test_col]
+
+    
+    testX_copy = testX_copy.astype(float)
+    testX_copy = scaler.transform(testX_copy)
+
+    predY = model.predict(testX_copy)
+    # print('finished predicition')
+    testY_copy['pred_finishTime'] = predY
+
+    overall = pd.merge(testX_bak, testY_copy, how='right',
+                       left_index=True, right_index=True)
+
+    overall["pred_plc"] = overall.groupby(['date', 'raceNo'])[
+        "pred_finishTime"].rank()
+    overall["real_plc"] = overall.groupby(['date', 'raceNo'])["plc"].rank()
+
+    overall = overall[(overall['pred_plc'] <= 1) & (
+        overall['odds'].astype(float) <= odds_max) & (overall['odds'].astype(float) >= odds_min)]
+    overall.loc[overall['real_plc'] <= 3, 'real_first_3'] = 1
+
+    overall.fillna(0, inplace=True)
+
+    return overall
+
+def test(result,train_test_col,odds_min=1,odds_max=999):
+    global testX
+    global testY
+    global testX_bak
+    global first_1_max
+    global first_3_max
+    train_test_col = list(train_test_col)
+    model = result[0]
+    scaler = result[1]
+    testX_copy = testX.copy()
+    testY_copy = testY.copy()
+    # logging.info('testX_copy \n %s', testX_copy[(testX_copy['date']==20190529) & (testX_copy['raceNo']==1) & (testX_copy['horseNo']==3)])
+    testX_copy = testX_copy[train_test_col]
+
+    testX_copy = testX_copy.astype(float)
+    testX_copy = scaler.transform(testX_copy)
+
+    predY = model.predict(testX_copy)
+    # print('finished predicition')
+    testY_copy['pred_finishTime'] = predY
+
+    overall = pd.merge(testX_bak, testY_copy, how='right',
+                       left_index=True, right_index=True)
+
+    overall["pred_plc"] = overall.groupby(['date', 'raceNo'])[
+        "pred_finishTime"].rank()
+    overall["real_plc"] = overall.groupby(['date', 'raceNo'])["plc"].rank()
+
+    overall = overall[(overall['pred_plc'] <= 1) & (
+        overall['odds'].astype(float) <= odds_max) & (overall['odds'].astype(float) >= odds_min)]
+    overall.loc[overall['real_plc'] <= 3, 'real_first_3'] = 1
+
+    overall.fillna(0, inplace=True)
+
+    if overall['real_plc'].count() < 10:
+        print('Number of rows < 10')
+        return
+
+    first_1 = accuracy_score(overall['real_plc'].round(
+        0), overall['pred_plc'].round(0))
+    first_3 = accuracy_score(overall['real_first_3'], overall['pred_plc'])
+
+    with first_1_max.get_lock(), first_3_max.get_lock():
+        # print('Compare global variable')
+        # if (first_1 + first_3) > (first_1_max.value + first_3_max.value):
+        if first_3 > first_3_max.value:
+            # print('perious:', first_1_max.value,
+            #       first_3_max.value, 'current: ', first_1, first_3)
+            logging.info('%s, Accuracy (All) first_1: %.4f, first_3: %.4f, No. of rows: %s, col: %s', testX['dist'].values[0],
+                 first_1, first_3, overall['real_plc'].count(), train_test_col)
+            first_1_max.value = first_1
+            first_3_max.value = first_3
+
+            overall = overall.head(20)
+            first_1_recent_20 = accuracy_score(
+                overall['real_plc'].round(0), overall['pred_plc'].round(0))
+            first_3_recent_20 = accuracy_score(
+                overall['real_first_3'], overall['pred_plc'])
+            # logging.info('%s, Accuracy (Recent 20) first_1: %.4f, first_3: %.4f, No. of rows: %s, col: %s', testX['dist'].values[0],
+            #             first_1_recent_20, first_3_recent_20, overall['real_plc'].count(), train_test_col)
+
+            overall = overall.head(10)
+            first_1_recent_10 = accuracy_score(
+                overall['real_plc'].round(0), overall['pred_plc'].round(0))
+            first_3_recent_10 = accuracy_score(
+                overall['real_first_3'], overall['pred_plc'])
+            # logging.info('%s, Accuracy (Recent 10) first_1: %.4f, first_3: %.4f, No. of rows: %s, col: %s', testX['dist'].values[0],
+            #             first_1_recent_10, first_3_recent_10, overall['real_plc'].count(), train_test_col)
+
+
+            pred_result = predict(model,scaler,train_test_col)
+            pred_result = pred_result[['date', 'raceNo', 'Horse No.','Horse',
+                            'pred_finishTime', 'pred_plc', ]]
+            logging.info('Predict Result \n Accuracy (All) first_1: %.4f, first_3: %.4f \n Accuracy (Recent 20) first_1: %.4f, first_3: %.4f \n Accuracy (Recent 10) first_1: %.4f, first_3: %.4f \n %s',first_1, first_3 ,first_1_recent_20,first_3_recent_20,first_1_recent_10,first_3_recent_10, pred_result[pred_result['pred_plc']==1])
+
+    return overall
+
+def predict(model,scaler,train_test_col):
+    global pred
+    pred_copy = pred.copy()
+    # ---- Add Missing Columns
+    for r in train_test_col:
+        if r not in pred_copy:
+            pred_copy[r] = np.NaN
+
+    # ---- Fill Missing Columns to null
+    pred_copy.fillna(0, inplace=True)
+    # logging.info('pred \n %s', pred[(pred['date']==20190529) & (pred['raceNo']==1) & (pred['Horse No.']==3)])
+    pred_copy = pred_copy[train_test_col]
+    
+    pred_copy = pred_copy.astype(float)
+    pred_copy = scaler.transform(pred_copy)
+    pred_y = model.predict(pred_copy)
+
+    pred_bak['pred_finishTime'] = pred_y
+    
+    pred_bak["pred_plc"] = pred_bak.groupby(['date', 'raceNo'])[
+        "pred_finishTime"].rank()
+
+    return pred_bak
+
+from functools import partial
+if __name__ == "__main__":
+    first_1_max = Value('f', 0)
+    first_3_max = Value('f', 0)
+
+    train_test_col = ['B','H','TT','CP','V','XB','SR','P','PC','E','BO','PS','SB','Sex_c','Sex_f','Sex_g','Sex_h','Sex_r','going_GOOD','going_GOOD TO FIRM','going_GOOD TO YIELDING','going_YIELDING','raceCourse_HV','raceCourse_ST','Runs_6','Runs_5','Runs_4','Runs_3','Runs_2','Runs_1','TrainerRank','SireRank','horseRank','JockeyRank','Draw','AWT','DamRank','HorseMatchRank','Horse Wt. (Declaration)','Age','Wt.+/- (vs Declaration)','class','Rtg.+/-']
+
+    
+    train_test_col = train_test_col[::-1]
+    # train_test_col = ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'SB', 'B']
+    perm = itertools.combinations(train_test_col,4)
+    pool = Pool(initializer = init, initargs = (first_1_max,first_3_max, ))
+    
+
+    for i in perm:
+        new_callback_function = partial(test, train_test_col=i,odds_min=odds_min, odds_max=odds_max)
+        result = pool.apply_async(train, (i,odds_min,odds_max),callback=new_callback_function)
+        # result = pool.apply(train, (i,5,15),callback=new_callback_function)
+        # result.wait()
+        # print(result)
+    time.sleep(5)
+    pool.close()
+    pool.join()
+
+    exit()
 
 
 
+    # train_test_col = ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'raceCourse_HV', 'going_YIELDING']
 
-class Regression:
+    model,scaler = train(train_test_col,5,15)
 
-    logging.basicConfig(filename='./Log/Regression.log', format='%(asctime)s %(levelname)s %(message)s',
-                        datefmt='%Y-%m-%d %H:%M:%S ', level=logging.INFO)
+    test_result = test(model,scaler,train_test_col,5,15)
 
-    def __init__(self, data, raceCourse, classes, dist, road,going):
-        self.data = data
-        self.originaldata = data
-        self.raceCourse = raceCourse
-        self.classes = classes
-        self.dist = dist
-        self.road = road
-        self.going = going
+    first_1 = accuracy_score(test_result['real_plc'].round(
+        0), test_result['pred_plc'].round(0))
+    first_3 = accuracy_score(test_result['real_first_3'], test_result['pred_plc'])
+    logging.info('%s, Accuracy (All) first_1: %.4f, first_3: %.4f, No. of rows: %s, col: %s', testX['dist'].values[0],
+                 first_1, first_3, test_result['real_plc'].count(), train_test_col)
 
-    def groupData(self, data):
-        # ========= Group data =========
-        data.loc[data['class'].str.contains('Class 2'), 'class'] = 'Class 2'
-        data.loc[data['class'].str.contains('Class 3'), 'class'] = 'Class 3'
-        data.loc[data['class'].str.contains('Class 4'), 'class'] = 'Class 4'
-        data = data[(data['class'] == 'Class 2') | (
-            data['class'] == 'Class 3') | (data['class'] == 'Class 4') | (data['class'] == 'Class 5') | (data['class'] == 'Class 1')]
-        data.loc[data['road'].str.contains('"A+'), 'road'] = 'TURF - A Course'
-        data.loc[data['road'].str.contains('"B+'), 'road'] = 'TURF - B Course'
-        data.loc[data['road'].str.contains('"C+'), 'road'] = 'TURF - C Course'
-        data.loc[data['plc'].astype(str).str.contains('3 DH'), 'plc'] = '3'
-        data.loc[data['plc'].astype(str).str.contains('2 DH'), 'plc'] = '2'
-        data.loc[data['plc'].astype(str).str.contains('1 DH'), 'plc'] = '1'
-        data.loc[data['plc'].astype(str).str.contains('4 DH'), 'plc'] = '4'
-        data.loc[data['plc'].astype(str).str.contains('5 DH'), 'plc'] = '5'
-        data.loc[data['plc'].astype(str).str.contains('6 DH'), 'plc'] = '6'
-        data.loc[data['plc'].astype(str).str.contains('7 DH'), 'plc'] = '7'
-        data.loc[data['plc'].astype(str).str.contains('8 DH'), 'plc'] = '8'
-        data.loc[data['plc'].astype(str).str.contains('9 DH'), 'plc'] = '9'
-        data.loc[data['plc'].astype(str).str.contains('10 DH'), 'plc'] = '10'
+    # test_result = test_result.tail(20)
+    # first_1_recent_20 = accuracy_score(
+    #     test_result['real_plc'].round(0), test_result['pred_plc'].round(0))
+    # first_3_recent_20 = accuracy_score(
+    #     test_result['real_first_3'], test_result['pred_plc'])
+    # logging.info('%s, Accuracy (Recent 20) first_1: %.4f, first_3: %.4f, No. of rows: %s, col: %s', testX['dist'].values[0],
+    #              first_1_recent_20, first_3_recent_20, test_result['real_plc'].count(), train_test_col)
 
-        return data
+    # test_result = test_result.tail(10)
+    # first_1_recent_10 = accuracy_score(
+    #     test_result['real_plc'].round(0), test_result['pred_plc'].round(0))
+    # first_3_recent_10 = accuracy_score(
+    #     test_result['real_first_3'], test_result['pred_plc'])
+    # logging.info('%s, Accuracy (Recent 10) first_1: %.4f, first_3: %.4f, No. of rows: %s, col: %s', testX['dist'].values[0],
+    #              first_1_recent_10, first_3_recent_10, test_result['real_plc'].count(), train_test_col)
 
-    def removeInvalidData(self, data):
-        # ========= Remove '---' value in finishTime =========
-        data = data[data.finishTime != '---']
-        data = data[data.plc != 'DISQ']
+    test_result = test_result[['date', 'raceNo', 'horseNo', 'plc',
+                     'odds', 'pred_finishTime', 'real_plc', 'pred_plc', ]]
 
-        return data
+    logging.info('Test Result \n %s', test_result.sort_values(by=['date', 'raceNo'], ascending=[False,False]).head())
 
-    def convertData(self, data):
-        # ========= Convert finishTime from String to float =========
-        data['finishTime'] = (pd.to_datetime(
-            data['finishTime'], format="%M:%S.%f") - datetime(1900, 1, 1))/timedelta(milliseconds=1)
-        data['plc'] = data['plc'].astype(float)
+    # ----------- Predict
 
-        return data
+    pred_result = predict(model,scaler,train_test_col)
+    pred_result = pred_result[['date', 'raceNo', 'Horse No.','Horse',
+                    'pred_finishTime', 'pred_plc', ]]
+    logging.info('Predict Result \n %s', pred_result[pred_result['pred_plc']==1])
 
-    def selectAppropriateData(self, data):
-        logging.info('SelectAppropriateData dist:  %s',self.dist)
-        logging.info('SelectAppropriateData road:  %s',self.road)
-        logging.info('SelectAppropriateData classes:  %s',self.classes)
-        logging.info('SelectAppropriateData raceCourse:  %s',self.raceCourse)
-        logging.info('SelectAppropriateData going:  %s',self.going)
-
-        data = data if self.dist is None else data[(data['dist'] == self.dist)]
-        data = data if road is None else data[(data['road'].str.contains(road))]
-        data = data if self.classes is None else data[(
-            data['class'] == self.classes)]
-        data = data if self.raceCourse is None else data[(
-            data['raceCourse'] == self.raceCourse)]
-        data = data if self.going is None else data[(
-            data['going'] == self.going)]
-        return data
-
-    def removeOutlier(self, data):
-        q = data["finishTime"].quantile(0.99)
-        data = data[data["finishTime"] < q]
-        return data
-
-
-
-
-
-for i,v in enumerate(distlist):
-    # print(date, goinglist[i] , distlist[i], road, classeslist[i],raceCourselist[i])
-    going = goinglist[i]
-    dist = distlist[i]
-    classes = classeslist[i]
-    raceCourse = raceCourselist[i]
-
-
-    # ========= Read CSV file =========
-    filename = './Processed Data/history_csv_merged_with_Sire_Dam_' + date + going + raceCourse + dist + classes + '.csv'
-    data = pd.read_csv(filename, header=0)
-    data = data.iloc[::-1]
-    logging.info('Original CSV Size, %s', str(np.shape(data)))
-
-    # ======== initial Regression Class ============
-    r = Regression(data, raceCourse, classes, dist, road,going)
-
-    # ======== Prepare Data ==============
-    data = r.groupData(data)
-
-    data = r.removeInvalidData(data)
-    logging.info('After removeInvalidData Size, %s', str(np.shape(data)))
-
-    data = r.convertData(data)
-
-    data = r.selectAppropriateData(data)
-    # logging.info('After selectAppropriateData Size, %s', str(np.shape(data)))
-    logging.info('After selectAppropriateData data Size : %s \n %s', np.shape(data), data)
-
-    data = r.removeOutlier(data)
-    logging.info('After removeOutlier Size, %s', str(np.shape(data)))
-
-
-    # ========= Select column for regresion ============
-
-    data_original = data.copy()
-    data['Age'] = data['Age'].astype(float).round(0)
-    data = data[[ 'draw', 'finishTime','Age','JockeyRank','TrainerRank', 'DamRank', 'SireRank','awt','dhw',]]
-    data['Age'] = data['Age'].fillna(-1)
-    data['Age'] = data['Age'].astype(int)
-    data['Age'] = data['Age'].astype(str)
-    data['Age'] = data['Age'].replace('-1', np.nan)
-    logging.info('Selected CSV Size, %s', str(np.shape(data)))
-
-
-    # ========= Convert Categories to 0 1 =========
-    # data = pd.get_dummies(data, columns=[
-    #     'dist'], prefix=['dist'])
-
-    # data = pd.get_dummies(data, columns=[
-    #     'draw'], prefix=['draw'])
-
-    # data = pd.get_dummies(data, columns=[
-    #     'Age'], prefix=['Age'])
-
-    # data = pd.get_dummies(data, columns=[
-    #     'Jockey'], prefix=['Jockey'])
-
-    # data = pd.get_dummies(data, columns=[
-    #     'Trainer'], prefix=['Trainer'])
-
-
-
-    logging.info('After converted categories Size, %s', str(np.shape(data)))
-
-    data = data.astype(float)
-    data.fillna(data.mean(), inplace=True)
-
-
-    # ========= Prepare X Y =========
-    X = data.drop(['finishTime'], axis=1)
-    headers = ','.join(map(str, X.columns.values))
-
-    y = data[['finishTime']]
-
-    logging.info('X: %s \n %s', np.shape(X), X)
-    # ========= split train and test =========
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.10, shuffle=False)
-
-    np.savetxt('./Report/predicitValue.csv', X_test.round(0),
-            delimiter=',', fmt='%s', header=headers, comments='')
-    # ========= Standardization for data =========
-    scaler = StandardScaler()  
-    scaler.fit(X_train) 
-
-    filename = 'scaler_' + date + going + raceCourse + dist + classes + '.sav'
-    dump(scaler, filename)
-
-    logging.info('X_train: %s \n %s', np.shape(X_train), X_train)
-    X_train = scaler.transform(X_train)
-
-    # poly=PolynomialFeatures(degree=3)
-    # poly_x=poly.fit_transform(X_train)
-
-
-    # model=LinearRegression()
-    # model.fit(poly_x,y_train)
-
-    model = MLPRegressor(
-        hidden_layer_sizes=(10,),  activation='relu', solver='lbfgs', alpha=0.001, batch_size='auto',
-        learning_rate='constant', learning_rate_init=0.01, power_t=0.5, max_iter=1000, shuffle=True,
-        random_state=9, tol=0.0001, verbose=False, warm_start=False, momentum=0.9, nesterovs_momentum=True,
-        early_stopping=False, validation_fraction=0.1, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
-
-    model.fit(X_train, y_train.values.ravel())
-
-    # modelname = 'regressioin_model_' + date + going + raceCourse + dist +'.sav'
-    filename = 'regressioin_model_' + date + going + raceCourse + dist + classes + '.sav'
-    dump(model, filename)
-
-    filename = 'preditParam' + date + going + raceCourse + dist + classes + '.csv'
-    np.savetxt(filename, X.columns.values,
-            delimiter=',', fmt='%s', comments='',header='value')
-
-    # # ========= Prediction =========
-    X_test = scaler.transform(X_test)  
-    # X_test = scalerX.transform(X_test)
-    # poly_y=poly.fit_transform(X_test)
-    y_pred = model.predict(X_test)
-
-    # for idx, col_name in enumerate(X.columns):
-    #     logging.info("The coefficient for {} is {}".format(
-    #         col_name, float(model.coef_[0][idx])))
-
-    y_test.loc[:, 'y_pred'] = y_pred
-
-    df_out = pd.merge(data_original, y_test, how='left',
-                      left_index=True, right_index=True)
-
-    # df_out = df_out[(df_out['y_pred'] > 0) & (df_out['y_pred'] < 200000)]
-    df_out["y_Rank"] = df_out.groupby(['date', 'raceNo'])["y_pred"].rank()
-    df_out["x_Rank"] = df_out.groupby(['date', 'raceNo'])["plc"].rank()
-
-    df_out = df_out[['date', 'raceNo','plc','finishTime_x', 'y_pred', 'y_Rank', 'x_Rank']]
-    df_out = df_out[(df_out['y_Rank'] <= 1)]
-
-    logging.info('df_out: %s \n %s', np.shape(df_out), df_out)
+    
