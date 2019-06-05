@@ -12,10 +12,10 @@ from sklearn.metrics import mean_squared_error, accuracy_score
 # ---------- Parameter
 date = '20190602'
 # dist = '1000M'
-# dist = '1200M'
+dist = '1200M'
 # dist = '1400M'
 # dist = '1600M'
-dist = '1650M'
+# dist = '1650M'
 # dist = '1800M'
 
 split_date = 20180831
@@ -39,9 +39,7 @@ Combine required csv files into 'data'
 data = pd.read_csv('Raw Data/history_bak.csv', header=0, low_memory=False)
 raceCard = pd.read_csv(
     'Raw Data/match_data_race_card_bak.csv', header=0, low_memory=False)
-# horse = pd.read_csv('Raw Data/horse_bak.csv', header=0)
-# jockey = pd.read_csv('Raw Data/jockey1819.csv', header=0)
-# trainer = pd.read_csv('Raw Data/trainer1819.csv', header=0)
+
 
 data = data.iloc[::-1]
 data = data[data.finishTime != '---']
@@ -124,7 +122,6 @@ data = data[(data['dist'] == dist) & (data['road'].str.contains('TURF'))]
 # data = data[data['road'].str.contains('TURF',na=False)]
 q = data["finishTime"].quantile(0.99)
 data = data[data["finishTime"] < q]
-# data_original = data.copy()
 
 logging.info('Selected data %s \n %s', np.shape(
     data), data.head(2).append(data.tail(2)))
@@ -147,8 +144,7 @@ y = data[['finishTime']]
 
 X_train, X_test = data[data['date'] < split_date].drop(
     ['finishTime'], axis=1), data[data['date'] >= split_date].drop(['finishTime'], axis=1)
-y_train, y_test = data[data['date'] < split_date][['finishTime']], data[data['date']
-                                                                        >= split_date][['finishTime']]
+y_train, y_test = data[data['date'] < split_date][['finishTime']], data[data['date']>= split_date][['finishTime']]
 
 # ---- Sire Rank
 sireRank = X_train.groupby(['Sire'])['plc'].apply(lambda x: (x <= 3).sum())
@@ -200,7 +196,8 @@ logging.info('X_train data %s \n %s', np.shape(X_train),
 """ 
 Select requried columns for train, test, predict 
 """
-
+print(X_train.dtypes)
+logging.info('X_train columns type: \n %s',X_train.dtypes)
 # Origial
 train_test_col = ['B', 'H', 'TT', 'CP', 'V', 'XB', 'SR', 'P', 'PC', 'E', 'BO', 'PS', 'SB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'raceCourse_ST','Runs_6', 'Runs_5', 'Runs_4', 'Runs_3', 'Runs_2', 'Runs_1', 'TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'Draw', 'Rtg.+/-', 'AWT', 'class', 'DamRank', 'HorseMatchRank', 'Age', 'Horse Wt. (Declaration)', 'Wt.+/- (vs Declaration)']
 
@@ -259,7 +256,7 @@ X_train.fillna(X_train.mean(), inplace=True)
 X_train_backup = X_train
 
 headers = ','.join(map(str, X_train.columns.values))
-np.savetxt('./Processed Data/trainX_'+date+'.csv', X_train,
+np.savetxt('./Processed Data/trainX_'+date+'_'+dist+'.csv', X_train,
            delimiter=',', fmt='%s', header=headers, comments='')
 
 """ 
@@ -304,15 +301,15 @@ X_test.fillna(X_train_backup.mean(), inplace=True)
 
 # print(X_test)
 headers = ','.join(map(str, X_test.columns.values))
-np.savetxt('./Processed Data/testX_'+date+'.csv', X_test,
+np.savetxt('./Processed Data/testX_'+date+'_'+dist+'.csv', X_test,
            delimiter=',', fmt='%s', header=headers, comments='')
 
 headers = ','.join(map(str, y_test.columns.values))
-np.savetxt('./Processed Data/testY_'+date+'.csv', y_test,
+np.savetxt('./Processed Data/testY_'+date+'_'+dist+'.csv', y_test,
            delimiter=',', fmt='%s', header=headers, comments='')
 
 headers = ','.join(map(str, y_train.columns.values))
-np.savetxt('./Processed Data/trainY_'+date+'.csv', y_train,
+np.savetxt('./Processed Data/trainY_'+date+'_'+dist+'.csv', y_train,
            delimiter=',', fmt='%s', header=headers, comments='')
 # ---- Select required columns
 # X_test = X_test[predictionColumns]
@@ -472,7 +469,7 @@ pred_data['HorseMatchRank'] = pred_data.groupby(['date', 'raceNo'])[
 pred_data.fillna(X_train_backup.mean(), inplace=True)
 
 headers = ','.join(map(str, pred_data.columns.values))
-np.savetxt('./Processed Data/pred_'+date+'.csv', pred_data,
+np.savetxt('./Processed Data/pred_'+date+'_'+dist+'.csv', pred_data,
            delimiter=',', fmt='%s', header=headers, comments='')
 
 # # ---- Generate missing columns

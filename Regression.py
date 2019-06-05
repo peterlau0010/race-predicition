@@ -10,12 +10,17 @@ import time
 
 
 date = '20190602'
+dist = '1650M'
 odds_max = 15
 odds_min = 5
-nCr_r = 4
+nCr_r = 5
 
 test_col = None
-test_col = ['Runs_6','Runs_5','Runs_4','Runs_3','Runs_2','Runs_1','Draw','AWT','Horse Wt. (Declaration)','Age','Wt.+/- (vs Declaration)','class','Rtg.+/-']
+test_one = None
+
+# test_col = ['Runs_1', 'Runs_4', 'Runs_2', 'Runs_6', 'Rtg.+/-']
+# test_one = True
+
 
 nPr_r = None
 nPr_r = 5
@@ -30,15 +35,15 @@ pd.set_option('display.width', 1000)
 
 
 
-testX = pd.read_csv('Processed Data/testX_'+date+'.csv',
+testX = pd.read_csv('Processed Data/testX_'+date+'_'+dist+'.csv',
                     header=0, low_memory=False)
-testY = pd.read_csv('Processed Data/testY_'+date+'.csv',
+testY = pd.read_csv('Processed Data/testY_'+date+'_'+dist+'.csv',
                     header=0, low_memory=False)
-trainX = pd.read_csv('Processed Data/trainX_'+date+'.csv',
+trainX = pd.read_csv('Processed Data/trainX_'+date+'_'+dist+'.csv',
                      header=0, low_memory=False)
-trainY = pd.read_csv('Processed Data/trainY_'+date+'.csv',
+trainY = pd.read_csv('Processed Data/trainY_'+date+'_'+dist+'.csv',
                      header=0, low_memory=False)
-pred = pd.read_csv('Processed Data/pred_'+date+'.csv',
+pred = pd.read_csv('Processed Data/pred_'+date+'_'+dist+'.csv',
                      header=0, low_memory=False)
 
 testX_bak = testX.copy()
@@ -212,6 +217,8 @@ def predict(model,scaler,train_test_col):
 
 from functools import partial
 if __name__ == "__main__":
+    logging.info('date: %s, dist: %s, odds_max: %s, odds_min: %s, nCr_r: %s, nPr_r: %s, test_col: %s, test_one: %s',date, dist,odds_max,odds_min,nCr_r,nPr_r,test_col,test_one)
+
     first_1_max = Value('f', 0)
     first_3_max = Value('f', 0)
 
@@ -219,15 +226,22 @@ if __name__ == "__main__":
 
     
     train_test_col = train_test_col[::-1]
-    perm = itertools.combinations(train_test_col, nCr_r)
+    if nPr_r == None:
+        perm = itertools.combinations(train_test_col, nCr_r)
+    else: 
+        perm = itertools.permutations(train_test_col, nPr_r)
 
     # ----- Test 1 time
     if not test_col == None:
         train_test_col = test_col
+        
         if not nPr_r == None:
             perm = itertools.permutations(train_test_col, nPr_r)
         else:
-            perm = itertools.permutations(train_test_col, len(train_test_col))
+            if test_one:
+                perm = itertools.combinations(train_test_col, len(train_test_col))
+            else:
+                perm = itertools.permutations(train_test_col, len(train_test_col))
 
     pool = Pool(initializer = init, initargs = (first_1_max,first_3_max, ))
     
