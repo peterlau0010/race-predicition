@@ -11,8 +11,8 @@ from sklearn.metrics import mean_squared_error, accuracy_score
 
 # ---------- Parameter
 date = '20190602'
-# dist = '1000M'
-dist = '1200M'
+dist = '1000M'
+# dist = '1200M'
 # dist = '1400M'
 # dist = '1600M'
 # dist = '1650M'
