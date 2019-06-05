@@ -54,6 +54,10 @@ def test(train_test_col, odds_max=99, odds_min=1):
     model = MLPRegressor(random_state=1, solver='lbfgs')
     model.fit(trainX_copy, trainY.values.ravel())
 
+    print(model.feature_importances_)
+
+    exit()
+
     testX_copy = testX_copy[train_test_col]
     # print(testX_copy)
     testX_copy = testX_copy.astype(float)

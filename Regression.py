@@ -10,20 +10,18 @@ import time
 
 
 date = '20190602'
-dist = '1650M'
+dist = '1200M'
 odds_max = 15
 odds_min = 5
 nCr_r = 5
 
 test_col = None
 test_one = None
-
-# test_col = ['Runs_1', 'Runs_4', 'Runs_2', 'Runs_6', 'Rtg.+/-']
-# test_one = True
-
-
 nPr_r = None
-nPr_r = 5
+
+test_col = ['Rtg.+/-', 'class', 'Horse Wt. (Declaration)', 'Runs_4', 'Runs_5']
+# test_one = True
+# nPr_r = 5
 
 # Config
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',datefmt='%Y-%m-%d %H:%M:%S ', level=logging.INFO, handlers=[logging.StreamHandler(), logging.FileHandler("{0}/{1}.log".format('./Log/', 'Regression'))])
@@ -234,12 +232,11 @@ if __name__ == "__main__":
     # ----- Test 1 time
     if not test_col == None:
         train_test_col = test_col
-        
-        if not nPr_r == None:
-            perm = itertools.permutations(train_test_col, nPr_r)
+        if test_one:
+            perm = itertools.combinations(train_test_col, len(train_test_col))
         else:
-            if test_one:
-                perm = itertools.combinations(train_test_col, len(train_test_col))
+            if not nPr_r == None:
+                perm = itertools.permutations(train_test_col, nPr_r)
             else:
                 perm = itertools.permutations(train_test_col, len(train_test_col))
 

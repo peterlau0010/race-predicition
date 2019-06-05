@@ -17,7 +17,8 @@ pd.set_option('display.max_rows', 50)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 
-
+date = '20190602'
+dist = '1200M'
 
 
 def train(train_test_col):
@@ -92,14 +93,15 @@ def train(train_test_col):
 
     return overall
 
-testX = pd.read_csv('Processed Data/testX_20190529.csv',
+testX = pd.read_csv('Processed Data/testX_'+date+'_'+dist+'.csv',
                     header=0, low_memory=False)
-testY = pd.read_csv('Processed Data/testY_20190529.csv',
+testY = pd.read_csv('Processed Data/testY_'+date+'_'+dist+'.csv',
                     header=0, low_memory=False)
-trainX = pd.read_csv('Processed Data/trainX_20190529.csv',
-                    header=0, low_memory=False)
-trainY = pd.read_csv('Processed Data/trainY_20190529.csv',
-                    header=0, low_memory=False)
+trainX = pd.read_csv('Processed Data/trainX_'+date+'_'+dist+'.csv',
+                     header=0, low_memory=False)
+trainY = pd.read_csv('Processed Data/trainY_'+date+'_'+dist+'.csv',
+                     header=0, low_memory=False)
+
 testX_bak = testX.copy()
 
 first_1_max = None
@@ -124,10 +126,13 @@ if __name__ == "__main__":
 
     # train_test_col = ['TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'Draw', 'Rtg.+/-', 'AWT','class', 'DamRank', 'HorseMatchRank', 'Age', 'Horse Wt. (Declaration)', 'Wt.+/- (vs Declaration)']
     train_test_col = ['B','H','TT','CP','V','XB','SR','P','PC','E','BO','PS','SB','Sex_c','Sex_f','Sex_g','Sex_h','Sex_r','going_GOOD','going_GOOD TO FIRM','going_GOOD TO YIELDING','going_YIELDING','raceCourse_HV','raceCourse_ST','Runs_6','Runs_5','Runs_4','Runs_3','Runs_2','Runs_1','TrainerRank','SireRank','horseRank','JockeyRank','Draw','AWT','DamRank','HorseMatchRank','Horse Wt. (Declaration)','Age','Wt.+/- (vs Declaration)','class','Rtg.+/-']
+
+    # train_test_col = ['B','H','TT','CP','V','XB','SR','P','PC','E','BO','PS','SB','Sex_c','Sex_f','Sex_g','Sex_h','Sex_r','going_GOOD','going_GOOD TO FIRM','going_GOOD TO YIELDING','going_YIELDING','raceCourse_HV','raceCourse_ST','Runs_6','Runs_5','Runs_4','Runs_3','Runs_2','Runs_1','TrainerRank','SireRank','horseRank','JockeyRank','Draw','AWT','DamRank','HorseMatchRank','Horse Wt. (Declaration)','Age','Wt.+/- (vs Declaration)','class','Rtg.+/-']
+
     train_test_col = train_test_col[::-1]
-    train_test_col = ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'SB', 'B']
+    train_test_col = ['Rtg.+/-', 'TT']
     # perm = itertools.permutations(train_test_col)
-    perm = itertools.combinations(train_test_col,5)
+    perm = itertools.permutations(train_test_col,2)
     pool = Pool(initializer = init, initargs = (first_1_max,first_3_max, ))
 
     for i in perm:
@@ -139,3 +144,18 @@ if __name__ == "__main__":
     pool.close()
     pool.join()
 
+# 2019-06-05 17:52:58  INFO 1200M, Accuracy (All) first_1: 0.4627, first_3: 0.6567, No. of rows: 67, col: ['Rtg.+/-']
+# 2019-06-05 17:53:25  INFO 1200M, Accuracy (All) first_1: 0.4697, first_3: 0.6515, No. of rows: 66, col: ['Rtg.+/-', 'class']
+# 2019-06-05 17:53:36  INFO 1200M, Accuracy (All) first_1: 0.4697, first_3: 0.6515, No. of rows: 66, col: ['Rtg.+/-', 'raceCourse_HV']
+# 2019-06-05 17:53:39  INFO 1200M, Accuracy (All) first_1: 0.4697, first_3: 0.6515, No. of rows: 66, col: ['Rtg.+/-', 'going_YIELDING']
+# 2019-06-05 17:53:39  INFO 1200M, Accuracy (All) first_1: 0.4697, first_3: 0.6515, No. of rows: 66, col: ['Rtg.+/-', 'going_GOOD TO FIRM']
+# 2019-06-05 17:53:39  INFO 1200M, Accuracy (All) first_1: 0.4697, first_3: 0.6515, No. of rows: 66, col: ['Rtg.+/-', 'going_GOOD']
+# 2019-06-05 17:53:40  INFO 1200M, Accuracy (All) first_1: 0.4697, first_3: 0.6515, No. of rows: 66, col: ['Rtg.+/-', 'Sex_r']
+# 2019-06-05 17:53:40  INFO 1200M, Accuracy (All) first_1: 0.4697, first_3: 0.6515, No. of rows: 66, col: ['Rtg.+/-', 'Sex_f']
+# 2019-06-05 17:53:42  INFO 1200M, Accuracy (All) first_1: 0.4697, first_3: 0.6515, No. of rows: 66, col: ['Rtg.+/-', 'PS']
+# 2019-06-05 17:53:42  INFO 1200M, Accuracy (All) first_1: 0.4697, first_3: 0.6515, No. of rows: 66, col: ['Rtg.+/-', 'Sex_c']
+# 2019-06-05 17:53:43  INFO 1200M, Accuracy (All) first_1: 0.4697, first_3: 0.6515, No. of rows: 66, col: ['Rtg.+/-', 'SB']
+# 2019-06-05 17:53:44  INFO 1200M, Accuracy (All) first_1: 0.4697, first_3: 0.6515, No. of rows: 66, col: ['Rtg.+/-', 'BO']
+# 2019-06-05 17:53:45  INFO 1200M, Accuracy (All) first_1: 0.4697, first_3: 0.6515, No. of rows: 66, col: ['Rtg.+/-', 'E']
+# 2019-06-05 17:53:47  INFO 1200M, Accuracy (All) first_1: 0.4697, first_3: 0.6515, No. of rows: 66, col: ['Rtg.+/-', 'V']
+# 2019-06-05 17:53:49  INFO 1200M, Accuracy (All) first_1: 0.4783, first_3: 0.6522, No. of rows: 69, col: ['Rtg.+/-', 'TT']
