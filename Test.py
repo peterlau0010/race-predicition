@@ -9,8 +9,8 @@ from multiprocessing import Process, Value, Lock, Pool, Manager
 import time
 
 # Config
-logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S ', level=logging.INFO, handlers=[logging.StreamHandler(), logging.FileHandler("{0}/{1}.log".format('./Log/', 'Test'))])
+# logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
+#                     datefmt='%Y-%m-%d %H:%M:%S ', level=logging.INFO, handlers=[logging.StreamHandler(), logging.FileHandler("{0}/{1}.log".format('./Log/', 'Test'))])
 
 pd.set_option('mode.chained_assignment', None)
 pd.set_option('display.max_rows', 50)
@@ -33,33 +33,16 @@ pred = pd.read_csv('Processed Data/pred_'+date+'.csv',
 testX_bak = testX.copy()
 
 
-def test(train_test_col, odds_max=99, odds_min=1):
-    # print('method init')
-    global testX
-    global testY
-    global trainX
-    global trainY
-    global testX_bak
-    train_test_col = list(train_test_col)
-
-    trainX_copy = trainX.copy()
+def test(model,scaler,train_test_col,testX,testY,testX_bak,odds_min=1,odds_max=999):
+    # global testX
+    # global testY
+    # global testX_bak
     testX_copy = testX.copy()
     testY_copy = testY.copy()
-
-    trainX_copy = trainX_copy[train_test_col]
-    trainX_copy = trainX_copy.astype(float)
-    scaler = StandardScaler()
-    scaler.fit(trainX_copy)
-    trainX_copy = scaler.transform(trainX_copy)
-    model = MLPRegressor(random_state=1, solver='lbfgs')
-    model.fit(trainX_copy, trainY.values.ravel())
-
-    print(model.feature_importances_)
-
-    exit()
-
+    # logging.info('testX_copy \n %s', testX_copy[(testX_copy['date']==20190529) & (testX_copy['raceNo']==1) & (testX_copy['horseNo']==3)])
     testX_copy = testX_copy[train_test_col]
-    # print(testX_copy)
+
+    
     testX_copy = testX_copy.astype(float)
     testX_copy = scaler.transform(testX_copy)
 
@@ -73,34 +56,15 @@ def test(train_test_col, odds_max=99, odds_min=1):
     overall["pred_plc"] = overall.groupby(['date', 'raceNo'])[
         "pred_finishTime"].rank()
     overall["real_plc"] = overall.groupby(['date', 'raceNo'])["plc"].rank()
-
+    print(overall[(overall['pred_plc'] <= 1)].tail())
     overall = overall[(overall['pred_plc'] <= 1) & (
         overall['odds'].astype(float) <= odds_max) & (overall['odds'].astype(float) >= odds_min)]
+    if overall['pred_plc'].count() == 0:
+        return 
+        
     overall.loc[overall['real_plc'] <= 3, 'real_first_3'] = 1
 
     overall.fillna(0, inplace=True)
-
-    first_1 = accuracy_score(overall['real_plc'].round(
-        0), overall['pred_plc'].round(0))
-    first_3 = accuracy_score(overall['real_first_3'], overall['pred_plc'])
-    logging.info('%s, Accuracy (All) first_1: %.4f, first_3: %.4f, No. of rows: %s, col: %s', testX['dist'].values[0],
-                 first_1, first_3, overall['real_plc'].count(), train_test_col)
-
-    overall = overall.tail(20)
-    first_1_recent_20 = accuracy_score(
-        overall['real_plc'].round(0), overall['pred_plc'].round(0))
-    first_3_recent_20 = accuracy_score(
-        overall['real_first_3'], overall['pred_plc'])
-    logging.info('%s, Accuracy (Recent 20) first_1: %.4f, first_3: %.4f, No. of rows: %s, col: %s', testX['dist'].values[0],
-                 first_1_recent_20, first_3_recent_20, overall['real_plc'].count(), train_test_col)
-
-    overall = overall.tail(10)
-    first_1_recent_10 = accuracy_score(
-        overall['real_plc'].round(0), overall['pred_plc'].round(0))
-    first_3_recent_10 = accuracy_score(
-        overall['real_first_3'], overall['pred_plc'])
-    logging.info('%s, Accuracy (Recent 10) first_1: %.4f, first_3: %.4f, No. of rows: %s, col: %s', testX['dist'].values[0],
-                 first_1_recent_10, first_3_recent_10, overall['real_plc'].count(), train_test_col)
 
     return overall
 

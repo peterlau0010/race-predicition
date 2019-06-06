@@ -11,7 +11,7 @@ import time
 
 date = '20190602'
 dist = '1200M'
-odds_max = 40
+odds_max = 15
 odds_min = 5
 nCr_r = 5
 
@@ -19,7 +19,7 @@ test_col = None
 test_one = None
 nPr_r = None
 
-test_col = ['Rtg.+/-', 'Draw', 'SB', 'TT', 'Wt.+/- (vs Declaration)']
+test_col = ['SB', 'Rtg.+/-', 'TT', 'Draw', 'BO', 'Wt.+/- (vs Declaration)']
 test_one = True
 # nPr_r = 5
 

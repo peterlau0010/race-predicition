@@ -9,8 +9,8 @@ from multiprocessing import Process, Value, Lock, Pool, Manager
 import time
 
 # Config
-logging.basicConfig(filename='./Log/Train.log', format='%(asctime)s %(levelname)s %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S ', level=logging.INFO)
+# logging.basicConfig(filename='./Log/Train.log', format='%(asctime)s %(levelname)s %(message)s',
+#                     datefmt='%Y-%m-%d %H:%M:%S ', level=logging.INFO)
 
 pd.set_option('mode.chained_assignment', None)
 pd.set_option('display.max_rows', 50)
@@ -21,21 +21,13 @@ date = '20190602'
 dist = '1200M'
 
 
-def train(train_test_col):
-    # print('method init')
-    global testX
-    global testY
-    global trainX
-    global trainY
-    global testX_bak
-    global first_1_max
-    global first_3_max
+def train(train_test_col,trainX,trainY):
     train_test_col = list(train_test_col)
     # print(train_test_col)
 
     trainX_copy = trainX.copy()
     testX_copy = testX.copy()
-    testY_copy = testY.copy()
+    # testY_copy = testY.copy()
 
     trainX_copy = trainX_copy[train_test_col]
     # print('set cols')
@@ -46,52 +38,55 @@ def train(train_test_col):
     # print('Set model')
     model = MLPRegressor(random_state=1, solver='lbfgs')
     model.fit(trainX_copy, trainY.values.ravel())
+
+    return model, scaler
+
     # print('finished set model')
 
-    testX_copy = testX_copy[train_test_col]
-    # print(testX_copy)
-    testX_copy = testX_copy.astype(float)
-    testX_copy = scaler.transform(testX_copy)
+    # testX_copy = testX_copy[train_test_col]
+    # # print(testX_copy)
+    # testX_copy = testX_copy.astype(float)
+    # testX_copy = scaler.transform(testX_copy)
 
-    predY = model.predict(testX_copy)
-    # print('finished predicition')
-    testY_copy['pred_finishTime'] = predY
+    # predY = model.predict(testX_copy)
+    # # print('finished predicition')
+    # testY_copy['pred_finishTime'] = predY
 
-    overall = pd.merge(testX_bak, testY_copy, how='right',
-                       left_index=True, right_index=True)
+    # overall = pd.merge(testX_bak, testY_copy, how='right',
+    #                    left_index=True, right_index=True)
 
-    overall["pred_plc"] = overall.groupby(['date', 'raceNo'])[
-        "pred_finishTime"].rank()
-    overall["real_plc"] = overall.groupby(['date', 'raceNo'])["plc"].rank()
+    # overall["pred_plc"] = overall.groupby(['date', 'raceNo'])[
+    #     "pred_finishTime"].rank()
+    # overall["real_plc"] = overall.groupby(['date', 'raceNo'])["plc"].rank()
 
-    overall = overall[(overall['pred_plc'] <= 1) & (
-        overall['odds'].astype(float) <= 15) & (overall['odds'].astype(float) >= 5)]
-    overall.loc[overall['real_plc'] <= 3, 'real_first_3'] = 1
-    overall.fillna(0, inplace=True)
-    first_1 = accuracy_score(overall['real_plc'].round(
-        0), overall['pred_plc'].round(0))
-    first_3 = accuracy_score(overall['real_first_3'], overall['pred_plc'])
-    # print('lock global variable')
-    # print(overall['real_plc'].count())
-    if overall['real_plc'].count() < 10:
-        print('Number of rows < 10')
-        return
+    # overall = overall[(overall['pred_plc'] <= 1) & (
+    #     overall['odds'].astype(float) <= 15) & (overall['odds'].astype(float) >= 5)]
+    # overall.loc[overall['real_plc'] <= 3, 'real_first_3'] = 1
+    # overall.fillna(0, inplace=True)
+    # first_1 = accuracy_score(overall['real_plc'].round(
+    #     0), overall['pred_plc'].round(0))
+    # first_3 = accuracy_score(overall['real_first_3'], overall['pred_plc'])
+    # # print('lock global variable')
+    # # print(overall['real_plc'].count())
+    # if overall['real_plc'].count() < 10:
+    #     print('Number of rows < 10')
+    #     return
 
-    with first_1_max.get_lock(), first_3_max.get_lock():
-        # print('Compare global variable')
-        # if (first_1 + first_3) > (first_1_max.value + first_3_max.value):
-        if first_3 > first_3_max.value:
-            print('perious:', first_1_max.value,
-                  first_3_max.value, 'current: ', first_1, first_3)
-            logging.info('%s, Accuracy (All) first_1: %.4f, first_3: %.4f, No. of rows: %s, col: %s', testX['dist'].values[0],
-                 first_1, first_3, overall['real_plc'].count(), train_test_col)
-            first_1_max.value = first_1
-            first_3_max.value = first_3
-        # else:
-            # print('perious:', first_1_max.value,
-            #       first_3_max.value, 'current: ', first_1, first_3)
+    # with first_1_max.get_lock(), first_3_max.get_lock():
+    #     # print('Compare global variable')
+    #     # if (first_1 + first_3) > (first_1_max.value + first_3_max.value):
+    #     if first_3 > first_3_max.value:
+    #         print('perious:', first_1_max.value,
+    #               first_3_max.value, 'current: ', first_1, first_3)
+    #         logging.info('%s, Accuracy (All) first_1: %.4f, first_3: %.4f, No. of rows: %s, col: %s', testX['dist'].values[0],
+    #              first_1, first_3, overall['real_plc'].count(), train_test_col)
+    #         first_1_max.value = first_1
+    #         first_3_max.value = first_3
+    #     # else:
+    #         # print('perious:', first_1_max.value,
+    #         #       first_3_max.value, 'current: ', first_1, first_3)
 
-    return overall
+    # return overall
 
 testX = pd.read_csv('Processed Data/testX_'+date+'_'+dist+'.csv',
                     header=0, low_memory=False)

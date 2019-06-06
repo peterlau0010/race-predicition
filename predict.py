@@ -9,8 +9,8 @@ from multiprocessing import Process, Value, Lock, Pool, Manager
 import time
 
 # Config
-logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S ', level=logging.INFO, handlers=[logging.StreamHandler(), logging.FileHandler("{0}/{1}.log".format('./Log/', 'Predict'))])
+# logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
+#                     datefmt='%Y-%m-%d %H:%M:%S ', level=logging.INFO, handlers=[logging.StreamHandler(), logging.FileHandler("{0}/{1}.log".format('./Log/', 'Predict'))])
 
 pd.set_option('mode.chained_assignment', None)
 pd.set_option('display.max_rows', 50)
@@ -30,6 +30,31 @@ pred = pd.read_csv('Processed Data/pred_20190602.csv',
                      header=0, low_memory=False)
 testX_bak = testX.copy()
 pred_bak = pred.copy()
+
+
+def predict(predX,train_test_col,model,scaler):
+    pred_bak = predX.copy()
+
+    for r in train_test_col:
+        if r not in predX:
+            predX[r] = np.NaN
+
+    # ---- Fill missing columns values
+    predX.fillna(0, inplace=True)
+
+    predX = predX[train_test_col]
+
+    predX = predX.astype(float)
+    predX = scaler.transform(predX)
+    pred_y = model.predict(predX)
+
+    pred_bak['pred_finishTime'] = pred_y
+    
+
+    pred_bak["pred_plc"] = pred_bak.groupby(['date', 'raceNo'])[
+        "pred_finishTime"].rank()
+
+    return pred_bak
 
 
 def train(train_test_col, odds_max=99, odds_min=1):
@@ -100,6 +125,8 @@ def train(train_test_col, odds_max=99, odds_min=1):
     #              first_1_recent_10, first_3_recent_10, overall['real_plc'].count(), train_test_col)
 
     # return overall
+
+
 
 
 if __name__ == "__main__":
