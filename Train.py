@@ -36,7 +36,7 @@ def train(train_test_col,trainX,trainY):
     scaler.fit(trainX_copy)
     trainX_copy = scaler.transform(trainX_copy)
     # print('Set model')
-    model = MLPRegressor(random_state=1, solver='lbfgs')
+    model = MLPRegressor(random_state=0, solver='lbfgs')
     model.fit(trainX_copy, trainY.values.ravel())
 
     return model, scaler

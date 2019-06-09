@@ -13,11 +13,45 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',datefmt='%Y-%
 
 
 
-date = '20190605'
-dist = '1650M'
-min_odds = 5
-max_odds = 50
-col = ['Runs_2', 'Draw', 'Rtg.+/-']
+date = '20190608'
+dist = '1400M'
+min_odds = 0
+max_odds = 20
+top_pred_plc = 1
+col = ['class', 'TT', 'Rtg.+/-', 'going_GOOD']
+base = ['class', 'TT', 'Rtg.+/-', 'going_GOOD']
+
+"""
+1400M ['Rtg.', 'H', 'Rtg.+/-', 'Season Stakes', 'Horse Wt. (Declaration)'] 0.72%
+
+# 2 features
+2A) 2019-06-08 13:38:58  INFO 1400M, Accuracy (30) first_1: 0.5667, first_3: 0.8333, col: ['Rtg.+/-', 'H'] from: 20180610.0
+2B) 2019-06-08 13:38:49  INFO 1400M, Accuracy (30) first_1: 0.5333, first_3: 0.8000, col: ['class', 'Rtg.+/-'] from: 20180610.0
+
+# 3 features
+3A2A) 2019-06-08 13:47:02  INFO 1400M, Accuracy (30) first_1: 0.5667, first_3: 0.8667, col: ['going_GOOD', 'Rtg.+/-', 'H'] from: 20180610.0
+3B2A) 2019-06-08 13:46:59  INFO 1400M, Accuracy (30) first_1: 0.5333, first_3: 0.8333, col: ['going_FAST', 'H', 'Rtg.+/-'] from: 20180616.0
+
+# 4 features
+4A 2019-06-08 14:17:38  INFO 1400M, Accuracy (30) first_1: 0.4000, first_3: 0.9000, col: ['Season Stakes', 'Horse Wt. (Declaration)', 'H', 'Rtg.+/-'] from: 20181110.0
+4B 2019-06-08 14:17:29  INFO 1400M, Accuracy (30) first_1: 0.4333, first_3: 0.8667, col: ['Horse Wt. (Declaration)', 'Rtg.+/-', 'H', 'Season Stakes'] from: 20181110.0
+
+
+# 5 features
+5A4AB) 2019-06-08 14:22:07  INFO 1400M, Accuracy (30) first_1: 0.3000, first_3: 0.8667, col: ['Season Stakes', 'Rtg.+/-', 'Draw', 'H', 'Horse Wt. (Declaration)'] from: 20181110.0
+5B4AB) 2019-06-08 14:24:28  INFO 1400M, Accuracy (30) first_1: 0.3333, first_3: 0.9000, col: ['Rtg.', 'H', 'Rtg.+/-', 'Season Stakes', 'Horse Wt. (Declaration)'] from: 20181013.0
+
+1200M ['class', 'TT', 'Rtg.+/-', 'going_GOOD']
+
+3 features
+3A) 2019-06-08 14:38:15  INFO 1200M, Accuracy (30) first_1: 0.4667, first_3: 0.8000, col: ['Rtg.+/-', 'Draw', 'TT'] from: 20190130.0
+3B) 2019-06-08 14:41:38  INFO 1200M, Accuracy (30) first_1: 0.6000, first_3: 0.8667, col: ['Rtg.+/-', 'TT', 'going_GOOD'] from: 20190112.0
+
+4 features
+4A) 2019-06-08 15:00:46  INFO 1200M, Accuracy (30) first_1: 0.6000, first_3: 0.9000, col: ['class', 'TT', 'Rtg.+/-', 'going_GOOD'] from: 20190130.0
+4B) 2019-06-08 15:04:59  INFO 1200M, Accuracy (30) first_1: 0.6000, first_3: 0.9333, col: ['XB', 'TT', 'Rtg.+/-', 'going_GOOD'] from: 20190130.0
+"""
+
 
 """ 
 No. Action
@@ -40,14 +74,31 @@ def train_async(train_test_col,testX,testY,trainX,trainY,testX_bak,predX,min_odd
     overall = Test.test(model,scaler,train_test_col,testX,testY,testX_bak,min_odds,max_odds)
     if overall is None or overall['real_plc'].count() < 15:
         return
+    overall_bak = overall.copy()
+    overall_bak = overall_bak.sort_values(by=['date', 'raceNo'], ascending=[False,True])
+
+    # overall = overall.tail(30)
+
     first_1 = accuracy_score(overall['real_plc'].round(
         0), overall['pred_plc'].round(0))
     first_3 = accuracy_score(overall['real_first_3'], overall['pred_plc'])
+
+    
     with first_1_max.get_lock(), first_3_max.get_lock():
         # if (first_1 + first_3) > (first_1_max.value + first_3_max.value):
-        if first_3 >= first_3_max.value or first_3 >= 75:
-            logging.info('%s, Accuracy (All) first_1: %.4f, first_3: %.4f, No. of rows: %s, col: %s', testX['dist'].values[0],
-                 first_1, first_3, overall['real_plc'].count(), train_test_col)
+
+        # if first_3 >= first_3_max.value :
+        if first_1 >= first_1_max.value :
+            # logging.info('%s, Accuracy (%s) plc_1: %.4f, plc_1_3: %.4f, odds: %s - %s, col: %s', testX['dist'].values[0],overall['real_plc'].count(),
+            #      first_1, first_3, min_odds, max_odds,  train_test_col)
+
+            for i in range(0,40,10):
+                test_result_print = overall_bak.head(999 if i==0 else i)
+                first_1_print = accuracy_score(test_result_print['real_plc'].round(0), test_result_print['pred_plc'].round(0))
+                first_3_print = accuracy_score(test_result_print['real_first_3'], test_result_print['pred_plc'])
+                logging.info('%s, Accuracy (%s) first_1: %.4f, first_3: %.4f, col: %s from: %s', testX['dist'].values[0], test_result_print['real_plc'].count(),
+                        first_1_print, first_3_print, train_test_col, test_result_print['date'].values[-1])
+
             first_1_max.value = first_1
             first_3_max.value = first_3
 
@@ -81,12 +132,14 @@ if __name__ == "__main__":
     if action == 0:
         """ Pool initital """
         pool = Pool(initializer = init, initargs = (first_1_max,first_3_max, ))
-        train_test_col = ['B','H','TT','CP','V','XB','SR','P','PC','E','BO','PS','SB','Sex_c','Sex_f','Sex_g','Sex_h','Sex_r','going_GOOD','going_GOOD TO FIRM','going_GOOD TO YIELDING','going_YIELDING','raceCourse_HV','raceCourse_ST','Runs_6','Runs_5','Runs_4','Runs_3','Runs_2','Runs_1','TrainerRank','SireRank','horseRank','JockeyRank','AWT','DamRank','HorseMatchRank','Horse Wt. (Declaration)','Age','Wt.+/- (vs Declaration)','class']
-
+        # train_test_col = ['Draw','Rtg.','Rtg.+/-','Horse Wt. (Declaration)','Wt.+/- (vs Declaration)','Age','Season Stakes','AWT','class','Runs_1','Runs_2','Runs_3','Runs_4','Runs_5','Runs_6','B','H','TT','CP','V','XB','SR','P','PC','E','BO','PS','SB','Sex_c','Sex_f','Sex_g','Sex_h','Sex_m','Sex_r','going_FAST','going_GOOD','going_GOOD TO FIRM','going_GOOD TO YIELDING','going_WET SLOW','going_YIELDING','raceCourse_HV','raceCourse_ST','SireRank','DamRank','horseRank','HorseMatchRank','JockeyRank','TrainerRank']
+        train_test_col = ['Draw','Rtg.','Rtg.+/-','Horse Wt. (Declaration)','Wt.+/- (vs Declaration)','Age','Season Stakes','AWT','class','Runs_1','Runs_2','Runs_3','Runs_4','Runs_5','Runs_6','B','H','TT','CP','V','XB','SR','P','PC','E','BO','PS','SB','Sex_c','Sex_f','Sex_g','Sex_h','Sex_m','Sex_r','going_FAST','going_GOOD','going_GOOD TO FIRM','going_GOOD TO YIELDING','going_WET SLOW','going_YIELDING','raceCourse_HV','raceCourse_ST','SireRank','DamRank','horseRank','HorseMatchRank','JockeyRank','TrainerRank']
+        
+        train_test_col = [x for x in train_test_col if x not in base]
         perm = itertools.permutations(train_test_col,1)
 
         for i in perm:
-            base = ['Rtg.+/-','Draw']
+            # base = ['Rtg.+/-', 'H']
             i = base + list(i)
             perm2 = itertools.permutations(i,len(i))
             for i in perm2:
@@ -102,7 +155,7 @@ if __name__ == "__main__":
         pred_result = Predict.predict(predX,col,model,scaler)
         pred_result = pred_result[['date', 'raceNo', 'Horse No.','Horse',
                         'pred_finishTime', 'pred_plc', ]]
-        logging.info('Prediction Result \n %s', pred_result[pred_result['pred_plc']<=2])
+        logging.info('Prediction Result \n %s', pred_result[pred_result['pred_plc']<=top_pred_plc])
 
     if action == 1:
         """ Test """
@@ -110,55 +163,60 @@ if __name__ == "__main__":
         test_result = Test.test(model,scaler,col,testX,testY,testX_bak,min_odds,max_odds)
         test_result = test_result.sort_values(by=['date', 'raceNo'], ascending=[False,True])
         # logging.info('Test Result \n %s', test_result.sort_values(by=['date', 'raceNo'], ascending=[False,False]).head())
-        for i in range(0,30,10):
+        for i in range(0,40,10):
             test_result_print = test_result.head(999 if i==0 else i)
             first_1 = accuracy_score(test_result_print['real_plc'].round(0), test_result_print['pred_plc'].round(0))
             first_3 = accuracy_score(test_result_print['real_first_3'], test_result_print['pred_plc'])
-            logging.info('%s, Accuracy (%s) first_1: %.4f, first_3: %.4f, col: %s', testX['dist'].values[0], test_result_print['real_plc'].count(),
-                    first_1, first_3,col)
+            logging.info('%s, Accuracy (%s) first_1: %.4f, first_3: %.4f, col: %s from: %s', testX['dist'].values[0], test_result_print['real_plc'].count(),
+                    first_1, first_3, col, test_result_print['date'].values[-1])
         test_result = test_result[['date', 'raceNo', 'horseNo', 'plc',
                      'odds', 'pred_finishTime', 'real_plc', 'pred_plc','real_first_3' ]]
-        logging.info('Test Result \n %s', test_result.head())
+        logging.info('Test Result \n %s', test_result.head(10))
 
 
 
 
 # train_test_col = ['B','H','TT','CP','V','XB','SR','P','PC','E','BO','PS','SB','Sex_c','Sex_f','Sex_g','Sex_h','Sex_r','going_GOOD','going_GOOD TO FIRM','going_GOOD TO YIELDING','going_YIELDING','raceCourse_HV','raceCourse_ST','Runs_6','Runs_5','Runs_4','Runs_3','Runs_2','Runs_1','TrainerRank','SireRank','horseRank','JockeyRank','Draw','AWT','DamRank','HorseMatchRank','Horse Wt. (Declaration)','Age','Wt.+/- (vs Declaration)','class','Rtg.+/-']
+# train_test_col = ['Over Wt.','Draw','Rtg.','Rtg.+/-','Horse Wt. (Declaration)','Wt.+/- (vs Declaration)','Age','Season Stakes','AWT','class','Runs_1','Runs_2','Runs_3','Runs_4','Runs_5','Runs_6','B','H','TT','CP','V','XB','SR','P','PC','E','BO','PS','SB','Sex_c','Sex_f','Sex_g','Sex_h','Sex_m','Sex_r','going_FAST','going_GOOD','going_GOOD TO FIRM','going_GOOD TO YIELDING','going_WET SLOW','going_YIELDING','raceCourse_HV','raceCourse_ST','SireRank','DamRank','horseRank','HorseMatchRank','JockeyRank','TrainerRank']
 
 """ 1200M 
+# odds: 5 ~ 15
 
-# 3
-2019-06-05 20: 35: 55  INFO 1200M, Accuracy(All) first_1: 0.4459, first_3: 0.6757, No. of rows: 74, col: ['Rtg.+/-', 'TT', 'Age']
-2019-06-05 20: 35: 55  INFO 1200M, Accuracy(All) first_1: 0.4324, first_3: 0.6892, No. of rows: 74, col: ['Rtg.+/-', 'TT', 'Wt.+/- (vs Declaration)']
-2019-06-05 20: 42: 44  INFO 1200M, Accuracy(All) first_1: 0.4416, first_3: 0.7273, No. of rows: 77, col: ['Wt.+/- (vs Declaration)', 'Rtg.+/-', 'TT']
+# 2 features
+2A) 2019-06-07 20:36:55  INFO 1200M, Accuracy (124) first_1: 0.3629, first_3: 0.6371, col: ['Draw', 'Rtg.+/-']
+2B) 2019-06-07 20:34:54  INFO 1200M, Accuracy (129) first_1: 0.3566, first_3: 0.6512, col: ['AWT', 'Rtg.+/-']
 
-# 4
-2019-06-05 20: 53: 31  INFO 1200M, Accuracy(All) first_1: 0.4487, first_3: 0.7179, No. of rows: 78, col: ['Wt.+/- (vs Declaration)', 'Rtg.+/-', 'TT', 'Draw']
-2019-06-05 20: 53: 32  INFO 1200M, Accuracy(All) first_1: 0.4722, first_3: 0.7361, No. of rows: 72, col: ['Wt.+/- (vs Declaration)', 'Rtg.+/-', 'Draw', 'TT']
-2019-06-05 20: 53: 52  INFO 1200M, Accuracy(All) first_1: 0.4324, first_3: 0.7432, No. of rows: 74, col: ['Draw', 'Wt.+/- (vs Declaration)', 'TT', 'Rtg.+/-']
+# 3 features 
+2019-06-07 21:34:03  INFO 1200M, Accuracy (30) first_1: 0.6000, first_3: 0.8667, col: ['Rtg.+/-', 'TT', 'going_GOOD']
 
-# 5
-2019-06-05 21: 05: 51  INFO 1200M, Accuracy(All) first_1: 0.4286, first_3: 0.7403, No. of rows: 77, col: ['Draw', 'Wt.+/- (vs Declaration)', 'Rtg.+/-', 'TT', 'class']
-2019-06-05 21: 05: 58  INFO 1200M, Accuracy(All) first_1: 0.4400, first_3: 0.7600, No. of rows: 75, col: ['Draw', 'TT', 'class', 'Wt.+/- (vs Declaration)', 'Rtg.+/-']
-2019-06-05 21: 30: 30  INFO 1200M, Accuracy(All) first_1: 0.4286, first_3: 0.7662, No. of rows: 77, col: ['Draw', 'Rtg.+/-', 'going_YIELDING', 'TT', 'Wt.+/- (vs Declaration)']
-2019-06-05 21: 31: 11  INFO 1200M, Accuracy(All) first_1: 0.4545, first_3: 0.7662, No. of rows: 77, col: ['Rtg.+/-', 'Draw', 'going_YIELDING', 'Wt.+/- (vs Declaration)', 'TT']
-2019-06-05 21: 32: 12  INFO 1200M, Accuracy(All) first_1: 0.4359, first_3: 0.7692, No. of rows: 78, col: ['TT', 'Draw', 'Wt.+/- (vs Declaration)', 'going_GOOD TO YIELDING', 'Rtg.+/-']
-2019-06-05 21: 37: 35  INFO 1200M, Accuracy(All) first_1: 0.4730, first_3: 0.7703, No. of rows: 74, col: ['Wt.+/- (vs Declaration)', 'Sex_h', 'Rtg.+/-', 'TT', 'Draw']
-2019-06-05 21: 37: 41  INFO 1200M, Accuracy(All) first_1: 0.4487, first_3: 0.7821, No. of rows: 78, col: ['TT', 'Wt.+/- (vs Declaration)', 'Rtg.+/-', 'Sex_h', 'Draw']
-2019-06-05 21: 43: 34  INFO 1200M, Accuracy(All) first_1: 0.4533, first_3: 0.7867, No. of rows: 75, col: ['Rtg.+/-', 'Draw', 'SB', 'TT', 'Wt.+/- (vs Declaration)']
+# 4 features
+2019-06-07 23:25:31  INFO 1200M, Accuracy (30) first_1: 0.6000, first_3: 0.9333, col: ['XB', 'TT', 'Rtg.+/-', 'going_GOOD'] from: 20190130.0
+2019-06-07 23:41:34  INFO 1200M, Accuracy (30) first_1: 0.6000, first_3: 0.9000, col: ['class', 'TT', 'Rtg.+/-', 'going_GOOD'] from: 20190130.0
 
-# 6 
-2019-06-05 22:26:22  INFO 1200M, Accuracy (All) first_1: 0.4079, first_3: 0.7500, No. of rows: 76, col: ['Rtg.+/-', 'TT', 'Draw', 'Wt.+/- (vs Declaration)', 'SB', 'class']
-2019-06-05 22:43:23  INFO 1200M, Accuracy (All) first_1: 0.4691, first_3: 0.7531, No. of rows: 81, col: ['Draw', 'SB', 'Horse Wt. (Declaration)', 'Wt.+/- (vs Declaration)', 'TT', 'Rtg.+/-']
-2019-06-05 22:47:20  INFO 1200M, Accuracy (All) first_1: 0.5190, first_3: 0.7595, No. of rows: 79, col: ['Wt.+/- (vs Declaration)', 'SB', 'Rtg.+/-', 'TT', 'Horse Wt. (Declaration)', 'Draw']
-2019-06-05 23:05:03  INFO 1200M, Accuracy (All) first_1: 0.4533, first_3: 0.7600, No. of rows: 75, col: ['Rtg.+/-', 'Draw', 'TT', 'SB', 'AWT', 'Wt.+/- (vs Declaration)']
-2019-06-05 23:06:14  INFO 1200M, Accuracy (All) first_1: 0.4521, first_3: 0.7671, No. of rows: 73, col: ['Rtg.+/-', 'AWT', 'Wt.+/- (vs Declaration)', 'Draw', 'SB', 'TT']
-2019-06-05 23:12:44  INFO 1200M, Accuracy (All) first_1: 0.4557, first_3: 0.7722, No. of rows: 79, col: ['AWT', 'Wt.+/- (vs Declaration)', 'TT', 'Draw', 'Rtg.+/-', 'SB']
-2019-06-06 01:00:22  INFO 1200M, Accuracy (All) first_1: 0.4400, first_3: 0.7733, No. of rows: 75, col: ['TT', 'Wt.+/- (vs Declaration)', 'SB', 'Rtg.+/-', 'going_GOOD TO YIELDING', 'Draw']
-2019-06-06 01:47:28  INFO 1200M, Accuracy (All) first_1: 0.4667, first_3: 0.7733, No. of rows: 75, col: ['SB', 'Wt.+/- (vs Declaration)', 'Draw', 'Sex_f', 'TT', 'Rtg.+/-']
-2019-06-06 02:10:51  INFO 1200M, Accuracy (All) first_1: 0.4400, first_3: 0.7733, No. of rows: 75, col: ['SB', 'Rtg.+/-', 'TT', 'Draw', 'BO', 'Wt.+/- (vs Declaration)']
+# 5 features
+2019-06-08 00:39:28  INFO 1200M, Accuracy (30) plc_1: 0.5667, plc_1_3: 0.9333, odds: 5 - 15, col: ['Rtg.+/-', 'XB', 'going_GOOD', 'TT', 'P']
 
 """
+
+
+""" 1400M
+# odd 5 ~ 15
+
+# 3 features
+2019-06-08 07:25:11  INFO 1400M, Accuracy (30) plc_1: 0.5667, plc_1_3: 0.8667, odds: 5 - 15, col: ['going_GOOD', 'Rtg.+/-', 'H']
+
+# 4 features
+2019-06-08 07:38:34  INFO 1400M, Accuracy (30) plc_1: 0.5667, plc_1_3: 0.8667, odds: 5 - 15, col: ['H', 'Rtg.+/-', 'TT', 'going_GOOD']
+2019-06-08 07:35:18  INFO 1400M, Accuracy (30) plc_1: 0.5333, plc_1_3: 0.8333, odds: 5 - 15, col: ['H', 'Rtg.+/-', 'going_GOOD', 'Horse Wt. (Declaration)']
+2019-06-08 07:57:50  INFO 1400M, Accuracy (30) first_1: 0.5667, first_3: 0.8333, col: ['going_GOOD', 'Rtg.+/-', 'class', 'H'] from: 20180610.0
+
+
+# 5 features
+2019-06-08 08:41:29  INFO 1400M, Accuracy (30) plc_1: 0.5333, plc_1_3: 0.9000, odds: 5 - 15, col: ['TT', 'going_GOOD TO FIRM', 'H', 'going_GOOD', 'Rtg.+/-']
+2019-06-08 08:25:29  INFO 1400M, Accuracy (30) plc_1: 0.6000, plc_1_3: 0.9000, odds: 5 - 15, col: ['going_GOOD', 'P', 'H', 'Rtg.+/-', 'TT']
+2019-06-08 08:23:19  INFO 1400M, Accuracy (30) plc_1: 0.5333, plc_1_3: 0.8667, odds: 5 - 15, col: ['H', 'Rtg.+/-', 'TT', 'going_GOOD', 'SR']
+"""
+
 
 
 """ 1600M

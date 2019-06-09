@@ -10,15 +10,15 @@ from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import mean_squared_error, accuracy_score
 
 # ---------- Parameter
-date = '20190605'
+date = '20190608'
 # dist = '1000M'
 # dist = '1200M'
-# dist = '1400M'
+dist = '1400M'
 # dist = '1600M'
 # dist = '1650M'
 # dist = '1800M'
 
-split_date = 20180831
+split_date = 20180101
 
 # --------- Setting
 logging.basicConfig(filename='./Log/csv_generator.log', format='%(asctime)s %(levelname)s %(message)s',
@@ -37,6 +37,13 @@ Combine required csv files into 'data'
 """
 
 data = pd.read_csv('Raw Data/history_bak.csv', header=0, low_memory=False)
+
+duplicate_record = data[['finishTime', 'odds', 'jockey', 'horseName', 'plc','date']]
+duplicate_record = duplicate_record[duplicate_record.duplicated()]
+
+print(duplicate_record)
+# exit()
+
 raceCard = pd.read_csv(
     'Raw Data/match_data_race_card_bak.csv', header=0, low_memory=False)
 
@@ -89,7 +96,7 @@ data = pd.merge(data, split_result, how='right',
 split_result = data["Gear"].str.split("/", expand=True)
 split_result = split_result.replace(
     to_replace='.-|1|2', value=np.nan, regex=True)
-split_result.columns = ['Gear_1', 'Gear_2', 'Gear_3', 'Gear_4']
+split_result.columns = ['Gear_1', 'Gear_2', 'Gear_3', 'Gear_4', 'Gear_5']
 data = pd.merge(data, split_result, how='right',
                 left_index=True, right_index=True)
 
@@ -98,7 +105,7 @@ col_name.columns = ['col_name', 'count']
 
 for index, row in col_name.iterrows():
     data[row['col_name']] = np.where((data['Gear_1'] == row['col_name']) | (data['Gear_2'] == row['col_name']) | (
-        data['Gear_3'] == row['col_name']) | (data['Gear_4'] == row['col_name']), 1, 0)
+        data['Gear_3'] == row['col_name']) | (data['Gear_4'] == row['col_name']) | (data['Gear_5'] == row['col_name']), 1, 0)
 
 
 data = pd.get_dummies(data, columns=[
@@ -196,10 +203,13 @@ logging.info('X_train data %s \n %s', np.shape(X_train),
 """ 
 Select requried columns for train, test, predict 
 """
-print(X_train.dtypes)
-logging.info('X_train columns type: \n %s',X_train.dtypes)
+# print(X_train.dtypes)
+logging.info('X_train columns type: \n %s', X_train.dtypes)
+logging.info('Cols: \n %s', "','".join(map(str, X_train.columns.values)))
 # Origial
-train_test_col = ['B', 'H', 'TT', 'CP', 'V', 'XB', 'SR', 'P', 'PC', 'E', 'BO', 'PS', 'SB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'raceCourse_ST','Runs_6', 'Runs_5', 'Runs_4', 'Runs_3', 'Runs_2', 'Runs_1', 'TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'Draw', 'Rtg.+/-', 'AWT', 'class', 'DamRank', 'HorseMatchRank', 'Age', 'Horse Wt. (Declaration)', 'Wt.+/- (vs Declaration)']
+# train_test_col = ['date','raceNo','horseNo','odds','plc','Horse No.','Last 6 Runs','Colour','Horse','Brand No.','Jockey','Over Wt.','Draw','Trainer','Rtg.','Rtg.+/-','Horse Wt. (Declaration)','Wt.+/- (vs Declaration)','Best Time','Age','WFA','Season Stakes','Priority','Gear','Owner','Sire','Dam','Import Cat.','AWT','road','dist','class','Runs_1','Runs_2','Runs_3','Runs_4','Runs_5','Runs_6','Gear_1','Gear_2','Gear_3','Gear_4','Gear_5','B','H','TT','CP','V','XB','SR','P','PC','E','BO','PS','SB','Sex_c','Sex_f','Sex_g','Sex_h','Sex_m','Sex_r','going_FAST','going_GOOD','going_GOOD TO FIRM','going_GOOD TO YIELDING','going_WET SLOW','going_YIELDING','raceCourse_HV','raceCourse_ST','SireRank','DamRank','horseRank','HorseMatchRank','JockeyRank','TrainerRank']
+train_test_col = ['Draw','Rtg.','Rtg.+/-','Horse Wt. (Declaration)','Wt.+/- (vs Declaration)','Age','Season Stakes','AWT','class','Runs_1','Runs_2','Runs_3','Runs_4','Runs_5','Runs_6','B','H','TT','CP','V','XB','SR','P','PC','E','BO','PS','SB','Sex_c','Sex_f','Sex_g','Sex_h','Sex_m','Sex_r','going_FAST','going_GOOD','going_GOOD TO FIRM','going_GOOD TO YIELDING','going_WET SLOW','going_YIELDING','raceCourse_HV','raceCourse_ST','SireRank','DamRank','horseRank','HorseMatchRank','JockeyRank','TrainerRank']
+# train_test_col = ['B', 'H', 'TT', 'CP', 'V', 'XB', 'SR', 'P', 'PC', 'E', 'BO', 'PS', 'SB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'raceCourse_ST','Runs_6', 'Runs_5', 'Runs_4', 'Runs_3', 'Runs_2', 'Runs_1', 'TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'Draw', 'Rtg.+/-', 'AWT', 'class', 'DamRank', 'HorseMatchRank', 'Age', 'Horse Wt. (Declaration)', 'Wt.+/- (vs Declaration)']
 
 # 1200M
 # 2019-06-03 10:53:15  INFO Accuracy (All) first_1: 0.4800, first_3: 0.7067, col: ['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'Sex_h', 'SB']

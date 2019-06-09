@@ -56,7 +56,7 @@ def test(model,scaler,train_test_col,testX,testY,testX_bak,odds_min=1,odds_max=9
     overall["pred_plc"] = overall.groupby(['date', 'raceNo'])[
         "pred_finishTime"].rank()
     overall["real_plc"] = overall.groupby(['date', 'raceNo'])["plc"].rank()
-    print(overall[(overall['pred_plc'] <= 1)].tail())
+    # print(overall[(overall['pred_plc'] <= 1)].tail())
     overall = overall[(overall['pred_plc'] <= 1) & (
         overall['odds'].astype(float) <= odds_max) & (overall['odds'].astype(float) >= odds_min)]
     if overall['pred_plc'].count() == 0:

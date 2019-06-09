@@ -25,6 +25,7 @@ class WebCrawling:
     def request(self, url):
         self.browser.get(url)
         try:
+            logging.info('URL with %s', url)
             page_source = WebDriverWait(self.browser, 10).until(
                 EC.presence_of_element_located((By.XPATH, "/html/body/div/div[5]/table")))
             html_source = bs4.BeautifulSoup(self.browser.page_source, 'lxml')
