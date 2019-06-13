@@ -17,8 +17,8 @@ pd.set_option('display.max_rows', 50)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 
-date = '20190602'
-dist = '1200M'
+# date = '20190602'
+# dist = '1400M'
 
 
 def train(train_test_col,trainX,trainY):
@@ -26,7 +26,7 @@ def train(train_test_col,trainX,trainY):
     # print(train_test_col)
 
     trainX_copy = trainX.copy()
-    testX_copy = testX.copy()
+    # testX_copy = testX.copy()
     # testY_copy = testY.copy()
 
     trainX_copy = trainX_copy[train_test_col]
@@ -88,61 +88,61 @@ def train(train_test_col,trainX,trainY):
 
     # return overall
 
-testX = pd.read_csv('Processed Data/testX_'+date+'_'+dist+'.csv',
-                    header=0, low_memory=False)
-testY = pd.read_csv('Processed Data/testY_'+date+'_'+dist+'.csv',
-                    header=0, low_memory=False)
-trainX = pd.read_csv('Processed Data/trainX_'+date+'_'+dist+'.csv',
-                     header=0, low_memory=False)
-trainY = pd.read_csv('Processed Data/trainY_'+date+'_'+dist+'.csv',
-                     header=0, low_memory=False)
-
-testX_bak = testX.copy()
-
-first_1_max = None
-first_3_max = None
-
-def init(arg1,arg2,):
-    ''' store the counter for later use '''
-    global first_1_max
-    global first_3_max
-    first_1_max = arg1
-    first_3_max = arg2
-
-if __name__ == "__main__":
-    # Declare varaible
-    # global first_1_max
-    # global first_3_max
-
-    first_1_max = Value('f', 0)
-    first_3_max = Value('f', 0)
-
-    print(','.join(map(str, trainX.columns.values)))
-
-    # train_test_col = ['TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'Draw', 'Rtg.+/-', 'AWT','class', 'DamRank', 'HorseMatchRank', 'Age', 'Horse Wt. (Declaration)', 'Wt.+/- (vs Declaration)']
-    # train_test_col = ['B','H','TT','CP','V','XB','SR','P','PC','E','BO','PS','SB','Sex_c','Sex_f','Sex_g','Sex_h','Sex_r','going_GOOD','going_GOOD TO FIRM','going_GOOD TO YIELDING','going_YIELDING','raceCourse_HV','raceCourse_ST','Runs_6','Runs_5','Runs_4','Runs_3','Runs_2','Runs_1','TrainerRank','SireRank','horseRank','JockeyRank','Draw','AWT','DamRank','HorseMatchRank','Horse Wt. (Declaration)','Age','Wt.+/- (vs Declaration)','class','Rtg.+/-']
-
-    train_test_col = ['B','H','CP','V','XB','SR','P','PC','E','BO','PS','Sex_c','Sex_f','Sex_g','Sex_h','Sex_r','going_GOOD','going_GOOD TO FIRM','going_GOOD TO YIELDING','going_YIELDING','raceCourse_HV','raceCourse_ST','Runs_6','Runs_5','Runs_4','Runs_3','Runs_2','Runs_1','TrainerRank','SireRank','horseRank','JockeyRank','AWT','DamRank','HorseMatchRank','Horse Wt. (Declaration)','Age','class',]
-
-    train_test_col = train_test_col[::-1]
-    base = ['Rtg.+/-', 'Draw', 'SB', 'TT', 'Wt.+/- (vs Declaration)']
-    # perm = itertools.permutations(train_test_col)
-    perm = itertools.permutations(train_test_col,1)
-    pool = Pool(initializer = init, initargs = (first_1_max,first_3_max, ))
-
-    for i in perm:
-        i = base +list(i)
-        # result = pool.apply_async(train, (i,))
-        perm2 = itertools.permutations(i, len(i))
-        for j in perm2:
-        #     # result = pool.apply(train, (i,))
-        #     print(j)
-            result = pool.apply_async(train, (j,))
-        # result.wait()
-        # print(result.get().head())
-    time.sleep(5)
-    pool.close()
-    pool.join()
+# testX = pd.read_csv('Processed Data/testX_'+date+'_'+dist+'.csv',
+#                     header=0, low_memory=False)
+# testY = pd.read_csv('Processed Data/testY_'+date+'_'+dist+'.csv',
+#                     header=0, low_memory=False)
+# trainX = pd.read_csv('Processed Data/trainX_'+date+'_'+dist+'.csv',
+#                      header=0, low_memory=False)
+# trainY = pd.read_csv('Processed Data/trainY_'+date+'_'+dist+'.csv',
+#                      header=0, low_memory=False)
+#
+# testX_bak = testX.copy()
+#
+# first_1_max = None
+# first_3_max = None
+#
+# def init(arg1,arg2,):
+#     ''' store the counter for later use '''
+#     global first_1_max
+#     global first_3_max
+#     first_1_max = arg1
+#     first_3_max = arg2
+#
+# if __name__ == "__main__":
+#     # Declare varaible
+#     # global first_1_max
+#     # global first_3_max
+#
+#     first_1_max = Value('f', 0)
+#     first_3_max = Value('f', 0)
+#
+#     print(','.join(map(str, trainX.columns.values)))
+#
+#     # train_test_col = ['TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'Draw', 'Rtg.+/-', 'AWT','class', 'DamRank', 'HorseMatchRank', 'Age', 'Horse Wt. (Declaration)', 'Wt.+/- (vs Declaration)']
+#     # train_test_col = ['B','H','TT','CP','V','XB','SR','P','PC','E','BO','PS','SB','Sex_c','Sex_f','Sex_g','Sex_h','Sex_r','going_GOOD','going_GOOD TO FIRM','going_GOOD TO YIELDING','going_YIELDING','raceCourse_HV','raceCourse_ST','Runs_6','Runs_5','Runs_4','Runs_3','Runs_2','Runs_1','TrainerRank','SireRank','horseRank','JockeyRank','Draw','AWT','DamRank','HorseMatchRank','Horse Wt. (Declaration)','Age','Wt.+/- (vs Declaration)','class','Rtg.+/-']
+#
+#     train_test_col = ['B','H','CP','V','XB','SR','P','PC','E','BO','PS','Sex_c','Sex_f','Sex_g','Sex_h','Sex_r','going_GOOD','going_GOOD TO FIRM','going_GOOD TO YIELDING','going_YIELDING','raceCourse_HV','raceCourse_ST','Runs_6','Runs_5','Runs_4','Runs_3','Runs_2','Runs_1','TrainerRank','SireRank','horseRank','JockeyRank','AWT','DamRank','HorseMatchRank','Horse Wt. (Declaration)','Age','class',]
+#
+#     train_test_col = train_test_col[::-1]
+#     base = ['Rtg.+/-', 'Draw', 'SB', 'TT', 'Wt.+/- (vs Declaration)']
+#     # perm = itertools.permutations(train_test_col)
+#     perm = itertools.permutations(train_test_col,1)
+#     pool = Pool(initializer = init, initargs = (first_1_max,first_3_max, ))
+#
+#     for i in perm:
+#         i = base +list(i)
+#         # result = pool.apply_async(train, (i,))
+#         perm2 = itertools.permutations(i, len(i))
+#         for j in perm2:
+#         #     # result = pool.apply(train, (i,))
+#         #     print(j)
+#             result = pool.apply_async(train, (j,))
+#         # result.wait()
+#         # print(result.get().head())
+#     time.sleep(5)
+#     pool.close()
+#     pool.join()
 
 # 2019-06-05 17:52:58  INFO 1200M, Accuracy (All) first_1: 0.4627, first_3: 0.6567, No. of rows: 67, col: ['Rtg.+/-']
 # 2019-06-05 17:53:25  INFO 1200M, Accuracy (All) first_1: 0.4697, first_3: 0.6515, No. of rows: 66, col: ['Rtg.+/-', 'class']

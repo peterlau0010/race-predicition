@@ -1,0 +1,47 @@
+!!!!!!!!!!!!! - 1400M - odds:0~20 Server result !!!!!!!!!!!!!
+############ 2Fs ################
+2019-06-13 04:30:09  INFO 1400M, Accuracy (133) first_1: 0.4887, first_3: 0.6992, col: ['SR', 'Rtg.+/-'] from: 20180107.0
+2019-06-13 04:30:09  INFO 1400M, Accuracy (10) first_1: 0.9000, first_3: 0.9000, col: ['SR', 'Rtg.+/-'] from: 20190331.0
+
+2019-06-13 04:27:49  INFO 1400M, Accuracy (136) first_1: 0.4853, first_3: 0.6985, col: ['class', 'Rtg.+/-'] from: 20180107.0
+2019-06-13 04:27:49  INFO 1400M, Accuracy (10) first_1: 0.9000, first_3: 0.9000, col: ['class', 'Rtg.+/-'] from: 20190331.0
+
+############ 3Fs ################
+2019-06-13 04:35:30  INFO 1400M, Accuracy (139) first_1: 0.4964, first_3: 0.7194, col: ['SR', 'Rtg.+/-', 'class'] from: 20180107.0
+2019-06-13 04:35:30  INFO 1400M, Accuracy (10) first_1: 0.8000, first_3: 0.9000, col: ['SR', 'Rtg.+/-', 'class'] from: 20190407.0
+
+############ 4Fs ################
+2019-06-13 04:55:30  INFO 1400M, Accuracy (161) first_1: 0.5093, first_3: 0.7640, col: ['SR', 'Season Stakes', 'Rtg.+/-', 'class'] from: 20180107.0
+2019-06-13 04:55:30  INFO 1400M, Accuracy (10) first_1: 0.3000, first_3: 0.6000, col: ['SR', 'Season Stakes', 'Rtg.+/-', 'class'] from: 20190511.0
+
+2019-06-13 04:55:27  INFO 1400M, Accuracy (158) first_1: 0.4873, first_3: 0.7532, col: ['SR', 'Rtg.+/-', 'class', 'Season Stakes'] from: 20180107.0
+2019-06-13 04:55:27  INFO 1400M, Accuracy (10) first_1: 0.4000, first_3: 0.7000, col: ['SR', 'Rtg.+/-', 'class', 'Season Stakes'] from: 20190511.0
+
+############ 5Fs ################
+2019-06-13 06:13:25  INFO 1400M, Accuracy (159) first_1: 0.4969, first_3: 0.7610, col: ['Season Stakes', 'Rtg.', 'SR', 'Rtg.+/-', 'class'] from: 20180107.0
+2019-06-13 06:13:25  INFO 1400M, Accuracy (10) first_1: 0.6000, first_3: 0.8000, col: ['Season Stakes', 'Rtg.', 'SR', 'Rtg.+/-', 'class'] from: 20190511.0
+
+2019-06-13 06:20:31  INFO 1400M, Accuracy (161) first_1: 0.5031, first_3: 0.7764, col: ['SR', 'Season Stakes', 'class', 'Wt.+/- (vs Declaration)', 'Rtg.+/-'] from: 20180107.0
+2019-06-13 06:20:31  INFO 1400M, Accuracy (10) first_1: 0.4000, first_3: 0.7000, col: ['SR', 'Season Stakes', 'class', 'Wt.+/- (vs Declaration)', 'Rtg.+/-'] from: 20190511.0
+
+2019-06-13 07:25:08  INFO 1400M, Accuracy (156) first_1: 0.5128, first_3: 0.7756, col: ['Season Stakes', 'Runs_5', 'class', 'Rtg.+/-', 'SR'] from: 20180107.0
+2019-06-13 07:25:08  INFO 1400M, Accuracy (10) first_1: 0.1000, first_3: 0.7000, col: ['Season Stakes', 'Runs_5', 'class', 'Rtg.+/-', 'SR'] from: 20190511.0
+
+2019-06-13 07:15:26  INFO 1400M, Accuracy (158) first_1: 0.5063, first_3: 0.7468, col: ['Rtg.+/-', 'SR', 'Runs_4', 'class', 'Season Stakes'] from: 20180107.0
+2019-06-13 07:15:26  INFO 1400M, Accuracy (10) first_1: 0.4000, first_3: 0.7000, col: ['Rtg.+/-', 'SR', 'Runs_4', 'class', 'Season Stakes'] from: 20190511.0
+
+2019-06-13 08:51:41  INFO 1400M, Accuracy (158) first_1: 0.5190, first_3: 0.7532, col: ['SR', 'Season Stakes', 'class', 'Rtg.+/-', 'BO'] from: 20180107.0
+2019-06-13 08:51:41  INFO 1400M, Accuracy (10) first_1: 0.4000, first_3: 0.7000, col: ['SR', 'Season Stakes', 'class', 'Rtg.+/-', 'BO'] from: 20190511.0
+
+
+
+
+
+
+
+
+
+!!!!!!!!!!!!! - 1200M - odds:0~20 Server result !!!!!!!!!!!!!
+############ 2Fs ################
+2019-06-13 08:57:43  INFO 1200M, Accuracy (232) first_1: 0.4871, first_3: 0.7198, col: ['H', 'Rtg.+/-'] from: 20180107.0
+2019-06-13 08:57:43  INFO 1200M, Accuracy (10) first_1: 0.4000, first_3: 0.7000, col: ['H', 'Rtg.+/-'] from: 20190417.0

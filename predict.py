@@ -18,18 +18,18 @@ pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 
 
-testX = pd.read_csv('Processed Data/testX_20190529.csv',
-                    header=0, low_memory=False)
-testY = pd.read_csv('Processed Data/testY_20190529.csv',
-                    header=0, low_memory=False)
-trainX = pd.read_csv('Processed Data/trainX_20190529.csv',
-                     header=0, low_memory=False)
-trainY = pd.read_csv('Processed Data/trainY_20190529.csv',
-                     header=0, low_memory=False)
-pred = pd.read_csv('Processed Data/pred_20190602.csv',
-                     header=0, low_memory=False)
-testX_bak = testX.copy()
-pred_bak = pred.copy()
+# testX = pd.read_csv('Processed Data/testX_20190529.csv',
+#                     header=0, low_memory=False)
+# testY = pd.read_csv('Processed Data/testY_20190529.csv',
+#                     header=0, low_memory=False)
+# trainX = pd.read_csv('Processed Data/trainX_20190529.csv',
+#                      header=0, low_memory=False)
+# trainY = pd.read_csv('Processed Data/trainY_20190529.csv',
+#                      header=0, low_memory=False)
+# pred = pd.read_csv('Processed Data/pred_20190602.csv',
+#                      header=0, low_memory=False)
+# testX_bak = testX.copy()
+# pred_bak = pred.copy()
 
 
 def predict(predX,train_test_col,model,scaler):
@@ -129,39 +129,39 @@ def train(train_test_col, odds_max=99, odds_min=1):
 
 
 
-if __name__ == "__main__":
-
-    train_test_col = ['B', 'H', 'TT', 'CP', 'V', 'XB', 'SR', 'P', 'PC', 'E', 'BO', 'PS', 'SB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'raceCourse_ST',
-                      'Runs_6', 'Runs_5', 'Runs_4', 'Runs_3', 'Runs_2', 'Runs_1', 'TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'Draw', 'Rtg.+/-', 'AWT', 'class', 'DamRank', 'HorseMatchRank', 'Age', 'Horse Wt. (Declaration)', 'Wt.+/- (vs Declaration)']
-
-    train_test_col =['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'SB', 'B']
-    model, scaler = train(train_test_col)
-    # model, scaler = train(train_test_col, 15, 5)
-
-    # ---- Generate missing columns
-    for r in train_test_col:
-        if r not in pred:
-            pred[r] = np.NaN
-
-    # ---- Fill missing columns values
-    pred.fillna(0, inplace=True)
-
-    pred = pred[train_test_col]
-
-    pred = pred.astype(float)
-    pred = scaler.transform(pred)
-    pred_y = model.predict(pred)
-
-    
-    pred_bak['pred_finishTime'] = pred_y
-    
-
-    pred_bak["pred_plc"] = pred_bak.groupby(['date', 'raceNo'])[
-        "pred_finishTime"].rank()
-
-    pred_bak = pred_bak[['date', 'raceNo', 'Horse No.','Horse',
-                    'pred_finishTime', 'pred_plc', ]]
-    print(pred_bak[pred_bak['pred_plc']==1])   
+# if __name__ == "__main__":
+#
+#     train_test_col = ['B', 'H', 'TT', 'CP', 'V', 'XB', 'SR', 'P', 'PC', 'E', 'BO', 'PS', 'SB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'raceCourse_ST',
+#                       'Runs_6', 'Runs_5', 'Runs_4', 'Runs_3', 'Runs_2', 'Runs_1', 'TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'Draw', 'Rtg.+/-', 'AWT', 'class', 'DamRank', 'HorseMatchRank', 'Age', 'Horse Wt. (Declaration)', 'Wt.+/- (vs Declaration)']
+#
+#     train_test_col =['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'SB', 'B']
+#     model, scaler = train(train_test_col)
+#     # model, scaler = train(train_test_col, 15, 5)
+#
+#     # ---- Generate missing columns
+#     for r in train_test_col:
+#         if r not in pred:
+#             pred[r] = np.NaN
+#
+#     # ---- Fill missing columns values
+#     pred.fillna(0, inplace=True)
+#
+#     pred = pred[train_test_col]
+#
+#     pred = pred.astype(float)
+#     pred = scaler.transform(pred)
+#     pred_y = model.predict(pred)
+#
+#
+#     pred_bak['pred_finishTime'] = pred_y
+#
+#
+#     pred_bak["pred_plc"] = pred_bak.groupby(['date', 'raceNo'])[
+#         "pred_finishTime"].rank()
+#
+#     pred_bak = pred_bak[['date', 'raceNo', 'Horse No.','Horse',
+#                     'pred_finishTime', 'pred_plc', ]]
+#     print(pred_bak[pred_bak['pred_plc']==1])
 
     # logging.info('Test Result \n %s', result.tail(5))
 

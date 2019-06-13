@@ -18,19 +18,19 @@ pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 
 
-date = '20190602'
-
-testX = pd.read_csv('Processed Data/testX_'+date+'.csv',
-                    header=0, low_memory=False)
-testY = pd.read_csv('Processed Data/testY_'+date+'.csv',
-                    header=0, low_memory=False)
-trainX = pd.read_csv('Processed Data/trainX_'+date+'.csv',
-                     header=0, low_memory=False)
-trainY = pd.read_csv('Processed Data/trainY_'+date+'.csv',
-                     header=0, low_memory=False)
-pred = pd.read_csv('Processed Data/pred_'+date+'.csv',
-                     header=0, low_memory=False)
-testX_bak = testX.copy()
+# date = '20190602'
+#
+# testX = pd.read_csv('Processed Data/testX_'+date+'.csv',
+#                     header=0, low_memory=False)
+# testY = pd.read_csv('Processed Data/testY_'+date+'.csv',
+#                     header=0, low_memory=False)
+# trainX = pd.read_csv('Processed Data/trainX_'+date+'.csv',
+#                      header=0, low_memory=False)
+# trainY = pd.read_csv('Processed Data/trainY_'+date+'.csv',
+#                      header=0, low_memory=False)
+# pred = pd.read_csv('Processed Data/pred_'+date+'.csv',
+#                      header=0, low_memory=False)
+# testX_bak = testX.copy()
 
 
 def test(model,scaler,train_test_col,testX,testY,testX_bak,odds_min=1,odds_max=999):
@@ -69,19 +69,19 @@ def test(model,scaler,train_test_col,testX,testY,testX_bak,odds_min=1,odds_max=9
     return overall
 
 
-if __name__ == "__main__":
-
-    train_test_col = ['B', 'H', 'TT', 'CP', 'V', 'XB', 'SR', 'P', 'PC', 'E', 'BO', 'PS', 'SB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'raceCourse_ST','Runs_6', 'Runs_5', 'Runs_4', 'Runs_3', 'Runs_2', 'Runs_1', 'TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'Draw', 'Rtg.+/-', 'AWT', 'class', 'DamRank', 'HorseMatchRank', 'Age', 'Horse Wt. (Declaration)', 'Wt.+/- (vs Declaration)']
-
-    train_test_col =['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'SB', 'B']
-
-    result = test(train_test_col, 15, 5)
-    # result = test(train_test_col)
-
-    result = result[['date', 'raceNo', 'horseNo', 'plc',
-                     'odds', 'pred_finishTime', 'real_plc', 'pred_plc', ]]
-
-    logging.info('Test Result \n %s', result.tail(10))
+# if __name__ == "__main__":
+#
+#     train_test_col = ['B', 'H', 'TT', 'CP', 'V', 'XB', 'SR', 'P', 'PC', 'E', 'BO', 'PS', 'SB', 'Sex_c', 'Sex_f', 'Sex_g', 'Sex_h', 'Sex_r', 'going_GOOD', 'going_GOOD TO FIRM', 'going_GOOD TO YIELDING', 'going_YIELDING', 'raceCourse_HV', 'raceCourse_ST','Runs_6', 'Runs_5', 'Runs_4', 'Runs_3', 'Runs_2', 'Runs_1', 'TrainerRank', 'SireRank', 'horseRank', 'JockeyRank', 'Draw', 'Rtg.+/-', 'AWT', 'class', 'DamRank', 'HorseMatchRank', 'Age', 'Horse Wt. (Declaration)', 'Wt.+/- (vs Declaration)']
+#
+#     train_test_col =['Rtg.+/-', 'class', 'Wt.+/- (vs Declaration)', 'SB', 'B']
+#
+#     result = test(train_test_col, 15, 5)
+#     # result = test(train_test_col)
+#
+#     result = result[['date', 'raceNo', 'horseNo', 'plc',
+#                      'odds', 'pred_finishTime', 'real_plc', 'pred_plc', ]]
+#
+#     logging.info('Test Result \n %s', result.tail(10))
 
 
 # 1000M
