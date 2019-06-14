@@ -33,7 +33,7 @@ pd.set_option('display.width', 1000)
 # testX_bak = testX.copy()
 
 
-def test(model,scaler,train_test_col,testX,testY,testX_bak,odds_min=1,odds_max=999):
+def test(model,scaler,train_test_col,testX,testY,testX_bak,odds_min=1,odds_max=999,pred_plc=1):
     # global testX
     # global testY
     # global testX_bak
@@ -57,11 +57,11 @@ def test(model,scaler,train_test_col,testX,testY,testX_bak,odds_min=1,odds_max=9
         "pred_finishTime"].rank()
     overall["real_plc"] = overall.groupby(['date', 'raceNo'])["plc"].rank()
     # print(overall[(overall['pred_plc'] <= 1)].tail())
-    overall = overall[(overall['pred_plc'] <= 1) & (
+    overall = overall[(overall['pred_plc'] <= pred_plc) & (
         overall['odds'].astype(float) <= odds_max) & (overall['odds'].astype(float) >= odds_min)]
     if overall['pred_plc'].count() == 0:
-        return 
-        
+        return
+
     overall.loc[overall['real_plc'] <= 3, 'real_first_3'] = 1
 
     overall.fillna(0, inplace=True)
