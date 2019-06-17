@@ -19,14 +19,14 @@ No. Action
 1   Test with col
 2   Predict with col
 """
-action = 2
+action = 1
 date = '20190616'
-dist = '1400M'
+dist = '1200M'
 min_odds = 5
-max_odds = 40
+max_odds = 30
 top_pred_plc = 1
 pred_plc_4_test = 1
-col = ['Rtg.+/-']
+col = ['Rtg.+/-', 'BO', 'CP', 'going_GOOD']
 base = ['Rtg.+/-', 'CP', 'class', 'going_GOOD']
 
 
