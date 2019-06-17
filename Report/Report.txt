@@ -1,47 +1,35 @@
-!!!!!!!!!!!!! - 1400M - odds:0~20 Server result !!!!!!!!!!!!!
-############ 2Fs ################
-2019-06-13 04:30:09  INFO 1400M, Accuracy (133) first_1: 0.4887, first_3: 0.6992, col: ['SR', 'Rtg.+/-'] from: 20180107.0
-2019-06-13 04:30:09  INFO 1400M, Accuracy (10) first_1: 0.9000, first_3: 0.9000, col: ['SR', 'Rtg.+/-'] from: 20190331.0
+5 - 30 Place
+2019-06-15 18:06:20  INFO 1400M, Accuracy (40) first_1: 0.3750, first_3: 0.7250, col: ['Rtg.+/-', 'Wt.+/- (vs Declaration)', 'H'] from: 20180902.0
+2019-06-15 18:01:21  INFO 1400M, Accuracy (32) first_1: 0.5000, first_3: 0.8125, col: ['H', 'going_GOOD', 'going_GOOD TO FIRM', 'Rtg.+/-', 'P'] from: 20180909.0
+2019-06-15 18:30:30  INFO 1400M, Accuracy (41) first_1: 0.4146, first_3: 0.7317, col: ['Wt.+/- (vs Declaration)', 'Rtg.+/-', 'Sex_m', 'H'] from: 20180902.0
+2019-06-15 20:41:31  INFO 1400M, Accuracy (51) first_1: 0.2941, first_3: 0.7451, col: ['Season Stakes', 'Rtg.+/-', 'H', 'Wt.+/- (vs Declaration)', 'Sex_m'] from: 20180902.0
+2019-06-16 00:46:48  INFO 1400M, Accuracy (47) first_1: 0.3191, first_3: 0.8298, col: ['H', 'Wt.+/- (vs Declaration)', 'Rtg.+/-', 'Season Stakes', 'Sex_m', 'Runs_1'] from: 20180902.0
+2019-06-16 00:36:08  INFO 1400M, Accuracy (49) first_1: 0.3469, first_3: 0.7959, col: ['Sex_m', 'H', 'Rtg.+/-', 'Wt.+/- (vs Declaration)', 'class', 'Season Stakes'] from: 20180902.0
 
-2019-06-13 04:27:49  INFO 1400M, Accuracy (136) first_1: 0.4853, first_3: 0.6985, col: ['class', 'Rtg.+/-'] from: 20180107.0
-2019-06-13 04:27:49  INFO 1400M, Accuracy (10) first_1: 0.9000, first_3: 0.9000, col: ['class', 'Rtg.+/-'] from: 20190331.0
 
-############ 3Fs ################
-2019-06-13 04:35:30  INFO 1400M, Accuracy (139) first_1: 0.4964, first_3: 0.7194, col: ['SR', 'Rtg.+/-', 'class'] from: 20180107.0
-2019-06-13 04:35:30  INFO 1400M, Accuracy (10) first_1: 0.8000, first_3: 0.9000, col: ['SR', 'Rtg.+/-', 'class'] from: 20190407.0
+5 - 30 Win
+2019-06-16 09:02:08  INFO 1400M, Accuracy (45) first_1: 0.4000, first_3: 0.6444, col: ['AWT', 'Rtg.+/-'] from: 20180902.0
+2019-06-16 09:07:58  INFO 1400M, Accuracy (42) first_1: 0.4524, first_3: 0.6667, col: ['P', 'AWT', 'Rtg.+/-'] from: 20180902.0
+2019-06-16 09:40:17  INFO 1400M, Accuracy (40) first_1: 0.4750, first_3: 0.7000, col: ['raceCourse_ST', 'Rtg.+/-', 'P', 'AWT'] from: 20180902.0
 
-############ 4Fs ################
-2019-06-13 04:55:30  INFO 1400M, Accuracy (161) first_1: 0.5093, first_3: 0.7640, col: ['SR', 'Season Stakes', 'Rtg.+/-', 'class'] from: 20180107.0
-2019-06-13 04:55:30  INFO 1400M, Accuracy (10) first_1: 0.3000, first_3: 0.6000, col: ['SR', 'Season Stakes', 'Rtg.+/-', 'class'] from: 20190511.0
+2019-06-16 09:07:11  INFO 1400M, Accuracy (42) first_1: 0.4286, first_3: 0.6190, col: ['H', 'AWT', 'Rtg.+/-'] from: 20180902.0
+2019-06-16 10:00:17  INFO 1400M, Accuracy (41) first_1: 0.4390, first_3: 0.6098, col: ['Rtg.+/-', 'H', 'AWT', 'Sex_m'] from: 20180902.0
 
-2019-06-13 04:55:27  INFO 1400M, Accuracy (158) first_1: 0.4873, first_3: 0.7532, col: ['SR', 'Rtg.+/-', 'class', 'Season Stakes'] from: 20180107.0
-2019-06-13 04:55:27  INFO 1400M, Accuracy (10) first_1: 0.4000, first_3: 0.7000, col: ['SR', 'Rtg.+/-', 'class', 'Season Stakes'] from: 20190511.0
-
-############ 5Fs ################
-2019-06-13 06:13:25  INFO 1400M, Accuracy (159) first_1: 0.4969, first_3: 0.7610, col: ['Season Stakes', 'Rtg.', 'SR', 'Rtg.+/-', 'class'] from: 20180107.0
-2019-06-13 06:13:25  INFO 1400M, Accuracy (10) first_1: 0.6000, first_3: 0.8000, col: ['Season Stakes', 'Rtg.', 'SR', 'Rtg.+/-', 'class'] from: 20190511.0
-
-2019-06-13 06:20:31  INFO 1400M, Accuracy (161) first_1: 0.5031, first_3: 0.7764, col: ['SR', 'Season Stakes', 'class', 'Wt.+/- (vs Declaration)', 'Rtg.+/-'] from: 20180107.0
-2019-06-13 06:20:31  INFO 1400M, Accuracy (10) first_1: 0.4000, first_3: 0.7000, col: ['SR', 'Season Stakes', 'class', 'Wt.+/- (vs Declaration)', 'Rtg.+/-'] from: 20190511.0
-
-2019-06-13 07:25:08  INFO 1400M, Accuracy (156) first_1: 0.5128, first_3: 0.7756, col: ['Season Stakes', 'Runs_5', 'class', 'Rtg.+/-', 'SR'] from: 20180107.0
-2019-06-13 07:25:08  INFO 1400M, Accuracy (10) first_1: 0.1000, first_3: 0.7000, col: ['Season Stakes', 'Runs_5', 'class', 'Rtg.+/-', 'SR'] from: 20190511.0
-
-2019-06-13 07:15:26  INFO 1400M, Accuracy (158) first_1: 0.5063, first_3: 0.7468, col: ['Rtg.+/-', 'SR', 'Runs_4', 'class', 'Season Stakes'] from: 20180107.0
-2019-06-13 07:15:26  INFO 1400M, Accuracy (10) first_1: 0.4000, first_3: 0.7000, col: ['Rtg.+/-', 'SR', 'Runs_4', 'class', 'Season Stakes'] from: 20190511.0
-
-2019-06-13 08:51:41  INFO 1400M, Accuracy (158) first_1: 0.5190, first_3: 0.7532, col: ['SR', 'Season Stakes', 'class', 'Rtg.+/-', 'BO'] from: 20180107.0
-2019-06-13 08:51:41  INFO 1400M, Accuracy (10) first_1: 0.4000, first_3: 0.7000, col: ['SR', 'Season Stakes', 'class', 'Rtg.+/-', 'BO'] from: 20190511.0
+           date  raceNo  Horse No.              Horse  pred_finishTime  pred_plc
+0   20190616.0       6          1         SUPER WISE     82962.151664       1.0
+18  20190616.0       7          5  FLYING TIGER HERO     82974.276548       1.0
 
 
 
+5 - 30 Win
+2019-06-16 10:23:12  INFO 1200M, Accuracy (84) first_1: 0.4167, first_3: 0.5952, col: ['CP', 'Rtg.+/-'] from: 20180902.0
+2019-06-16 10:33:24  INFO 1200M, Accuracy (81) first_1: 0.4444, first_3: 0.6173, col: ['Rtg.+/-', 'going_GOOD', 'CP'] from: 20180902.0
+2019-06-16 10:44:01  INFO 1200M, Accuracy (81) first_1: 0.4321, first_3: 0.6296, col: ['Rtg.+/-', 'CP', 'class', 'going_GOOD'] from: 20180902.0
+2019-06-16 10:58:49  INFO 1200M, Accuracy (81) first_1: 0.4444, first_3: 0.6173, col: ['Rtg.+/-', 'BO', 'CP', 'going_GOOD'] from: 20180902.0
 
 
-
-
-
-
-!!!!!!!!!!!!! - 1200M - odds:0~20 Server result !!!!!!!!!!!!!
-############ 2Fs ################
-2019-06-13 08:57:43  INFO 1200M, Accuracy (232) first_1: 0.4871, first_3: 0.7198, col: ['H', 'Rtg.+/-'] from: 20180107.0
-2019-06-13 08:57:43  INFO 1200M, Accuracy (10) first_1: 0.4000, first_3: 0.7000, col: ['H', 'Rtg.+/-'] from: 20190417.0
+2019-06-16 10:58:49  INFO           date  raceNo  Horse No.          Horse  pred_finishTime  pred_plc
+11  20190616.0       5         12  GREAT VICTORY     70633.333558       1.0
+14  20190616.0       8          3  SOLOMON'S BAY     70667.660980       1.0
+33  20190616.0       9         10   FALCON TURBO     70642.935963       1.0
+28  20190616.0       9          5  SUPREME PATROL     70652.981847       1.0

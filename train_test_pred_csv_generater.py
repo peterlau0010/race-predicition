@@ -10,15 +10,15 @@ from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import mean_squared_error, accuracy_score
 
 # ---------- Parameter
-date = '20190608'
+date = '20190616'
 # dist = '1000M'
-# dist = '1200M'
-dist = '1400M'
+dist = '1200M'
+# dist = '1400M'
 # dist = '1600M'
 # dist = '1650M'
 # dist = '1800M'
 
-split_date = 20180101
+split_date = 20180901
 
 # --------- Setting
 logging.basicConfig(filename='./Log/csv_generator.log', format='%(asctime)s %(levelname)s %(message)s',

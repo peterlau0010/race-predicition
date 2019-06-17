@@ -19,15 +19,15 @@ No. Action
 1   Test with col
 2   Predict with col
 """
-action = 1
-date = '20190608'
+action = 2
+date = '20190616'
 dist = '1400M'
 min_odds = 5
-max_odds = 30
-top_pred_plc = 2
-pred_plc_4_test = 2
-col = ['Rtg.+/-', 'Runs_4', 'class', 'E', 'Season Stakes']
-base = ['Rtg.+/-']
+max_odds = 40
+top_pred_plc = 1
+pred_plc_4_test = 1
+col = ['Rtg.+/-']
+base = ['Rtg.+/-', 'CP', 'class', 'going_GOOD']
 
 
 def init(arg1, arg2, ):
@@ -39,11 +39,13 @@ def init(arg1, arg2, ):
 
 def train_async(train_test_col, testX, testY, trainX, trainY, testX_bak, predX, min_odds, max_odds):
     model, scaler = Train.train(train_test_col, trainX, trainY)
-    overall = Test.test(model, scaler, train_test_col, testX, testY, testX_bak, min_odds, max_odds)
-    if overall is None or overall['real_plc'].count() < 15:
+    overall = Test.test(model, scaler, train_test_col, testX,
+                        testY, testX_bak, min_odds, max_odds)
+    if overall is None or overall['real_plc'].count() < 40:
         return
     overall_bak = overall.copy()
-    overall_bak = overall_bak.sort_values(by=['date', 'raceNo'], ascending=[False, True])
+    overall_bak = overall_bak.sort_values(
+        by=['date', 'raceNo'], ascending=[False, True])
 
     # overall = overall.tail(30)
 
@@ -54,8 +56,8 @@ def train_async(train_test_col, testX, testY, trainX, trainY, testX_bak, predX, 
     with first_1_max.get_lock(), first_3_max.get_lock():
         # if (first_1 + first_3) > (first_1_max.value + first_3_max.value):
 
-        if first_3 >= first_3_max.value :
-        # if first_1 >= first_1_max.value:
+        # if first_3 >= first_3_max.value:
+        if first_1 >= first_1_max.value:
             # logging.info('%s, Accuracy (%s) plc_1: %.4f, plc_1_3: %.4f, odds: %s - %s, col: %s', testX['dist'].values[0],overall['real_plc'].count(),
             #      first_1, first_3, min_odds, max_odds,  train_test_col)
 
@@ -63,7 +65,8 @@ def train_async(train_test_col, testX, testY, trainX, trainY, testX_bak, predX, 
                 test_result_print = overall_bak.head(999 if i == 0 else i)
                 first_1_print = accuracy_score(test_result_print['real_plc'].round(0),
                                                test_result_print['pred_plc'].round(0))
-                first_3_print = accuracy_score(test_result_print['real_first_3'], test_result_print['pred_plc'])
+                first_3_print = accuracy_score(
+                    test_result_print['real_first_3'], test_result_print['pred_plc'])
                 logging.info('%s, Accuracy (%s) first_1: %.4f, first_3: %.4f, col: %s from: %s',
                              testX['dist'].values[0], test_result_print['real_plc'].count(),
                              first_1_print, first_3_print, train_test_col, test_result_print['date'].values[-1])
@@ -110,7 +113,7 @@ if __name__ == "__main__":
                           'TrainerRank']
 
         train_test_col = [x for x in train_test_col if x not in base]
-        perm = itertools.permutations(train_test_col, 1)
+        perm = itertools.combinations(train_test_col, 1)
 
         for i in perm:
             # base = ['Rtg.+/-', 'H']
@@ -130,28 +133,35 @@ if __name__ == "__main__":
         pred_result = Predict.predict(predX, col, model, scaler)
         pred_result = pred_result[['date', 'raceNo', 'Horse No.', 'Horse',
                                    'pred_finishTime', 'pred_plc', ]]
-        logging.info('Prediction Result \n %s', pred_result[pred_result['pred_plc'] <= top_pred_plc])
+        logging.info('Prediction Result \n %s',
+                     pred_result[pred_result['pred_plc'] <= top_pred_plc])
 
     if action == 1:
         """ Test """
         model, scaler = Train.train(col, trainX, trainY)
-        test_result = Test.test(model, scaler, col, testX, testY, testX_bak, min_odds, max_odds,pred_plc_4_test)
-        test_result = test_result.sort_values(by=['date', 'raceNo','pred_plc'], ascending=[False, True,True])
-        test_result = test_result.groupby(['date', 'raceNo']).head(1).reset_index(drop=True)
+        test_result = Test.test(
+            model, scaler, col, testX, testY, testX_bak, min_odds, max_odds, pred_plc_4_test)
+        test_result = test_result.sort_values(
+            by=['date', 'raceNo', 'pred_plc'], ascending=[False, True, True])
+        test_result = test_result.groupby(
+            ['date', 'raceNo']).head(1).reset_index(drop=True)
         # logging.info('Test Result \n %s', test_result.sort_values(by=['date', 'raceNo'], ascending=[False,False]).head())
         for i in range(0, 40, 10):
             test_result_print = test_result.head(999 if i == 0 else i)
-            first_1 = accuracy_score(test_result_print['real_plc'].round(0), test_result_print['pred_plc'].round(0))
-            first_3 = accuracy_score(test_result_print['real_first_3'], test_result_print['pred_plc'].round(0))
+            first_1 = accuracy_score(test_result_print['real_plc'].round(
+                0), test_result_print['pred_plc'].round(0))
+            first_3 = accuracy_score(
+                test_result_print['real_first_3'], test_result_print['pred_plc'].round(0))
             logging.info('%s, Accuracy (%s) first_1: %.4f, first_3: %.4f, col: %s from: %s', testX['dist'].values[0],
                          test_result_print['real_plc'].count(),
                          first_1, first_3, col, test_result_print['date'].values[-1])
         test_result = test_result[['date', 'raceNo', 'horseNo', 'plc',
                                    'odds', 'pred_finishTime', 'real_plc', 'pred_plc', 'real_first_3']]
 
-        logging.info('Test Result \n %s', test_result.head(30))
+        logging.info('Test Result \n %s', test_result.head(10))
         logging.info('Odds median: %s', test_result['odds'].median())
-        logging.info('Odds median: %s', test_result[test_result['plc']==1]['odds'].median())
+        logging.info('Odds median: %s',
+                     test_result[test_result['plc'] == 1]['odds'].median())
 
     logging.info('Done')
 
