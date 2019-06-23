@@ -20,14 +20,17 @@ No. Action
 2   Predict with col
 """
 action = 1
-date = '20190616'
+date = '20190623'
 dist = '1200M'
 min_odds = 5
-max_odds = 30
+max_odds = 15
 top_pred_plc = 1
 pred_plc_4_test = 1
 col = ['Rtg.+/-', 'BO', 'CP', 'going_GOOD']
 base = ['Rtg.+/-', 'CP', 'class', 'going_GOOD']
+
+# 1400M odds 5 - 10 ['raceCourse_ST', 'Rtg.+/-', 'P', 'AWT']
+# 1200M odds 5 - 15 ['Rtg.+/-', 'BO', 'CP', 'going_GOOD']
 
 
 def init(arg1, arg2, ):
