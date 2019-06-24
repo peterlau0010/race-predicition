@@ -20,7 +20,7 @@ No. Action
 2   Predict with col
 """
 action = 1
-date = '20190623'
+date = '20190624'
 dist = '1200M'
 min_odds = 5
 max_odds = 15
